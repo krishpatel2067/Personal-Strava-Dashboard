@@ -1,0 +1,20 @@
+{
+  "name": "strava-data-analysis",
+  "version": "1.0.0",
+  "description": "Perform data analysis on my Strava activity data.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Strava",
+    "data",
+    "analysis",
+    "API"
+  ],
+  "author": "Krish A. Patel",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
