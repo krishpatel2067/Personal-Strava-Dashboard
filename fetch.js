@@ -85,7 +85,7 @@ async function fetchData() {
 
     let data = await response.json();
     console.log('Data received!');
-    return { response, data };
+    return [response, data];
 }
 
 module.exports = { retrieveAuthCode, retrieveAccessToken, fetchData };

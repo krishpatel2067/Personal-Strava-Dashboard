@@ -8,33 +8,16 @@
 
 <body>
     <script>
-        if ("geolocation" in navigator) {
-            console.log("geolocation available");
-            navigator.geolocation.getCurrentPosition(async pos => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                document.getElementById('latitude').innerHTML = lat;
-                document.getElementById('longitude').innerHTML = lon;
-
-                const data = { lat, lon };
-                const options = {
-                    'method': 'POST',
-                    'headers': {
-                        'Content-Type': 'application/json',
-                    },
-                    'body': JSON.stringify(data),
-                };
-                const res = await fetch('/api', options);
-                const json = await res.json();
-                console.log(json);
+        fetch('/api')
+            .then(res => {
+                console.log(res);
+                return res.json();
+            })
+            .then(data => {
+                console.log(data);
             });
-        } else {
-            console.log("geolocation NOT available");
-        }
     </script>
     <button id="fetch-button">Fetch</button>
-    <p>Latitude: <span id="latitude"></span>&deg</p>
-    <p>Longitude: <span id="longitude"></span>&deg</p>
     <p id="data"></p>
 </body>
 
