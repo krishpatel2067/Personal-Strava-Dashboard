@@ -82,9 +82,10 @@ async function fetchData() {
             Authorization: `Bearer ${accToken}`
         }
     });
+
     let data = await response.json();
     console.log('Data received!');
-    console.log(data);
+    return { response, data };
 }
 
-export { retrieveAuthCode, retrieveAccessToken, fetchData };
+module.exports = { retrieveAuthCode, retrieveAccessToken, fetchData };
