@@ -1,4 +1,6 @@
 const fs = require('fs');
+const MAX_PER_PAGE = 200;       // Strava's max page size is 200
+const API_LIMIT = 750;          // Strava's read limit is 1000, but try to stay under
 
 function retrieveAuthCode(force) {
     const secret = JSON.parse(fs.readFileSync('./secret.json', 'utf-8'));
@@ -9,14 +11,14 @@ function retrieveAuthCode(force) {
         params.append('response_type', 'code');
         params.append('approval_prompt', 'force');
         params.append('scope', 'activity:read_all');
-        
+
         let url = `https://www.strava.com/oauth/authorize?${params.toString()}`;
         console.log('Please visit this URL to authenticate:');
         console.log(url);
     }
 }
 
-async function retrieveAccessToken(forceUseAuthCode) {
+async function retrieveAccessToken(forceUseAuthCode = false, showExpDateMsg = true) {
     let secret = JSON.parse(fs.readFileSync('./secret.json', 'utf-8'));
 
     if (secret.REFRESH_TOKEN === undefined || forceUseAuthCode === true) {
@@ -52,7 +54,7 @@ async function retrieveAccessToken(forceUseAuthCode) {
         if (secret.EXPIRES_AT !== undefined)
             console.log('Access token expires at: ' + new Date(secret.EXPIRES_AT * 1000));
 
-        console.log('old access token: ' + secret.ACCESS_TOKEN);
+        console.log('Old access token: ' + secret.ACCESS_TOKEN);
 
         let params = new URLSearchParams();
         params.append('client_id', secret.CLIENT_ID);
@@ -71,13 +73,14 @@ async function retrieveAccessToken(forceUseAuthCode) {
         console.log('Access token received: ' + secret.ACCESS_TOKEN);
         console.log('Refresh token: ' + secret.REFRESH_TOKEN);
     }
-    console.log('Access token expires on ' + new Date(secret.EXPIRES_AT * 1000));
+    if (showExpDateMsg === true)
+        console.log('Access token expires on ' + new Date(secret.EXPIRES_AT * 1000));
     fs.writeFileSync('secret.json', JSON.stringify(secret, null, 4));
     return secret.ACCESS_TOKEN;
 }
 
-async function fetchData(perPage = 1, page = 1) {
-    let accToken = await retrieveAccessToken();
+async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
+    let accToken = await retrieveAccessToken(false, showExpDateMsg);
     let response = await fetch(`https://www.strava.com/api/v3/athlete/activities?per_page=${perPage}&page=${page}`, {
         method: 'GET',
         headers: {
@@ -90,29 +93,61 @@ async function fetchData(perPage = 1, page = 1) {
     return data;
 }
 
-async function getData() {
+async function getData(numEntries = 10) {
     // datastore has fields: { lastSaved: number, data: Object }
     const datastore = JSON.parse(fs.readFileSync('./data.json', 'utf-8'));
+    let data = null;
 
     if (datastore.lastSaved === undefined || Date.now() - datastore.lastSaved > 24 * 3600 * 1000) {
         // fetch new data
         console.log('Saved data is undated or is older than 1 day. Fetching new data...');
+
+        // check API limit for today
+        let secret = JSON.parse(fs.readFileSync('./secret.json', 'utf-8'));
+
+        let now = new Date(Date.now());
+        let lastFetched = new Date(secret.LAST_FETCHED === undefined ? Date.now() : secret.LAST_FETCHED);
+        let apiUseToday = 0;
+
+        if (lastFetched.getUTCDate() == now.getUTCDate() && lastFetched.getUTCMonth() == now.getUTCMonth() && lastFetched.getUTCFullYear() == now.getUTCFullYear()) {
+            console.log('It\'s the same day.');
+        } else {
+            console.log('It\'s NOT the same day.');
+        }
+
+        // fetch all data to conserve API requests
+        const perPage = MAX_PER_PAGE;
+        const maxPages = -1;            // -1 means all the pages that exist
+
         let newData = [];
         let tempData = null;
-        const perPage = 10;
-        const maxPages = 1;            // -1 means all the pages that exist
-        let page = 1;
 
-        while (tempData == null || (tempData != null && tempData.length > 0)) {
+        let page = 1;
+        let numEntriesGot = 0;
+        let numFetches = 0;
+        let showExpDateMsg = true;
+        let apiLimit = 10;
+
+        // keep fetching until empty pages are returned
+        while ((tempData == null || (tempData != null && tempData.length > 0))) {
+            if (page > apiLimit) {
+                console.log(`Preset API limit of ${apiLimit} reached. No more data will be fetched.`);
+                break;
+            }
+
             if (tempData != null) {
-                console.log(`Page ${page - 1} data received.`);
+                // according to Strava API, # of entries per page may sometimes be less than requested
+                let pgSz = tempData.length;
+                console.log(`Page ${page - 1}, entries ${numEntriesGot}-${numEntriesGot + pgSz - 1} received.`);
+                numEntriesGot += tempData.length;
                 newData = newData.concat(tempData);
             }
 
             if (maxPages > 0 && page > maxPages)
                 break;
 
-            tempData = await fetchData(perPage, page++);
+            tempData = await fetchData(perPage, page++, showExpDateMsg);
+            showExpDateMsg = false;
         }
 
         fs.writeFile('./data.json', JSON.stringify({ lastSaved: Date.now(), data: newData }), (err) => {
@@ -121,12 +156,18 @@ async function getData() {
             else
                 console.log('Successfully saved new data to data.json.');
         });
-        return newData;
+        data = newData;
     } else {
         // use existing data
         console.log('Returning stored data from data.json.');
-        return JSON.parse(JSON.stringify(datastore.data));
+        data = JSON.parse(JSON.stringify(datastore.data));
     }
+
+    if (numEntries > data.length)
+        console.log(`More entries requested than are available. Returning all ${data.length} entries.`);
+
+    // return only what is requested
+    return data.slice(0, numEntries);
 }
 
 module.exports = { retrieveAuthCode, retrieveAccessToken, getData };

@@ -1,4 +1,5 @@
-const fs = require('fs');
-let data = JSON.parse(fs.readFileSync('./data.json', 'utf-8'));
-console.log(data);
-fs.writeFileSync('./data.json', JSON.stringify(data));
+let date = new Date(Date.now());
+console.log(date);
+console.log(date.getUTCDate());
+console.log(date.getUTCMonth());
+console.log(date.getUTCFullYear());
