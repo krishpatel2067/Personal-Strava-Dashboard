@@ -6,8 +6,8 @@ app.listen(8080, () => console.log('listening to port 8080: http://localhost:808
 app.use(express.static('public'));
 app.get('/api', async (req, res) => {
     console.log('fetching data');
-    const [response, data] = await fetch.fetchData();
-    res.send(data);
+    const data = await fetch.getData();
+    res.json(data);
     console.log('sent data');
     res.end();
 });
