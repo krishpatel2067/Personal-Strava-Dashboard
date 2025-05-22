@@ -107,13 +107,17 @@ async function getData(numEntries = 10) {
 
         let now = new Date(Date.now());
         let lastFetched = new Date(secret.LAST_FETCHED === undefined ? Date.now() : secret.LAST_FETCHED);
-        let apiUseToday = 0;
+        let numFetchesSoFar = null;
 
         if (lastFetched.getUTCDate() == now.getUTCDate() && lastFetched.getUTCMonth() == now.getUTCMonth() && lastFetched.getUTCFullYear() == now.getUTCFullYear()) {
-            console.log('It\'s the same day.');
+            // same day
+            numFetchesSoFar = secret.NUM_FETCHES_TODAY === undefined? 0 : secret.NUM_FETCHES_TODAY;
         } else {
-            console.log('It\'s NOT the same day.');
+            numFetchesSoFar = 0;
         }
+
+        console.log('Last fetched: ' + new Date(lastFetched));
+        console.log('Num fetches today: ' + numFetchesSoFar);
 
         // fetch all data to conserve API requests
         const perPage = MAX_PER_PAGE;
@@ -124,13 +128,14 @@ async function getData(numEntries = 10) {
 
         let page = 1;
         let numEntriesGot = 0;
-        let numFetches = 0;
+        let numFetchesNow = 0;
+        let numFetchesToday = numFetchesSoFar;
         let showExpDateMsg = true;
-        let apiLimit = 10;
-
+        let apiLimitNow = 10;                   // prevent excessive API use at once
+    
         // keep fetching until empty pages are returned
         while ((tempData == null || (tempData != null && tempData.length > 0))) {
-            if (page > apiLimit) {
+            if (numFetchesNow > apiLimitNow || numFetchesToday > API_LIMIT) {
                 console.log(`Preset API limit of ${apiLimit} reached. No more data will be fetched.`);
                 break;
             }
@@ -147,8 +152,23 @@ async function getData(numEntries = 10) {
                 break;
 
             tempData = await fetchData(perPage, page++, showExpDateMsg);
+            lastFetched = Date.now();
+            numFetchesNow++;
+            numFetchesToday++;
             showExpDateMsg = false;
         }
+
+        console.log('New last fetched: ' + new Date(lastFetched));
+        console.log('Num fetches now: ' + numFetchesNow);
+        console.log('Num fetches today: ' + numFetchesToday);
+
+        secret.LAST_FETCHED = lastFetched;
+        secret.NUM_FETCHES_TODAY = numFetchesToday;
+
+        fs.writeFile('./secret.json', JSON.stringify(secret, null, 4), (err) => {
+            if (err)
+                throw err;
+        });
 
         fs.writeFile('./data.json', JSON.stringify({ lastSaved: Date.now(), data: newData }), (err) => {
             if (err)
@@ -156,6 +176,7 @@ async function getData(numEntries = 10) {
             else
                 console.log('Successfully saved new data to data.json.');
         });
+
         data = newData;
     } else {
         // use existing data
