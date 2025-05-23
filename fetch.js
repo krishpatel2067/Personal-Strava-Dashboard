@@ -93,7 +93,7 @@ async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
     return data;
 }
 
-async function getData(numEntries = 10) {
+async function getData(numEntries = 10, callback = () => { }) {
     // datastore has fields: { lastSaved: number, data: Object }
     const datastore = JSON.parse(fs.readFileSync('./data.json', 'utf-8'));
     let data = null;
@@ -111,7 +111,7 @@ async function getData(numEntries = 10) {
 
         if (lastFetched.getUTCDate() == now.getUTCDate() && lastFetched.getUTCMonth() == now.getUTCMonth() && lastFetched.getUTCFullYear() == now.getUTCFullYear()) {
             // same day
-            numFetchesSoFar = secret.NUM_FETCHES_TODAY === undefined? 0 : secret.NUM_FETCHES_TODAY;
+            numFetchesSoFar = secret.NUM_FETCHES_TODAY === undefined ? 0 : secret.NUM_FETCHES_TODAY;
         } else {
             numFetchesSoFar = 0;
         }
@@ -132,7 +132,7 @@ async function getData(numEntries = 10) {
         let numFetchesToday = numFetchesSoFar;
         let showExpDateMsg = true;
         let apiLimitNow = 10;                   // prevent excessive API use at once
-    
+
         // keep fetching until empty pages are returned
         while ((tempData == null || (tempData != null && tempData.length > 0))) {
             if (numFetchesNow > apiLimitNow || numFetchesToday > API_LIMIT) {
@@ -191,4 +191,18 @@ async function getData(numEntries = 10) {
     return data.slice(0, numEntries);
 }
 
-module.exports = { retrieveAuthCode, retrieveAccessToken, getData };
+// function to temporarily get the stored data only
+function getCachedData(numEntries = 10) {
+    console.log('Returning stored data from data.json without checking for updated data.');
+    // in case datastore doesn't exist, etc.
+    try {
+        const datastore = JSON.parse(fs.readFileSync('./data.json', 'utf-8'));
+        let data = JSON.parse(JSON.stringify(datastore.data));
+        return data.slice(0, numEntries);
+    } catch (err) {
+        console.log('Error: ' + err.message);
+        return {status: 'Unsuccessful'};
+    }
+}
+
+module.exports = { retrieveAuthCode, retrieveAccessToken, getData, getCachedData };
