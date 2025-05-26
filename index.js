@@ -1,5 +1,5 @@
 const express = require('express');
-const fetch = require('./fetch.js');
+const fetchData = require('./fetch.js');
 const app = express();
 
 app.listen(8080, () => console.log('listening to port 8080: http://localhost:8080/'));
@@ -7,7 +7,7 @@ app.use(express.static('public'));
 app.get('/api', async (req, res) => {
     if (req.url === '/api?forceCache=true') {
         console.log('Mode: force cache. Getting cached data...');
-        const cache = fetch.getCachedData();
+        const cache = fetchData.getCachedData();
 
         if (cache.status !== 'Unsuccessful') {
             res.json(cache);
@@ -20,10 +20,15 @@ app.get('/api', async (req, res) => {
         res.end();
     } else {
         console.log('Mode: default. Getting data...');
-        const data = await fetch.getData();
+        const data = await fetchData.getData();
         res.json(data);
         console.log('Sent data.');
         res.end();
     }
+
+    let response = await fetch('http://localhost:5000/api/python');
+    console.log(response);
+    let data = await response.text();
+    console.log(data);
 });
 // TODO: temp response while all new data being fetched (show cached while updated are loading, for better UX)
