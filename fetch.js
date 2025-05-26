@@ -93,7 +93,7 @@ async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
     return data;
 }
 
-async function getData(numEntries = 10, callback = () => { }) {
+async function getData(numEntries = 10) {
     // datastore has fields: { lastSaved: number, data: Object }
     const datastore = JSON.parse(fs.readFileSync('./data.json', 'utf-8'));
     let data = null;
@@ -187,10 +187,12 @@ async function getData(numEntries = 10, callback = () => { }) {
     if (numEntries > data.length)
         console.log(`More entries requested than are available. Returning all ${data.length} entries.`);
 
+    // NOT NECESSARY ANYMORE - TODELETE
     // return only what is requested
     return data.slice(0, numEntries);
 }
 
+// NOT NECESSARY ANYMORE - TODELETE
 // function to temporarily get the stored data only
 function getCachedData(numEntries = 10) {
     console.log('Returning stored data from data.json without checking for updated data.');
