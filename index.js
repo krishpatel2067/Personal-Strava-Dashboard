@@ -27,8 +27,6 @@ app.get('/api', async (req, res) => {
     }
 
     let response = await fetch('http://localhost:5000/api/python');
-    console.log(response);
-    let data = await response.text();
-    console.log(data);
+    let analysis = await response.json();
+    console.log(analysis);
 });
-// TODO: temp response while all new data being fetched (show cached while updated are loading, for better UX)

@@ -2,3 +2,4 @@ secret.json
 data.json
 node_modules
 .env
+__pycache__
