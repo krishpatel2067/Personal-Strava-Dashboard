@@ -55,7 +55,6 @@ def analyze_and_store(file_path="analysis.json"):
     # max elevation gain (m)
     max_elv_gain = df.total_elevation_gain.max()
 
-
     # activity with max elevation gain
     max_elv_gain_act = remove_unnecessary_info(df.iloc[df.total_elevation_gain.idxmax()].fillna(-1).to_dict())
     
@@ -65,6 +64,18 @@ def analyze_and_store(file_path="analysis.json"):
 
     # non-manual activity with max elevation gain
     max_elv_gain_nm_act = remove_unnecessary_info(non_manual_df.loc[non_manual_df.total_elevation_gain.idxmax()].fillna(-1).to_dict())    
+
+    # total kudos
+    total_kudos = int(df.kudos_count.sum())
+    
+    # max kudos
+    max_kudos = df.kudos_count.max()
+    
+    # max kudos activity
+    max_kudos_act = remove_unnecessary_info(df.iloc[df.kudos_count.idxmax()].fillna(-1).to_dict())
+
+    # average kudos per non-private activity
+    avg_kudos_per_np_act = total_kudos / len(df[df.visibility != 'only_me'])
 
     # store in file
     with open(file_path, "w") as file:
@@ -85,6 +96,12 @@ def analyze_and_store(file_path="analysis.json"):
             "max_elevation_gain_activity": max_elv_gain_act,
             "non_manual_max_elevation_gain": nm_max_elv_gain,
             "max_elevation_gain_non_manual_activity": max_elv_gain_nm_act,
+            
+            # kudos
+            "total_kudos": total_kudos,
+            "max_kudos": max_kudos,
+            "max_kudos_activity": max_kudos_act,
+            "avg_kudos_per_non_private_activity": avg_kudos_per_np_act,
         }, file)
 
 
