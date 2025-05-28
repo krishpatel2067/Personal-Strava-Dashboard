@@ -55,10 +55,16 @@ def analyze_and_store(file_path="analysis.json"):
     # max elevation gain (m)
     max_elv_gain = df.total_elevation_gain.max()
 
+
     # activity with max elevation gain
     max_elv_gain_act = remove_unnecessary_info(df.iloc[df.total_elevation_gain.idxmax()].fillna(-1).to_dict())
+    
+    # non-manual activity max elevation gain (m)
+    non_manual_df = df[df.manual == False]
+    nm_max_elv_gain = non_manual_df.total_elevation_gain.max()
 
-    # TODO: max elevation gain activity that's not manual
+    # non-manual activity with max elevation gain
+    max_elv_gain_nm_act = remove_unnecessary_info(non_manual_df.loc[non_manual_df.total_elevation_gain.idxmax()].fillna(-1).to_dict())    
 
     # store in file
     with open(file_path, "w") as file:
@@ -77,6 +83,8 @@ def analyze_and_store(file_path="analysis.json"):
             "total_elevation_gain": total_elv_gain,
             "max_elevation_gain": max_elv_gain,
             "max_elevation_gain_activity": max_elv_gain_act,
+            "non_manual_max_elevation_gain": nm_max_elv_gain,
+            "max_elevation_gain_non_manual_activity": max_elv_gain_nm_act,
         }, file)
 
 
