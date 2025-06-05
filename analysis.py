@@ -77,6 +77,8 @@ def analyze_and_store(file_path="analysis.json"):
     # average kudos per non-private activity
     avg_kudos_per_np_act = total_kudos / len(df[df.visibility != 'only_me'])
 
+    # TODO: distance, time, # activities per sport type
+
     # store in file
     with open(file_path, "w") as file:
         json.dump({
