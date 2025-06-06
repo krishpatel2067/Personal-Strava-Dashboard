@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-
+import os
 
 def read_datastore(file_path):
     try:
@@ -26,7 +26,8 @@ def remove_unnecessary_info(activity):
 
 # TODO: LEARN ABOUT DF GROUPBY STUFF!
 def analyze_and_store(file_path="analysis.json"):
-    data = read_datastore("data.json")["data"]
+    data_file = os.path.join(os.path.dirname(__file__), "data.json")
+    data = read_datastore(data_file)["data"]
     df = pd.DataFrame(data)
 
     # total distance (m)

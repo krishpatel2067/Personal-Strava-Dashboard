@@ -6,9 +6,9 @@ app = Flask(__name__)
 
 @app.route('/api/python', methods=['GET'])
 def get_analysis():
-    analyze_and_store('analysis.json')
+    analyze_and_store('./analysis.json')
 
-    with open('analysis.json', 'r') as file:
+    with open('./analysis.json', 'r') as file:
         analysis = json.load(file)
         return analysis
 

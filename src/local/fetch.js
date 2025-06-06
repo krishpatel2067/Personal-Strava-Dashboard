@@ -1,9 +1,13 @@
 const fs = require('fs');
+const path = require('path');
 const MAX_PER_PAGE = 200;       // Strava's max page size is 200
 const API_LIMIT = 750;          // Strava's read limit is 1000, but try to stay under
 
+const secretJsonPath = path.join(__dirname, 'secret.json');
+const dataJsonPath = path.join(__dirname, 'data.json');
+
 function retrieveAuthCode(force) {
-    const secret = JSON.parse(fs.readFileSync('./secret.json', 'utf-8'));
+    const secret = JSON.parse(fs.readFileSync(secretJsonPath, 'utf-8'));
     if (secret.AUTH_CODE === undefined || force === true) {
         let params = new URLSearchParams();
         params.append('client_id', secret.CLIENT_ID);
@@ -19,7 +23,7 @@ function retrieveAuthCode(force) {
 }
 
 async function retrieveAccessToken(forceUseAuthCode = false, showExpDateMsg = true) {
-    let secret = JSON.parse(fs.readFileSync('./secret.json', 'utf-8'));
+    let secret = JSON.parse(fs.readFileSync(secretJsonPath, 'utf-8'));
 
     if (secret.REFRESH_TOKEN === undefined || forceUseAuthCode === true) {
         console.log('Using auth code to grant access token.');
@@ -75,7 +79,7 @@ async function retrieveAccessToken(forceUseAuthCode = false, showExpDateMsg = tr
     }
     if (showExpDateMsg === true)
         console.log('Access token expires on ' + new Date(secret.EXPIRES_AT * 1000));
-    fs.writeFileSync('secret.json', JSON.stringify(secret, null, 4));
+    fs.writeFileSync(secretJsonPath, JSON.stringify(secret, null, 4));
     return secret.ACCESS_TOKEN;
 }
 
@@ -95,7 +99,7 @@ async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
 
 async function getData(numEntries = 10) {
     // datastore has fields: { lastSaved: number, data: Object }
-    const datastore = JSON.parse(fs.readFileSync('./data.json', 'utf-8'));
+    const datastore = JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'));
     let data = null;
 
     if (datastore.lastSaved === undefined || Date.now() - datastore.lastSaved > 24 * 3600 * 1000) {
@@ -103,7 +107,7 @@ async function getData(numEntries = 10) {
         console.log('Saved data is undated or is older than 1 day. Fetching new data...');
 
         // check API limit for today
-        let secret = JSON.parse(fs.readFileSync('./secret.json', 'utf-8'));
+        let secret = JSON.parse(fs.readFileSync(secretJsonPath, 'utf-8'));
 
         let now = new Date(Date.now());
         let lastFetched = new Date(secret.LAST_FETCHED === undefined ? Date.now() : secret.LAST_FETCHED);
@@ -165,12 +169,12 @@ async function getData(numEntries = 10) {
         secret.LAST_FETCHED = lastFetched;
         secret.NUM_FETCHES_TODAY = numFetchesToday;
 
-        fs.writeFile('./secret.json', JSON.stringify(secret, null, 4), (err) => {
+        fs.writeFile(secretJsonPath, JSON.stringify(secret, null, 4), (err) => {
             if (err)
                 throw err;
         });
 
-        fs.writeFile('./data.json', JSON.stringify({ lastSaved: Date.now(), data: newData }), (err) => {
+        fs.writeFile(dataJsonPath, JSON.stringify({ lastSaved: Date.now(), data: newData }), (err) => {
             if (err)
                 throw err;
             else
@@ -198,7 +202,7 @@ function getCachedData(numEntries = 10) {
     console.log('Returning stored data from data.json without checking for updated data.');
     // in case datastore doesn't exist, etc.
     try {
-        const datastore = JSON.parse(fs.readFileSync('./data.json', 'utf-8'));
+        const datastore = JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'));
         let data = JSON.parse(JSON.stringify(datastore.data));
         return data.slice(0, numEntries);
     } catch (err) {
