@@ -8,3 +8,4 @@ analysis.json
 *.toml
 *.log
 !firebase.json
+notes.txt
