@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+// const admin = require('firebase-admin');
 const { initializeApp, cert } = require('firebase-admin/app');
 const { onRequest } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
@@ -6,19 +6,21 @@ const { getStorage, getDownloadURL } = require("firebase-admin/storage");
 require('dotenv').config();
 
 const serviceAccount = require('./serviceAccountKey.json');
-admin.initializeApp({
+initializeApp({
     credential: cert(serviceAccount),
     storageBucket: process.env.STORAGE_BUCKET
 });
 
-exports.helloWorld = onRequest((request, response) => {
+exports.helloWorld = onRequest(async (request, response) => {
     logger.info("Reading storage...", { structuredData: true });
-
-    const bucket = admin.storage().bucket();
+    
+    const bucket = getStorage().bucket(process.env.STORAGE_BUCKET);
+    logger.info("after bucket");
     const fileRef = bucket.file('test/MyTestNote.txt');
-
-    fileRef.download().then(data => {
-        logger.info(data[0]);
-    })
+    logger.info("after fileRef");
+    const url = await getDownloadURL(fileRef);
+    logger.info("URL received!")
+    logger.info(url);
+    
     response.send("Hello from Firebase!");
 });
