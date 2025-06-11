@@ -6,15 +6,12 @@ const { getStorage, getDownloadURL } = require("firebase-admin/storage");
 require('dotenv').config();
 
 const serviceAccount = require('./serviceAccountKey.json');
-initializeApp({
-    credential: cert(serviceAccount),
-    storageBucket: process.env.STORAGE_BUCKET
-});
+initializeApp();
 
 exports.helloWorld = onRequest(async (request, response) => {
     logger.info("Reading storage...", { structuredData: true });
     
-    const bucket = getStorage().bucket(process.env.STORAGE_BUCKET);
+    const bucket = getStorage().bucket();
     logger.info("after bucket");
     const fileRef = bucket.file('test/MyTestNote.txt');
     logger.info("after fileRef");
