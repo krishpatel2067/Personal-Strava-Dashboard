@@ -12,7 +12,7 @@ exports.helloWorld = onRequest(async (request, response) => {
 
     const bucket = getStorage().bucket();
     logger.info("after bucket");
-    const fileRef = bucket.file('test/MyTestNote.txt');
+    const fileRef = bucket.file("test/MyTestNote.txt");
     logger.info("after fileRef");
     const url = await getDownloadURL(fileRef);
     logger.info("URL received!");
