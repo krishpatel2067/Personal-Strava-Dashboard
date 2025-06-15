@@ -3,6 +3,7 @@
     {
       "source": "functions",
       "codebase": "default",
+      "runtime": "nodejs20",
       "ignore": [
         "node_modules",
         ".git",
@@ -15,8 +16,8 @@
       ]
     },
     {
-      "source": "python-functions",
-      "codebase": "python-functions",
+      "source": "python_functions",
+      "codebase": "python_functions",
       "ignore": [
         "venv",
         ".git",
