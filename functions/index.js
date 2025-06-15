@@ -2,7 +2,7 @@ const { initializeApp, cert } = require("firebase-admin/app");
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineString } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
-const test = require("./test");
+const fetch = require("./fetch");
 
 // env vars
 const testVar = defineString("TEST_VAR");
@@ -16,6 +16,5 @@ const app = initializeApp({
 exports.helloWorld = onRequest(async (request, response) => {
     logger.info("Reading storage...", { structuredData: true });
     logger.info(testVar.value());
-    test.testFunc(app, bucketVar.value());
     response.send("Hello from Firebase!");
 });
