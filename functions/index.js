@@ -5,7 +5,6 @@ const logger = require("firebase-functions/logger");
 const fetch = require("./fetch");
 
 // env vars
-const testVar = defineString("TEST_VAR");
 const bucketVar = defineString("STORAGE_BUCKET");
 
 const serviceAccount = require("./serviceAccountKey.json");
@@ -13,8 +12,8 @@ const app = initializeApp({
     credential: cert(serviceAccount),
 });
 
-exports.helloWorld = onRequest(async (request, response) => {
-    logger.info("Reading storage...", { structuredData: true });
-    logger.info(testVar.value());
-    response.send("Hello from Firebase!");
+exports.fetchAndStore = onRequest(async (request, response) => {
+    logger.info("Starting fetch and store operation...", { structuredData: true });
+    fetch.retrieveAllData(app, bucketVar.value());
+    response.send("Fetch and store operation completed.");
 });
