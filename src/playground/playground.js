@@ -1,4 +1,1 @@
-const d = new Date();
-console.log(Date.now() + 24*3600*1000);
-
-// 1750346075387
+console.log(new Date('Wed Jun 18 2025 21:30:12 GMT+0000 (Coordinated Universal Time)').getTime())

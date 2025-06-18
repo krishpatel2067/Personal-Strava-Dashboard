@@ -136,7 +136,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
         // fetch all data to conserve API requests
         const perPage = MAX_PER_PAGE;
-        const maxPages = 2;            // -1 means all the pages that exist
+        const maxPages = 4;            // -1 means all the pages that exist
 
         let newData = [];
         let tempData = null;
@@ -181,10 +181,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         secret.LAST_FETCHED = lastFetched;
         secret.NUM_FETCHES_TODAY = numFetchesToday;
 
-        fs.writeFile(secretJsonPath, JSON.stringify(secret, null, 4), (err) => {
-            if (err)
-                throw err;
-        });
+        fs.writeFileSync(secretJsonPath, JSON.stringify(secret, null, 4));
 
         datastoreFile.save(JSON.stringify({ lastSaved: Date.now(), data: newData }), {
             contentType: "application/json"
