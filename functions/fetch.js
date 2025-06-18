@@ -112,7 +112,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         }
     });
 
-    if (datastore === null || datastore.lastSaved === undefined || Date.now() - datastore.lastSaved > 24 * 3600 * 1000 || fetchNew === true) {
+    if (datastore === null || datastore.lastSaved === undefined || Date.now() - datastore.lastSaved > 24 * 3600 * 1000 || forceNew === true) {
         // fetch new data
         logger.info("(Datastore not found) or (saved data is undated or older than 1 day) or (`forceNew` is true). Fetching new data...");
 
@@ -189,18 +189,31 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             contentType: "application/json"
         }, err => {
             if (!err) {
-                // TODO: add signed url to access new datastore directly
-                logger.log("New datastore `data.json` uploaded successfully.")
+                logger.log("New datastore `data.json` uploaded successfully.");
+
+                getDownloadURL(datastoreFile)
+                    .then(url => {
+                        logger.log("Datastore download URL:");
+                        logger.log(url);
+                    })
+                    .catch(err => {
+                        logger.log("Failed to get download URL for the new datastore `data.json`: " + err.message);
+                    });
+
+                // bucket.getSignedUrl({
+                //     action: "read",
+                //     expires: Date.now() + 24 * 3600 * 1000      // expire in 1 day
+                // })
+                //     .then(url => {
+                //         logger.log("Datastore URL (expires in 1 day): ")
+                //         logger.log(url);
+                //     })
+                //     .catch(err => {
+                //         logger.log("Error getting signed URL: " + err.message);
+                //     });
             } else {
                 logger.log("Error in uploading datastore `data.json`:", err);
             }
-        });
-
-        fs.writeFile(dataJsonPath, JSON.stringify({ lastSaved: Date.now(), data: newData }), (err) => {
-            if (err)
-                throw err;
-            else
-                logger.info("Successfully saved new data to data.json.");
         });
     } else {
         logger.info("Fetch of new data denied: either set `forceNew` to true or wait for at least 24 hours from the last fetch of new data.");
