@@ -5,6 +5,8 @@ const fs = require("fs");
 const path = require("path");
 const MAX_PER_PAGE = 200;       // Strava's max page size is 200
 const API_LIMIT = 750;          // Strava's read limit is 1000, but try to stay under
+const DS_FILE = 'data.json';
+const DS_FILE_PATH = `private/${DS_FILE}`;
 
 const secretJsonPath = path.join(__dirname, "secret.json");
 
@@ -85,31 +87,31 @@ async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
 async function retrieveAllData(app, bucketName, forceNew = false) {
     // datastore has fields: { lastSaved: number, data: Object }
     const bucket = getStorage(app).bucket(bucketName);
-    const datastoreFile = bucket.file('data.json');
+    const datastoreFile = bucket.file(DS_FILE_PATH);
     let datastore = null;
-
-    datastoreFile.exists().then((exists) => {
-        if (exists[0] === true) {
-            logger.info("Datastore `data.json` found.")
-
-            getDownloadURL(datastoreFile)
-                .then(url => {
-                    fetch(url)
-                        .then(res => res.json())
-                        .then(json => {
-                            datastore = json;
-                        })
-                        .catch(err => {
-                            logger.info("Error while fetching: " + err.message);
-                        });
-                })
-                .catch(err => {
-                    logger.info("Error while getting download URL: " + err.message);
-                });
-        } else {
-            logger.info("Datastore `data.json` does not exist.")
-        }
+    const exists = await datastoreFile.exists().catch(err => {
+        logger.info("Error checking whether datastore exists:");
+        logger.warn(err.message);
     });
+
+    if (exists[0] === true) {
+        logger.info(`Datastore found at ${DS_FILE_PATH}`)
+        
+        const url = await getDownloadURL(datastoreFile).catch(err => {
+            logger.info("Error while getting datastore's download URL:");
+            logger.warn(err.message);
+        });
+        const res = await fetch(url).catch(err => {
+            logger.info("Error while fetching datastore:");
+            logger.warn(err.message);
+        });
+        datastore = await res.json().catch(err => {
+            logger.info("Error while converting fetched datastore to JSON:");
+            logger.warn(err.message);
+        });
+    } else {
+        logger.info(`Datastore does not exist at ${DS_FILE_PATH}`)
+    }
 
     if (datastore === null || datastore.lastSaved === undefined || Date.now() - datastore.lastSaved > 24 * 3600 * 1000 || forceNew === true) {
         // fetch new data
@@ -134,7 +136,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
         // fetch all data to conserve API requests
         const perPage = MAX_PER_PAGE;
-        const maxPages = -1;            // -1 means all the pages that exist
+        const maxPages = 2;            // -1 means all the pages that exist
 
         let newData = [];
         let tempData = null;
@@ -188,7 +190,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             contentType: "application/json"
         })
             .then(() => {
-                logger.log("New datastore `data.json` uploaded successfully.");
+                logger.log(`New datastore uploaded successfully to ${DS_FILE_PATH}`);
 
                 getDownloadURL(datastoreFile)
                     .then(url => {
@@ -196,24 +198,14 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
                         logger.log(url);
                     })
                     .catch(err => {
-                        logger.log("Failed to get download URL for the new datastore `data.json`: " + err.message);
+                        logger.info(`Failed to get download URL for the new datastore ${DS_FILE_PATH}: `);
+                        logger.warn(err.message);
                     });
             })
             .catch(err => {
-                logger.log("Error in uploading datastore `data.json`:", err);
+                logger.log(`Error in uploading datastore to ${DS_FILE_PATH}`);
+                logger.warn(err.message);
             });
-
-        // bucket.getSignedUrl({
-        //     action: "read",
-        //     expires: Date.now() + 24 * 3600 * 1000      // expire in 1 day
-        // })
-        //     .then(url => {
-        //         logger.log("Datastore URL (expires in 1 day): ")
-        //         logger.log(url);
-        //     })
-        //     .catch(err => {
-        //         logger.log("Error getting signed URL: " + err.message);
-        //     });
     } else {
         logger.info("Fetch of new data denied: either set `forceNew` to true or wait for at least 24 hours from the last fetch of new data.");
     }
