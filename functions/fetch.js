@@ -79,7 +79,6 @@ async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
     });
 
     const data = await response.json();
-    logger.info("Data received!");
     return data;
 }
 
@@ -187,8 +186,8 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
         datastoreFile.save(JSON.stringify({ lastSaved: Date.now(), data: newData }), {
             contentType: "application/json"
-        }, err => {
-            if (!err) {
+        })
+            .then(() => {
                 logger.log("New datastore `data.json` uploaded successfully.");
 
                 getDownloadURL(datastoreFile)
@@ -199,22 +198,22 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
                     .catch(err => {
                         logger.log("Failed to get download URL for the new datastore `data.json`: " + err.message);
                     });
-
-                // bucket.getSignedUrl({
-                //     action: "read",
-                //     expires: Date.now() + 24 * 3600 * 1000      // expire in 1 day
-                // })
-                //     .then(url => {
-                //         logger.log("Datastore URL (expires in 1 day): ")
-                //         logger.log(url);
-                //     })
-                //     .catch(err => {
-                //         logger.log("Error getting signed URL: " + err.message);
-                //     });
-            } else {
+            })
+            .catch(err => {
                 logger.log("Error in uploading datastore `data.json`:", err);
-            }
-        });
+            });
+
+        // bucket.getSignedUrl({
+        //     action: "read",
+        //     expires: Date.now() + 24 * 3600 * 1000      // expire in 1 day
+        // })
+        //     .then(url => {
+        //         logger.log("Datastore URL (expires in 1 day): ")
+        //         logger.log(url);
+        //     })
+        //     .catch(err => {
+        //         logger.log("Error getting signed URL: " + err.message);
+        //     });
     } else {
         logger.info("Fetch of new data denied: either set `forceNew` to true or wait for at least 24 hours from the last fetch of new data.");
     }

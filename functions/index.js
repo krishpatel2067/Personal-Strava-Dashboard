@@ -14,6 +14,6 @@ const app = initializeApp({
 
 exports.fetchAndStore = onRequest(async (request, response) => {
     logger.info("Starting fetch and store operation...", { structuredData: true });
-    fetch.retrieveAllData(app, bucketVar.value());
+    await fetch.retrieveAllData(app, bucketVar.value());
     response.send("Fetch and store operation completed.");
 });
