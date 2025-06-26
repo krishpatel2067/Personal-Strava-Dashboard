@@ -12,6 +12,7 @@ const app = initializeApp({
     credential: cert(serviceAccount),
 });
 
+// TODO: FIX PYTHON FUNC NOT LOADING
 exports.fetchAndStore = onRequest(async (request, response) => {
     logger.info("Starting fetch and store operation...", { structuredData: true });
     await fetch.retrieveAllData(app, bucketVar.value(), true);

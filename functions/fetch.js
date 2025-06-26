@@ -143,8 +143,6 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         const perPage = MAX_PER_PAGE;
         const maxPages = 2;            // -1 means all the pages that exist
 
-        // TODO: EMULATOR REFRESHES WITH JSON EDITS, BREAKS STORING DATA.JSON
-
         let newData = [];
         let tempData = null;
 
