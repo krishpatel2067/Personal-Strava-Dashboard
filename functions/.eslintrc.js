@@ -17,6 +17,10 @@ module.exports = {
         "indent": ["warn", 4],
         "no-trailing-spaces": "off",
         "object-curly-spacing": ["error", "always"],
+        "no-multi-spaces": "off",
+        "max-len": "off",
+        "require-jsdoc": "off",
+        "arrow-parens": "off",
     },
     overrides: [
         {
