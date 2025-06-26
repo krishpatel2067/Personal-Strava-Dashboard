@@ -8,7 +8,10 @@ const API_LIMIT = 750;          // Strava's read limit is 1000, but try to stay 
 const DS_FILE = "data.json";
 const DS_FILE_PATH = `private/${DS_FILE}`;
 
+// TODO: FIX SECRET.JSON STORING (NEEDS TO BE FIRESTORE / STORAGE)
 const secretJsonPath = path.join(__dirname, "secret.json");
+const secretTemp = require(secretJsonPath);
+console.log(secretTemp);
 
 async function retrieveAccessToken(forceUseAuthCode = false, showExpDateMsg = true) {
     const secret = JSON.parse(fs.readFileSync(secretJsonPath, "utf-8"));
