@@ -8,6 +8,7 @@ const API_LIMIT = 750;          // Strava's read limit is 1000, but try to stay 
 const DS_FILE = "data.json";
 const DS_FILE_PATH = `private/${DS_FILE}`;
 
+const SECRET_DB_ID = "strava-data-analysis-secret";
 const SECRET_COLLEC_PATH = "secret";
 const SECRET_DOC_PATH = `${SECRET_COLLEC_PATH}/secret`;
 
@@ -106,7 +107,7 @@ async function fetchData(secretDb, perPage = 1, page = 1, showExpDateMsg = true)
 
 async function retrieveAllData(app, bucketName, forceNew = false) {
     // Firestore for secret (e.g. tokens) storage
-    const secretDb = getFirestore(app);
+    const secretDb = getFirestore(app, SECRET_DB_ID);
     // await __initFirestore(secretDb);
 
     // datastore has fields: { lastSaved: number, data: Object }
