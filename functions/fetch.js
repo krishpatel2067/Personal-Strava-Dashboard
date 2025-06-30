@@ -1,20 +1,34 @@
 const { getStorage, getDownloadURL } = require("firebase-admin/storage");
+const { getFirestore } = require("firebase-admin/firestore");
 const logger = require("firebase-functions/logger");
 
-const fs = require("fs");
+// const fs = require("fs");
 const path = require("path");
 const MAX_PER_PAGE = 200;       // Strava's max page size is 200
 const API_LIMIT = 750;          // Strava's read limit is 1000, but try to stay under
 const DS_FILE = "data.json";
 const DS_FILE_PATH = `private/${DS_FILE}`;
 
+const SECRET_COLLEC_PATH = "secret";
+const SECRET_DOC_PATH = `${SECRET_COLLEC_PATH}/secret`;
+
 // TODO: FIX SECRET.JSON STORING (NEEDS TO BE FIRESTORE / STORAGE)
 const secretJsonPath = path.join(__dirname, "secret.json");
-const secretTemp = require(secretJsonPath);
-console.log(secretTemp);
+// const secretTemp = require(secretJsonPath);
+// console.log(secretTemp);
 
-async function retrieveAccessToken(forceUseAuthCode = false, showExpDateMsg = true) {
-    const secret = JSON.parse(fs.readFileSync(secretJsonPath, "utf-8"));
+async function __initFirestore(secretDb) {
+    const secretLocal = require(secretJsonPath);
+    const docRef = secretDb.doc(SECRET_DOC_PATH);
+    const res = await docRef.set(secretLocal);
+    logger.log(res);
+}
+
+async function retrieveAccessToken(secretDb, forceUseAuthCode = false, showExpDateMsg = true) {
+    // const secret = JSON.parse(fs.readFileSync(secretJsonPath, "utf-8"));
+    const docRef = secretDb.doc(SECRET_DOC_PATH);
+    const secret = (await docRef.get()).data();
+    const newSecret = JSON.parse(JSON.stringify(secret));
 
     if (secret.REFRESH_TOKEN === undefined || forceUseAuthCode === true) {
         logger.info("Using auth code to grant access token.");
@@ -35,13 +49,13 @@ async function retrieveAccessToken(forceUseAuthCode = false, showExpDateMsg = tr
             "method": "POST",
         });
         const resJson = await response.json();
-        secret.EXPIRES_AT = resJson.expires_at;
-        secret.EXPIRES_IN = resJson.expires_in;
-        secret.REFRESH_TOKEN = resJson.refresh_token;
-        secret.ACCESS_TOKEN = resJson.access_token;
-        secret.ATHLETE = resJson.athlete;
-        logger.info("Access token received: " + secret.ACCESS_TOKEN);
-        logger.info("Refresh token: " + secret.REFRESH_TOKEN);
+        newSecret.EXPIRES_AT = resJson.expires_at;
+        newSecret.EXPIRES_IN = resJson.expires_in;
+        newSecret.REFRESH_TOKEN = resJson.refresh_token;
+        newSecret.ACCESS_TOKEN = resJson.access_token;
+        newSecret.ATHLETE = resJson.athlete;
+        logger.info("Access token received: " + newSecret.ACCESS_TOKEN);
+        logger.info("Refresh token: " + newSecret.REFRESH_TOKEN);
     } else if (secret.EXPIRES_AT === undefined || secret.EXPIRES_AT - Date.now() / 1000 <= 3600) {
         // if access token doesn't exist or it is going to expire in an hour
         logger.info("Access token does not exist, or it is already expired or will expire in 1 hour.");
@@ -62,22 +76,27 @@ async function retrieveAccessToken(forceUseAuthCode = false, showExpDateMsg = tr
             method: "POST",
         });
         const resJson = await response.json();
-        secret.EXPIRES_AT = resJson.expires_at;
-        secret.EXPIRES_IN = resJson.expires_in;
-        secret.REFRESH_TOKEN = resJson.refresh_token;
-        secret.ACCESS_TOKEN = resJson.access_token;
-        logger.info("Access token received: " + secret.ACCESS_TOKEN);
-        logger.info("Refresh token: " + secret.REFRESH_TOKEN);
+        newSecret.EXPIRES_AT = resJson.expires_at;
+        newSecret.EXPIRES_IN = resJson.expires_in;
+        newSecret.REFRESH_TOKEN = resJson.refresh_token;
+        newSecret.ACCESS_TOKEN = resJson.access_token;
+        logger.info("Access token received: " + newSecret.ACCESS_TOKEN);
+        logger.info("Refresh token: " + newSecret.REFRESH_TOKEN);
     }
     if (showExpDateMsg === true) {
-        logger.info("Access token expires on " + new Date(secret.EXPIRES_AT * 1000));
+        logger.info("Access token expires on " + new Date(newSecret.EXPIRES_AT * 1000));
     }
-    fs.writeFileSync(secretJsonPath, JSON.stringify(secret, null, 4));
-    return secret.ACCESS_TOKEN;
+    // write to secretDb
+    docRef.set(newSecret).then(res => {
+        logger.log(`New secret stored in Firestore at ${res.updateTime}`);
+        logger.log(res);
+    });
+    // fs.writeFileSync(secretJsonPath, JSON.stringify(secretDb, null, 4));
+    return newSecret.ACCESS_TOKEN;
 }
 
-async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
-    const  accToken = await retrieveAccessToken(false, showExpDateMsg);
+async function fetchData(secretDb, perPage = 1, page = 1, showExpDateMsg = true) {
+    const  accToken = await retrieveAccessToken(secretDb, false, showExpDateMsg);
     const response = await fetch(`https://www.strava.com/api/v3/athlete/activities?per_page=${perPage}&page=${page}`, {
         method: "GET",
         headers: {
@@ -95,6 +114,10 @@ async function fetchData(perPage = 1, page = 1, showExpDateMsg = true) {
 }
 
 async function retrieveAllData(app, bucketName, forceNew = false) {
+    // Firestore for secret (e.g. tokens) storage
+    const secretDb = getFirestore(app);
+    await __initFirestore(secretDb);
+
     // datastore has fields: { lastSaved: number, data: Object }
     const bucket = getStorage(app).bucket(bucketName);
     const datastoreFile = bucket.file(DS_FILE_PATH);
@@ -128,7 +151,10 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         logger.info("(Datastore not found) or (saved data is undated or older than 1 day) or (`forceNew` is true). Fetching new data...");
 
         // check API limit for today
-        const secret = JSON.parse(fs.readFileSync(secretJsonPath, "utf-8"));
+        // const secret = JSON.parse(fs.readFileSync(secretJsonPath, "utf-8"));
+        const docRef = secretDb.doc(SECRET_DOC_PATH);
+        const secret = (await docRef.get()).data();
+        const newSecret = JSON.parse(JSON.stringify(secret));
 
         const now = new Date(Date.now());
         let lastFetched = new Date(secret.LAST_FETCHED === undefined ? Date.now() : secret.LAST_FETCHED);
@@ -177,7 +203,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
                 break;
             }
 
-            const [response, dataJson] = await fetchData(perPage, page, showExpDateMsg);
+            const [response, dataJson] = await fetchData(secretDb, perPage, page, showExpDateMsg);
 
             if (response.status === 429) {
                 logger.log("Status code 429 - too many requests. Aborting fetch...");
@@ -197,10 +223,14 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         logger.info("Num fetches now: " + numFetchesNow);
         logger.info("Num fetches today: " + numFetchesToday);
 
-        secret.LAST_FETCHED = lastFetched;
-        secret.NUM_FETCHES_TODAY = numFetchesToday;
+        newSecret.LAST_FETCHED = lastFetched;
+        newSecret.NUM_FETCHES_TODAY = numFetchesToday;
 
-        fs.writeFileSync(secretJsonPath, JSON.stringify(secret, null, 4));
+        // fs.writeFileSync(secretJsonPath, JSON.stringify(secret, null, 4));
+        // write secret to Firestore
+        docRef.set(newSecret).then(res => {
+            logger.log(`New fetch times stored in Firestore at ${res.updateTime}`);
+        });
 
         datastoreFile.save(JSON.stringify({ lastSaved: Date.now(), data: newData }), {
             contentType: "application/json",
