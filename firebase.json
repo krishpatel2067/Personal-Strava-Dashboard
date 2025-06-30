@@ -11,7 +11,8 @@
         "firebase-debug.*.log",
         "*.local",
         "data.json",
-        "secret.json"
+        "secret.json",
+        ".env"
       ],
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run lint"
