@@ -3,15 +3,23 @@
 # Deploy with `firebase deploy`
 
 from firebase_functions import https_fn, logger
-from firebase_admin import initialize_app
+from firebase_admin import initialize_app, storage, credentials
 import pandas as pd
 
-# initialize_app()
+cred = credentials.Certificate("./serviceAccountKey.json")
+app = initialize_app(cred)
 #
 #
 @https_fn.on_request()
-def on_request_example(req: https_fn.Request) -> https_fn.Response:
-    df = pd.DataFrame({'Column1': [1, 2, 3], 'Column2': [4, 5, 6]})
-    logger.info(df.to_json())
+def read_and_analyze(req):
     logger.info("Got request!")
+    
+    bucket = storage.bucket(app=app)
+    logger.info("all the blobs:")
+    iterator = bucket.list_blobs()
+    first_blob = next(iterator, "No files!")
+    content = first_blob.download_as_string().decode("utf-8")
+    logger.info("first blob contents:", first_blob.path)
+    logger.info(content)
+    
     return https_fn.Response("Hello world from Python!")
