@@ -5,22 +5,51 @@
 from firebase_functions import https_fn, logger
 from firebase_admin import initialize_app, storage, credentials
 import pandas as pd
+from datetime import datetime
+import json
 
 DATA_PATH = "private/data.json"
 
 cred = credentials.Certificate("./serviceAccountKey.json")
 app = initialize_app(cred)
 
+
+def analyze(data: dict) -> dict:
+    df = pd.DataFrame(data)
+    print(df.shape)
+    return {
+        "shape": df.shape
+    }
+
+
 @https_fn.on_request()
 def read_and_analyze(req):
     logger.info("Got request!")
-    
+
     bucket = storage.bucket(app=app)
     data_blob = bucket.get_blob(DATA_PATH)
-    
+
     if data_blob:
         logger.info(f"Found {DATA_PATH}")
+        overall_data = None
+
+        with data_blob.open() as data_file:
+            overall_data = json.load(data_file)
+            
+        last_saved = overall_data["lastSaved"]              # in milliseconds
+        data = overall_data["data"]
+
+        print(f"Successfully loaded {DATA_PATH}, which was last saved {datetime.fromtimestamp(last_saved/1000)}")
+        analysis: dict = analyze(data)
+            
+        return https_fn.Response(json.dumps({
+            "message": "Success",
+            "analysis": str(analysis),
+        }), status=200, mimetype="application/json")
     else:
-        logger.info(f"Unable to find {DATA_PATH}")    
-    
-    return https_fn.Response("Hello world from Python!")
+        logger.info(f"Unable to find {DATA_PATH}")
+
+        return https_fn.Response(json.dumps({
+            "message": "Storage data not found",
+            "analysis": {},
+        }), status=599, mimetype="application/json")
