@@ -6,20 +6,21 @@ from firebase_functions import https_fn, logger
 from firebase_admin import initialize_app, storage, credentials
 import pandas as pd
 
+DATA_PATH = "private/data.json"
+
 cred = credentials.Certificate("./serviceAccountKey.json")
 app = initialize_app(cred)
-#
-#
+
 @https_fn.on_request()
 def read_and_analyze(req):
     logger.info("Got request!")
     
     bucket = storage.bucket(app=app)
-    logger.info("all the blobs:")
-    iterator = bucket.list_blobs()
-    first_blob = next(iterator, "No files!")
-    content = first_blob.download_as_string().decode("utf-8")
-    logger.info("first blob contents:", first_blob.path)
-    logger.info(content)
+    data_blob = bucket.get_blob(DATA_PATH)
+    
+    if data_blob:
+        logger.info(f"Found {DATA_PATH}")
+    else:
+        logger.info(f"Unable to find {DATA_PATH}")    
     
     return https_fn.Response("Hello world from Python!")
