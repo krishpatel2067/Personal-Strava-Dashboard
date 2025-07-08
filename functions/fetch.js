@@ -162,7 +162,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
         // fetch all data to conserve API requests
         const perPage = MAX_PER_PAGE;
-        const maxPages = 2;            // -1 means all the pages that exist
+        const maxPages = -1;                      // -1 means all the pages that exist
         const apiLimitNow = 10;                   // prevent excessive API use at once
 
         let newData = [];
