@@ -5,6 +5,7 @@
 from firebase_functions import https_fn, logger
 from firebase_admin import initialize_app, storage, credentials
 import pandas as pd
+from numpy import float64 as np_float64, int64 as np_int64
 from datetime import datetime
 import json
 
@@ -13,6 +14,15 @@ DATA_PATH = "private/data.json"
 cred = credentials.Certificate("./serviceAccountKey.json")
 app = initialize_app(cred)
 
+def convert_np_types_to_plain(dictionary: dict) -> dict:
+    for key, value in dictionary.items():
+        if isinstance(value, np_float64):
+            dictionary[key] = float(value)
+        elif isinstance(value, np_int64):
+            dictionary[key] = int(value)
+        elif isinstance(value, dict):
+            dictionary[key] = convert_np_types_to_plain(value)
+    return dictionary
 
 def analyze(data: dict) -> dict:
     df = pd.DataFrame(data)
@@ -36,7 +46,8 @@ def analyze(data: dict) -> dict:
     # total elapsed time
     analysis["total_elapsed_time"] = df["elapsed_time"].sum()
 
-    return analysis
+    # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
+    return convert_np_types_to_plain(analysis)
 
 
 @https_fn.on_request()
