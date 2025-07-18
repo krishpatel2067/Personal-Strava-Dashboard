@@ -3,16 +3,23 @@
 # Deploy with `firebase deploy`
 
 from firebase_functions import https_fn, logger
-from firebase_admin import initialize_app, storage, credentials
+from firebase_admin import initialize_app, get_app, storage, credentials
 import pandas as pd
 from numpy import float64 as np_float64, int64 as np_int64
 from datetime import datetime
 import json
 
 DATA_PATH = "private/data.json"
+ANALYSIS_PATH = "public/analysis.json"
 
 cred = credentials.Certificate("./serviceAccountKey.json")
-app = initialize_app(cred)
+
+try:
+    app = get_app()
+except ValueError as err:
+    logger.info("Error:")
+    logger.info(str(err))
+    app = initialize_app(cred)
 
 def convert_np_types_to_plain(dictionary: dict) -> dict:
     for key, value in dictionary.items():
@@ -67,12 +74,19 @@ def read_and_analyze(req):
         last_saved = overall_data["lastSaved"]              # in milliseconds
         data = overall_data["data"]
 
-        print(f"Successfully loaded {DATA_PATH}, which was last saved {datetime.fromtimestamp(last_saved/1000)}")
+        logger.info(f"Successfully loaded {DATA_PATH}, which was last saved {datetime.fromtimestamp(last_saved/1000)}")
         analysis: dict = analyze(data)
+
+        analysis_blob = bucket.blob(ANALYSIS_PATH)
+        analysis_blob.upload_from_string(
+            data=json.dumps(analysis),
+            content_type="application/json"
+        )
+            
+        logger.info(f"Successfully uploaded to {ANALYSIS_PATH}")
 
         return https_fn.Response(json.dumps({
             "message": "Success",
-            "analysis": analysis,
         }), status=200, mimetype="application/json")
     else:
         logger.info(f"Unable to find {DATA_PATH}")
