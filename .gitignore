@@ -16,3 +16,6 @@ __pycache__
 notes.txt
 
 !firebase.json
+!package.json
+!package-lock.json
+!cors.json
