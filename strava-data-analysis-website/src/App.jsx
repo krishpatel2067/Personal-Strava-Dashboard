@@ -21,7 +21,6 @@ function App() {
     const fetchAnalysis = () => {
       const storage = getStorage(app);
       const analysisRef = ref(storage, "public/analysis.json");
-      console.log(analysisRef);
 
       getDownloadURL(analysisRef)
         .then(async url => {
