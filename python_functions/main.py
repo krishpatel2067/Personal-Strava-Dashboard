@@ -2,7 +2,7 @@
 # To get started, simply uncomment the below code or create your own.
 # Deploy with `firebase deploy`
 
-from firebase_functions import https_fn, logger
+from firebase_functions import logger, scheduler_fn
 from firebase_admin import initialize_app, get_app, storage, credentials
 import pandas as pd
 from numpy import float64 as np_float64, int64 as np_int64
@@ -57,9 +57,10 @@ def analyze(data: dict) -> dict:
     return convert_np_types_to_plain(analysis)
 
 
-@https_fn.on_request()
-def read_and_analyze(req):
-    logger.info("Got request!")
+@scheduler_fn.on_schedule(schedule="every day 02:00")
+def read_and_analyze(event: scheduler_fn.ScheduledEvent) -> None:
+    logger.info("Running Python function `read_and_analyze`...")
+    # logger.info(event)
 
     bucket = storage.bucket(app=app)
     data_blob = bucket.get_blob(DATA_PATH)
@@ -84,14 +85,5 @@ def read_and_analyze(req):
         )
             
         logger.info(f"Successfully uploaded to {ANALYSIS_PATH}")
-
-        return https_fn.Response(json.dumps({
-            "message": "Success",
-        }), status=200, mimetype="application/json")
     else:
         logger.info(f"Unable to find {DATA_PATH}")
-
-        return https_fn.Response(json.dumps({
-            "message": "Storage data not found",
-            "analysis": {},
-        }), status=599, mimetype="application/json")
