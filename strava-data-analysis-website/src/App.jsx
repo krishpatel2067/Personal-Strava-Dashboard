@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import { initializeApp } from 'firebase/app';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
+import StatCard from './components/StatCard';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
@@ -16,6 +17,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 function App() {
+  const [loaded, setLoaded] = useState(false);
+  const [metadata, setMetadata] = useState({});
+  const [data, setData] = useState({});
 
   useEffect(() => {
     const fetchAnalysis = () => {
@@ -25,10 +29,13 @@ function App() {
       getDownloadURL(analysisRef)
         .then(async url => {
           console.log(url);
-          
+
           const res = await fetch(url);
           const json = await res.json();
           console.log(json);
+          setMetadata(json.created);
+          setData(json.data);
+          setLoaded(true);
         })
         .catch(err => {
           console.log("Error while fetching analysis.json:", err.message);
@@ -39,9 +46,14 @@ function App() {
 
   return (
     <div className="App">
-
+      <StatCard
+        name="Total Distance"
+        stat={data.total_distance}
+        units="m"
+        loaded={loaded}
+      />
     </div>
-  )
+  );
 }
 
 export default App
