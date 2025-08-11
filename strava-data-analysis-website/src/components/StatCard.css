@@ -1,0 +1,9 @@
+.StatCard {
+    padding: 10px;
+    width: fit-content;
+    text-align: center;
+}
+
+.stat {
+    font-size: 2rem;
+}
