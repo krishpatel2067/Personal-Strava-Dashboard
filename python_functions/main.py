@@ -51,7 +51,7 @@ def analyze(data):
     analysis["total_elapsed_time"] = df["elapsed_time"].sum()
     
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
-    return convert_np_types_to_plain({ "created": time.time(), "data": analysis })
+    return convert_np_types_to_plain({ "created": time.time() * 1000, "data": analysis })
 
 
 @scheduler_fn.on_schedule(schedule="every day 02:00")
@@ -68,7 +68,7 @@ def read_and_analyze():
         with data_blob.open() as data_file:
             overall_data = json.load(data_file)
 
-        last_saved = overall_data["lastSaved"]              # in milliseconds
+        last_saved = overall_data["created"]              # in milliseconds
         data = overall_data["data"]
 
         logger.info(f"Successfully loaded {DATA_PATH}, which was last saved {datetime.fromtimestamp(last_saved/1000)}")

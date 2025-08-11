@@ -110,7 +110,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     const secretDb = getFirestore(app, SECRET_DB_ID);
     // await __initFirestore(secretDb);
 
-    // datastore has fields: { lastSaved: number, data: Object }
+    // datastore has fields: { created: number, data: Object }
     const bucket = getStorage(app).bucket(bucketName);
     const datastoreFile = bucket.file(DS_FILE_PATH);
     let datastore = null;
@@ -138,7 +138,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         logger.info(`Datastore does not exist at ${DS_FILE_PATH}`);
     }
 
-    if (datastore === null || datastore.lastSaved === undefined || Date.now() - datastore.lastSaved > 24 * 3600 * 1000 || forceNew === true) {
+    if (datastore === null || datastore.created === undefined || Date.now() - datastore.created > 24 * 3600 * 1000 || forceNew === true) {
         // fetch new data
         logger.info("(Datastore not found) or (saved data is undated or older than 1 day) or (`forceNew` is true). Fetching new data...");
 
@@ -221,7 +221,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             logger.log(`New fetch times stored in Firestore at ${res.writeTime.toDate()}`);
         });
 
-        datastoreFile.save(JSON.stringify({ lastSaved: Date.now(), data: newData }), {
+        datastoreFile.save(JSON.stringify({ created: Date.now(), data: newData }), {
             contentType: "application/json",
         })
             .then(() => {
