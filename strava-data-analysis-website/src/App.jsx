@@ -3,6 +3,7 @@ import './App.css'
 import { initializeApp } from 'firebase/app';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import StatCard from './components/StatCard';
+import TableCard from './components/TableCard';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
@@ -71,6 +72,13 @@ function App() {
           name="Total Moving Time"
           stat={sToHrs(data.total_moving_time)}
           units="hrs"
+          loaded={loaded}
+        />
+        <TableCard
+          name="Distance by Sport"
+          data={data.distance_by_sport}
+          headers={["", "Distance (mi)"]}
+          applyFunc={(val) => Math.round(mToMi(val))}
           loaded={loaded}
         />
       </div>
