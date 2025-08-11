@@ -1,4 +1,4 @@
-
+import './StatCard.css';
 
 function StatCard({ name, stat, units, loaded, round = true }) {
     if (loaded) {
