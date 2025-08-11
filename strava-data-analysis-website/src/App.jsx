@@ -16,6 +16,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+function mToMi(m) {
+  return m / 1609;
+}
+
+function sToHrs(s) {
+  return s / 3600;
+}
+
 function App() {
   const [loaded, setLoaded] = useState(false);
   const [metadata, setMetadata] = useState({});
@@ -48,8 +56,20 @@ function App() {
     <div className="App">
       <StatCard
         name="Total Distance"
-        stat={data.total_distance}
-        units="m"
+        stat={mToMi(data.total_distance)}
+        units="mi"
+        loaded={loaded}
+      />
+      <StatCard
+        name="Total Elapsed Time"
+        stat={sToHrs(data.total_elapsed_time)}
+        units="hrs"
+        loaded={loaded}
+      />
+      <StatCard
+        name="Total Moving Time"
+        stat={sToHrs(data.total_moving_time)}
+        units="hrs"
         loaded={loaded}
       />
     </div>

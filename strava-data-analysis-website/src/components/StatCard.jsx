@@ -1,13 +1,16 @@
-function StatCard({ name, stat, units, loaded }) {
-    return (
-        <div className="StatCard">
-            <span className="name">{name}</span>
-            <br />
-            <span className="stat">{stat.toLocaleString()}</span>
-            <br />  
-            <span className="units">{units}</span>
-        </div>
-    );
+
+
+function StatCard({ name, stat, units, loaded, round = true }) {
+    if (loaded) {
+        return (
+            <div className="StatCard">
+                <span className="name">{name}</span>
+                <br />
+                <span className="stat">{(round ? Math.round(stat) : stat).toLocaleString()}</span>
+                <span className="units"> {units}</span>
+            </div>
+        );
+    }
 }
 
 export default StatCard;
