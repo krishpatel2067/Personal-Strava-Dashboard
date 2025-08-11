@@ -1,9 +1,22 @@
 .StatCard {
-  padding: 10px;
+  padding: 16px;
   width: fit-content;
   text-align: center;
+  flex-grow: 1;
+  border: var(--bord-col) 1px solid;
+  border-radius: 8px;
+}
+
+span {
+  white-space: nowrap;
+}
+
+.name,
+.units {
+  color: var(--secondary-txt-col);
 }
 
 .stat {
   font-size: 2rem;
+  font-weight: bolder;
 }

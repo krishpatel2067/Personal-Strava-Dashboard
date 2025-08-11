@@ -54,24 +54,26 @@ function App() {
 
   return (
     <div className="App">
-      <StatCard
-        name="Total Distance"
-        stat={mToMi(data.total_distance)}
-        units="mi"
-        loaded={loaded}
-      />
-      <StatCard
-        name="Total Elapsed Time"
-        stat={sToHrs(data.total_elapsed_time)}
-        units="hrs"
-        loaded={loaded}
-      />
-      <StatCard
-        name="Total Moving Time"
-        stat={sToHrs(data.total_moving_time)}
-        units="hrs"
-        loaded={loaded}
-      />
+      <div className="container">
+        <StatCard
+          name="Total Distance"
+          stat={mToMi(data.total_distance)}
+          units="mi"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Elapsed Time"
+          stat={sToHrs(data.total_elapsed_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Moving Time"
+          stat={sToHrs(data.total_moving_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+      </div>
     </div>
   );
 }
