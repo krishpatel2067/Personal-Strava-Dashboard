@@ -1,7 +1,10 @@
+import "./Card.css";
+import "./TableCard.css";
+
 function TableCard({ name, data, headers, applyFunc, loaded }) {
   if (loaded) {
     return (
-      <div className="TableCard">
+      <div className="TableCard Card">
         <table>
           <caption>{name}</caption>
           <thead>
