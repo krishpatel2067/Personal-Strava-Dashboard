@@ -88,7 +88,7 @@ async function retrieveAccessToken(secretDb, forceUseAuthCode = false, showExpDa
 }
 
 async function fetchData(secretDb, perPage = 1, page = 1, showExpDateMsg = true) {
-    const  accToken = await retrieveAccessToken(secretDb, false, showExpDateMsg);
+    const accToken = await retrieveAccessToken(secretDb, false, showExpDateMsg);
     const response = await fetch(`https://www.strava.com/api/v3/athlete/activities?per_page=${perPage}&page=${page}`, {
         method: "GET",
         headers: {
@@ -110,7 +110,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     const secretDb = getFirestore(app, SECRET_DB_ID);
     // await __initFirestore(secretDb);
 
-    // datastore has fields: { created: number, data: Object }
+    // datastore has fields: { fetchedAt: number, data: Object }
     const bucket = getStorage(app).bucket(bucketName);
     const datastoreFile = bucket.file(DS_FILE_PATH);
     let datastore = null;
@@ -121,7 +121,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
     if (exists[0] === true) {
         logger.info(`Datastore found at ${DS_FILE_PATH}`);
-        
+
         const url = await getDownloadURL(datastoreFile).catch(err => {
             logger.info("Error while getting datastore's download URL:");
             logger.warn(err.message);
@@ -138,7 +138,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         logger.info(`Datastore does not exist at ${DS_FILE_PATH}`);
     }
 
-    if (datastore === null || datastore.created === undefined || Date.now() - datastore.created > 24 * 3600 * 1000 || forceNew === true) {
+    if (datastore === null || datastore.fetchedAt === undefined || Date.now() - datastore.fetchedAt > 24 * 3600 * 1000 || forceNew === true) {
         // fetch new data
         logger.info("(Datastore not found) or (saved data is undated or older than 1 day) or (`forceNew` is true). Fetching new data...");
 
@@ -221,7 +221,12 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             logger.log(`New fetch times stored in Firestore at ${res.writeTime.toDate()}`);
         });
 
-        datastoreFile.save(JSON.stringify({ created: Date.now(), data: newData }), {
+        datastoreFile.save(JSON.stringify({
+            metadata: {
+                fetchedAt: Date.now()
+            },
+            data: newData
+        }), {
             contentType: "application/json",
         })
             .then(() => {

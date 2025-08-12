@@ -18,6 +18,7 @@ except ValueError as err:
     logger.info(str(err))
     app = initialize_app(cred)
 
+
 def convert_np_types_to_plain(dictionary):
     for key, value in dictionary.items():
         if isinstance(value, np_float64):
@@ -27,6 +28,7 @@ def convert_np_types_to_plain(dictionary):
         elif isinstance(value, dict):
             dictionary[key] = convert_np_types_to_plain(value)
     return dictionary
+
 
 def analyze(data):
     df = pd.DataFrame(data)
@@ -46,12 +48,12 @@ def analyze(data):
 
     # total moving time
     analysis["total_moving_time"] = df["moving_time"].sum()
-    
+
     # total elapsed time
     analysis["total_elapsed_time"] = df["elapsed_time"].sum()
-    
+
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
-    return convert_np_types_to_plain({ "created": time.time() * 1000, "data": analysis })
+    return convert_np_types_to_plain(analysis)
 
 
 @scheduler_fn.on_schedule(schedule="every day 02:00")
@@ -68,18 +70,24 @@ def read_and_analyze(event):
         with data_blob.open() as data_file:
             overall_data = json.load(data_file)
 
-        last_saved = overall_data["created"]              # in milliseconds
+        fetched_at = overall_data["metadata"]["fetchedAt"]              # in milliseconds
         data = overall_data["data"]
 
-        logger.info(f"Successfully loaded {DATA_PATH}, which was last saved {datetime.fromtimestamp(last_saved/1000)}")
+        logger.info(f"Successfully loaded {DATA_PATH}, which was last saved {datetime.fromtimestamp(fetched_at/1000)}")
         analysis = analyze(data)
 
         analysis_blob = bucket.blob(ANALYSIS_PATH)
         analysis_blob.upload_from_string(
-            data=json.dumps(analysis),
+            data=json.dumps({
+                "metadata": {
+                    "analyzed_at": time.time() * 1000,
+                    "fetched_at": fetched_at
+                },
+                "data": analysis
+            }),
             content_type="application/json"
         )
-            
+
         logger.info(f"Successfully uploaded to {ANALYSIS_PATH}")
     else:
         logger.info(f"Unable to find {DATA_PATH}")
