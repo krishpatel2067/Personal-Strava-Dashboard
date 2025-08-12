@@ -1,0 +1,20 @@
+caption {
+  text-align: center;
+}
+
+table {
+  margin: 0 auto;
+  border-spacing: 0;
+}
+
+th, td {
+  padding: 8px;
+}
+
+th {
+  text-align: left;
+}
+
+tr:not(:last-child) :is(th, td) {
+  border-bottom: var(--bord-col) 1px solid;
+}
