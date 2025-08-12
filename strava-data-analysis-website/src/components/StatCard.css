@@ -1,10 +1,5 @@
 .StatCard {
-  padding: 16px;
-  width: fit-content;
   text-align: center;
-  flex-grow: 1;
-  border: var(--bord-col) 1px solid;
-  border-radius: 8px;
 }
 
 span {
