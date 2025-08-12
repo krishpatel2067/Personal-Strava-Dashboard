@@ -42,7 +42,7 @@ function App() {
           const res = await fetch(url);
           const json = await res.json();
           console.log(json);
-          setMetadata(json.created);
+          setMetadata(json.metadata);
           setData(json.data);
           setLoaded(true);
         })
@@ -55,7 +55,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className="container">
+      <main>
         <StatCard
           name="Total Distance"
           stat={mToMi(data.total_distance)}
@@ -82,7 +82,14 @@ function App() {
           applyFunc={(val) => Math.round(mToMi(val))}
           loaded={loaded}
         />
-      </div>
+      </main>
+      <footer>
+        <div className="inner-container">
+          Last fetched: {new Date(metadata?.fetched_at).toLocaleString()}
+          <br />
+          Last analyzed: {new Date(metadata?.analyzed_at).toLocaleString()}
+        </div>
+      </footer>
     </div>
   );
 }
