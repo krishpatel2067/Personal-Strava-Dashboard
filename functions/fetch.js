@@ -223,9 +223,9 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
         datastoreFile.save(JSON.stringify({
             metadata: {
-                fetchedAt: Date.now()
+                fetchedAt: Date.now(),
             },
-            data: newData
+            data: newData,
         }), {
             contentType: "application/json",
         })
