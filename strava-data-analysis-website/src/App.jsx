@@ -76,7 +76,8 @@ function App() {
         />
         <TableCard
           name="Distance by Sport"
-          data={data.distance_by_sport}
+          // sort by distance, descending
+          data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
           headers={["", "Distance (mi)"]}
           applyFunc={(val) => Math.round(mToMi(val))}
           loaded={loaded}

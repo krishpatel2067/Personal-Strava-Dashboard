@@ -6,7 +6,7 @@ function TableCard({ name, data, headers, applyFunc, loaded }) {
     return (
       <div className="TableCard Card">
         <table>
-          <caption>{name}</caption>
+          <caption className="secondary">{name}</caption>
           <thead>
             <tr>
               {headers && headers.map((header, index) => (
@@ -15,7 +15,7 @@ function TableCard({ name, data, headers, applyFunc, loaded }) {
             </tr>
           </thead>
           <tbody>
-            {data && Object.entries(data).map(([rowHeader, rowData], index1) => (
+            {data && data.map(([rowHeader, ...rowData], index1) => (
               <tr key={index1}>
                 <th>{rowHeader}</th>
                 {rowData && [].concat(rowData).map((value, index2) => (

@@ -6,11 +6,6 @@ span {
   white-space: nowrap;
 }
 
-.name,
-.units {
-  color: var(--secondary-txt-col);
-}
-
 .stat {
   font-size: 2rem;
   font-weight: bolder;

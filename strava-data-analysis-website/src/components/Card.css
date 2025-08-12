@@ -7,3 +7,7 @@
   break-inside: avoid;
   margin-bottom: 8px;
 }
+
+.secondary {
+  color: var(--secondary-txt-col);
+}
