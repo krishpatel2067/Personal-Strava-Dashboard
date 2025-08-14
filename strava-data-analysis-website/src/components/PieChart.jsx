@@ -1,8 +1,4 @@
-import * as echarts from "echarts/core";
-import { PieChart as PieChartEChart } from "echarts/charts";
-import ReactEChartsCore from "echarts-for-react/lib/core";
-
-echarts.use([PieChartEChart]);
+import ReactECharts from "echarts-for-react";
 
 function PieChart({ option: optionProp, title, data }) {
   const option = optionProp ?? {
@@ -13,7 +9,7 @@ function PieChart({ option: optionProp, title, data }) {
       {
         name: `${title} Pie Chart`,
         type: "pie",
-        radius: 250,
+        radius: 200,
         center: ["50%", "50%"],
         data: data
       }
@@ -21,10 +17,9 @@ function PieChart({ option: optionProp, title, data }) {
   };
 
   return (
-    <ReactEChartsCore
-      echarts={echarts}
+    <ReactECharts
       option={option}
-      style={{ width: "400px", height: "100%" }}
+      style={{ width: "400px", height: "400px" }}
     />
   );
 }
