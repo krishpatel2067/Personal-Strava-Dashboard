@@ -82,6 +82,110 @@ function App() {
           applyFunc={(val) => Math.round(mToMi(val))}
           loaded={loaded}
         />
+        <StatCard
+          name="Total Distance"
+          stat={mToMi(data.total_distance)}
+          units="mi"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Elapsed Time"
+          stat={sToHrs(data.total_elapsed_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Moving Time"
+          stat={sToHrs(data.total_moving_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <TableCard
+          name="Distance by Sport"
+          // sort by distance, descending
+          data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+          headers={["", "Distance (mi)"]}
+          applyFunc={(val) => Math.round(mToMi(val))}
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Distance"
+          stat={mToMi(data.total_distance)}
+          units="mi"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Elapsed Time"
+          stat={sToHrs(data.total_elapsed_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Moving Time"
+          stat={sToHrs(data.total_moving_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <TableCard
+          name="Distance by Sport"
+          // sort by distance, descending
+          data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+          headers={["", "Distance (mi)"]}
+          applyFunc={(val) => Math.round(mToMi(val))}
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Distance"
+          stat={mToMi(data.total_distance)}
+          units="mi"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Elapsed Time"
+          stat={sToHrs(data.total_elapsed_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Moving Time"
+          stat={sToHrs(data.total_moving_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <TableCard
+          name="Distance by Sport"
+          // sort by distance, descending
+          data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+          headers={["", "Distance (mi)"]}
+          applyFunc={(val) => Math.round(mToMi(val))}
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Distance"
+          stat={mToMi(data.total_distance)}
+          units="mi"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Elapsed Time"
+          stat={sToHrs(data.total_elapsed_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Moving Time"
+          stat={sToHrs(data.total_moving_time)}
+          units="hrs"
+          loaded={loaded}
+        />
+        <TableCard
+          name="Distance by Sport"
+          // sort by distance, descending
+          data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+          headers={["", "Distance (mi)"]}
+          applyFunc={(val) => Math.round(mToMi(val))}
+          loaded={loaded}
+        />
       </main>
       <footer>
         <div className="inner-container">

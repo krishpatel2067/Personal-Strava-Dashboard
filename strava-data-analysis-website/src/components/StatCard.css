@@ -2,11 +2,11 @@
   text-align: center;
 }
 
-span {
+.StatCard span {
   white-space: nowrap;
 }
 
-.stat {
-  font-size: 2rem;
+.StatCard .stat {
+  font-size: 2em;
   font-weight: bolder;
 }

@@ -1,13 +1,18 @@
 .Card {
   padding: 16px;
-  /* width: fit-content; */
-  /* flex-grow: 1; */
   border: var(--bord-col) 1px solid;
   border-radius: 8px;
   break-inside: avoid;
   margin-bottom: 8px;
 }
 
-.secondary {
+.Card h2 {
+  margin: 0;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 1em;
+}
+
+.Card .secondary {
   color: var(--secondary-txt-col);
 }

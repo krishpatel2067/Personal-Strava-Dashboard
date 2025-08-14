@@ -5,7 +5,10 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-body, html, #root, .App {
+body,
+html,
+#root,
+.App {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
@@ -19,9 +22,8 @@ body, html, #root, .App {
 
 main {
   margin: 0 auto;
-  width: calc(100% - 32px);
-  columns: 300px 10;
-  column-gap: 8px;
+  max-width: calc(100% - 32px);
+  display: grid;
 }
 
 footer {

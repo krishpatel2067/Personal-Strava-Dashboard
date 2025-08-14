@@ -1,20 +1,24 @@
-caption {
+.TableCard .data-container {
+  display: flex;
+}
+
+.TableCard caption {
   text-align: center;
 }
 
-table {
+.TableCard table {
   margin: 0 auto;
   border-spacing: 0;
 }
 
-th, td {
+.TableCard th, td {
   padding: 8px;
 }
 
-th {
+.TableCard th {
   text-align: left;
 }
 
-tr:not(:last-child) :is(th, td) {
+.TableCard tr:not(:last-child) :is(th, td) {
   border-bottom: var(--bord-col) 1px solid;
 }

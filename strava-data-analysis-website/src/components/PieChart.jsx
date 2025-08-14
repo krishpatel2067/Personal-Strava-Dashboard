@@ -5,11 +5,14 @@ function PieChart({ option: optionProp, title, data }) {
     title: {
       text: title
     },
+    tooltip: {
+      show: true,
+    },
     series: [
       {
-        name: `${title} Pie Chart`,
+        name: title,
         type: "pie",
-        radius: 200,
+        radius: 150,
         center: ["50%", "50%"],
         data: data
       }
@@ -17,10 +20,12 @@ function PieChart({ option: optionProp, title, data }) {
   };
 
   return (
-    <ReactECharts
-      option={option}
-      style={{ width: "400px", height: "400px" }}
-    />
+    <div className="PieChart">
+      <ReactECharts
+        option={option}
+        style={{ width: "400px", height: "400px" }}
+      />
+    </div>
   );
 }
 
