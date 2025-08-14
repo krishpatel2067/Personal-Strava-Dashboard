@@ -2,15 +2,27 @@
   padding: 16px;
   border: var(--bord-col) 1px solid;
   border-radius: 8px;
-  break-inside: avoid;
-  margin-bottom: 8px;
+  display: grid;
+  gap: 8px;
+  align-content: space-between;
+  height: fit-content;
+}
+
+.Card .data-container {
+  height: min-content
+}
+
+.Card span {
+  line-height: 1em;
+  /* display: inline-block; */
 }
 
 .Card h2 {
   margin: 0;
-  margin-bottom: 12px;
   text-align: center;
+  line-height: 1em;
   font-size: 1em;
+  height: fit-content;
 }
 
 .Card .secondary {
