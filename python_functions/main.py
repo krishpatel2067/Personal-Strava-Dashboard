@@ -39,19 +39,47 @@ def analyze(data):
         Distance in meters
         Time in seconds
     """
+    
+    # --- total ----------------------------------------------------------
 
     # total distance
     analysis["total_distance"] = df["distance"].sum()
-
-    # distance by sport type
-    analysis["distance_by_sport"] = df.groupby(by="sport_type")["distance"].sum().to_dict()
 
     # total moving time
     analysis["total_moving_time"] = df["moving_time"].sum()
 
     # total elapsed time
     analysis["total_elapsed_time"] = df["elapsed_time"].sum()
+    
+    # total elevation gain
+    analysis["total_elevation_gain"] = df["total_elevation_gain"].sum()
+    
+    # total kudos
+    analysis["total_kudos"] = df["kudos_count"].sum()
+    
+    # --- average --------------------------------------------------------
+    
+    # mean kudos (per non-private activity)
+    analysis["mean_kudos"] = analysis["total_kudos"] / df["visibility"].value_counts().drop(index="only_me").values.sum()
 
+    # --- groups ---------------------------------------------------------
+    sport_type_group = df.groupby(by="sport_type")
+
+    # distance by sport type
+    analysis["distance_by_sport"] = sport_type_group["distance"].sum().to_dict()
+    
+    # moving time by sport type
+    analysis["moving_time_by_sport"] = sport_type_group["moving_time"].sum().to_dict()
+    
+    # elapsed time by sport type
+    analysis["moving_time_by_sport"] = sport_type_group["elapsed_time"].sum().to_dict()
+    
+    # elevation gain by sport type
+    analysis["elevation_gain_by_sport"] = sport_type_group["total_elevation_gain"].sum().to_dict()
+    
+    # kudos by sport type
+    analysis["kudos_by_sport"] = sport_type_group["kudos_count"].sum().to_dict()
+    
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
     return convert_np_types_to_plain(analysis)
 
