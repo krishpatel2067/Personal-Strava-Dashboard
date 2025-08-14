@@ -1,4 +1,5 @@
 import "./Card.css";
+import PieChart from "./PieChart";
 import "./TableCard.css";
 
 function TableCard({ name, data, headers, applyFunc, loaded }) {
@@ -27,6 +28,9 @@ function TableCard({ name, data, headers, applyFunc, loaded }) {
             ))}
           </tbody>
         </table>
+        <PieChart
+          data={data.map(item => ({ value: item[1], name: item[0] }))}
+        />
       </div>
     )
   }

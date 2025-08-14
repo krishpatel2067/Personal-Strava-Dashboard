@@ -1,8 +1,8 @@
 import * as echarts from "echarts/core";
-import { PieChart } from "echarts/charts";
-import ReactEchartsCore from "echarts-for-react/lib/core";
+import { PieChart as PieChartEChart } from "echarts/charts";
+import ReactEChartsCore from "echarts-for-react/lib/core";
 
-echarts.use([PieChart]);
+echarts.use([PieChartEChart]);
 
 function PieChart({ option: optionProp, title, data }) {
   const option = optionProp ?? {
@@ -21,7 +21,7 @@ function PieChart({ option: optionProp, title, data }) {
   };
 
   return (
-    <ReactEchartsCore
+    <ReactEChartsCore
       echarts={echarts}
       option={option}
       style={{ width: "400px", height: "100%" }}
