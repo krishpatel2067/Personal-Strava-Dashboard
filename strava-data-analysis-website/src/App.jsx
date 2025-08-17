@@ -68,6 +68,8 @@ function App() {
               .map(([_, value]) => value);
           }
 
+          data.weekly_distance_by_sport["Total"] = Object.values(data.weekly_distance);
+
           // console.log({ data, metadata });
           setMetadata(metadata);
           setData(data);
@@ -111,7 +113,7 @@ function App() {
           loaded={loaded}
         />
         <ChartCard
-          name="Distance Per Week By Sport"
+          name="Distance Per Week"
           chart={
             <StackedLineChart
               data={data.weekly_distance_by_sport}
@@ -119,9 +121,9 @@ function App() {
               xAxis={{
                 name: "Date",
                 data: loaded ?
-                data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
-                :
-                []
+                  data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
+                  :
+                  []
               }}
               yAxis={{
                 name: "Distance (mi)",

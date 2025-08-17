@@ -17,7 +17,6 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
     yAxis: mergeObjects({
       type: "value",
     }, yAxis),
-    legend: {},
     series: Object.entries(data).map(([category, valueData]) => {
       return {
         name: category,
