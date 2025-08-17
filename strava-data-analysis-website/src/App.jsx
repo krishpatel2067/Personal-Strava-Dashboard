@@ -111,16 +111,21 @@ function App() {
           loaded={loaded}
         />
         <ChartCard
-          name="Distance Per Week"
+          name="Distance Per Week By Sport"
           chart={
             <StackedLineChart
               data={data.weekly_distance_by_sport}
               applyFunc={distance => Math.round(mToMi(distance))}
-              xAxis={loaded ?
+              xAxis={{
+                name: "Date",
+                data: loaded ?
                 data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
                 :
                 []
-              }
+              }}
+              yAxis={{
+                name: "Distance (mi)",
+              }}
             />
           }
           loaded={loaded}
