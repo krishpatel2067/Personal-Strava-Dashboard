@@ -27,6 +27,17 @@ function sToHrs(s) {
   return s / 3600;
 }
 
+function fillKeys(superset, subset, defaultValue = 0) {
+  for (const key in superset) {
+    if (!(key in subset)) {
+      // console.log(`\tfilled ${key} with 0`);
+      subset[key] = defaultValue;
+    }
+  }
+
+  return subset;
+}
+
 function App() {
   const [loaded, setLoaded] = useState(false);
   const [metadata, setMetadata] = useState({});
@@ -42,10 +53,26 @@ function App() {
           console.log(url);
 
           const res = await fetch(url);
-          const json = await res.json();
-          console.log(json);
-          setMetadata(json.metadata);
-          setData(json.data);
+          let { data, metadata } = await res.json();
+
+          console.log({ data, metadata });
+
+          // the epoch timestamps of all weeks since account creation
+          data.week_starts = Object.keys(data.weekly_distance).sort();
+
+          for (const [sport, distanceData] of Object.entries(data.weekly_distance_by_sport)) {
+            console.log(sport);
+            console.log(distanceData);
+            // fill non-existent keys to 0; sort by keys (oldest first); retain only the distance
+            data.weekly_distance_by_sport[sport] = Object.entries(fillKeys(data.weekly_distance, distanceData))
+              .sort((a, b) => a[0] - b[0])
+              .map(([_, value]) => value);
+            console.log(data.weekly_distance_by_sport[sport]);
+          }
+
+          // console.log({ data, metadata });
+          setMetadata(metadata);
+          setData(data);
           setLoaded(true);
         })
         .catch(err => {
@@ -92,10 +119,7 @@ function App() {
               data={data.weekly_distance_by_sport}
               applyFunc={distance => Math.round(mToMi(distance))}
               xAxis={loaded ?
-                Object.keys(data.weekly_distance)
-                  .map(epoch => {
-                    return new Date(Number(epoch)).toLocaleDateString();
-                  })
+                data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
                 :
                 []
               }
