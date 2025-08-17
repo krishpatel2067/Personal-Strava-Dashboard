@@ -85,7 +85,10 @@ def analyze(data):
         if "start_date_dt" not in df.columns:
             df["start_date_dt"] = pd.to_datetime(df["start_date"])
 
-        return target_df.groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))[column].sum().rename(index=lambda ts: int(ts.timestamp()) * 1000)
+        return (target_df
+                .groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))[column]
+                .sum()
+                .rename(index=lambda ts: int(ts.timestamp()) * 1000))
     
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
     return convert_np_types_to_plain(analysis)
