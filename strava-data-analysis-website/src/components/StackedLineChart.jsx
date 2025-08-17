@@ -8,11 +8,21 @@ function StackedLineChart({ option: optionProp, title, data }) {
     tooltip: {
       show: true,
     },
-    series: []
+    series: Object.entries(data).map(([category, data]) => {
+      return {
+        name: category,
+        type: "line",
+        stack: "Total",
+        emphasis: {
+          focus: "series",
+        },
+        data: [Object.values(data)]
+      };
+    })
   };
 
   return (
-    <div className="PieChart">
+    <div className="StackedLineChart">
       <ReactECharts
         option={option}
         style={{ width: "400px", height: "400px" }}
