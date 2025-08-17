@@ -1,7 +1,8 @@
 import ReactECharts from "echarts-for-react";
-import { mergeObjects } from "../util";
+import { mergeObjects, useTheme } from "../util";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, yAxis }) {
+  const isDarkTheme = useTheme();
   const option = optionProp ?? {
     title: {
       text: title
@@ -37,6 +38,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
       <ReactECharts
         option={option}
         style={{ width: "100%", height: "400px" }}
+        theme={isDarkTheme ? "dark" : "light"}
       />
     </div>
   );

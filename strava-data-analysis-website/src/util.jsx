@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 function mergeObjects(baseObj, addObj, override = true, copy = true) {
   if (baseObj == null) {
     return {};
@@ -27,4 +29,19 @@ function mergeObjects(baseObj, addObj, override = true, copy = true) {
   return result;
 }
 
-export { mergeObjects };
+function useTheme() {
+    const [isDarkTheme, setIsDarkTheme] = useState(
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    );  
+    const mqListener = e => setIsDarkTheme(e.matches);
+    
+    useEffect(() => {
+      const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+      darkThemeMq.addEventListener("change", mqListener);
+      return () => darkThemeMq.removeEventListener("change", mqListener);
+    }, []);
+    
+    return isDarkTheme;
+}
+
+export { mergeObjects, useTheme };
