@@ -4,6 +4,8 @@ import { initializeApp } from 'firebase/app';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import StatCard from './components/StatCard';
 import TableCard from './components/TableCard';
+import ChartCard from './components/ChartCard';
+import StackedLineChart from './components/StackedLineChart';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
@@ -81,6 +83,24 @@ function App() {
           data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
           headers={["", "Distance (mi)"]}
           applyFunc={(val) => Math.round(mToMi(val))}
+          loaded={loaded}
+        />
+        <ChartCard
+          name="Distance Per Week"
+          chart={
+            <StackedLineChart
+              data={data.weekly_distance_by_sport}
+              applyFunc={distance => Math.round(mToMi(distance))}
+              xAxis={loaded ?
+                Object.keys(data.weekly_distance)
+                  .map(epoch => {
+                    return new Date(Number(epoch)).toLocaleDateString();
+                  })
+                :
+                []
+              }
+            />
+          }
           loaded={loaded}
         />
       </main>

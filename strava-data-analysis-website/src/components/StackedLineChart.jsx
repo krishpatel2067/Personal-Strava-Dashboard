@@ -1,6 +1,7 @@
 import ReactECharts from "echarts-for-react";
 
-function StackedLineChart({ option: optionProp, title, data }) {
+function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc: applyFuncProp }) {
+  const applyFunc = applyFuncProp ?? (() => { });
   const option = optionProp ?? {
     title: {
       text: title
@@ -8,7 +9,14 @@ function StackedLineChart({ option: optionProp, title, data }) {
     tooltip: {
       show: true,
     },
-    series: Object.entries(data).map(([category, data]) => {
+    xAxis: {
+      type: "category",
+      data: xAxis,
+    },
+    yAxis: {
+      type: "value"
+    },
+    series: Object.entries(data ?? {}).map(([category, data]) => {
       return {
         name: category,
         type: "line",
@@ -16,7 +24,12 @@ function StackedLineChart({ option: optionProp, title, data }) {
         emphasis: {
           focus: "series",
         },
-        data: [Object.values(data)]
+        data: (
+          (applyFunc != null) ?
+            Object.values(data).map(datapoint => applyFunc(datapoint))
+            :
+            Object.values(data)
+        )
       };
     })
   };
@@ -25,7 +38,7 @@ function StackedLineChart({ option: optionProp, title, data }) {
     <div className="StackedLineChart">
       <ReactECharts
         option={option}
-        style={{ width: "400px", height: "400px" }}
+        style={{ width: "100%", height: "400px" }}
       />
     </div>
   );
