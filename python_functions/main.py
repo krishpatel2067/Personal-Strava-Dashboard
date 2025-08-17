@@ -39,7 +39,7 @@ def analyze(data):
         Distance in meters
         Time in seconds
     """
-    
+
     # --- total ----------------------------------------------------------
 
     # total distance
@@ -50,46 +50,60 @@ def analyze(data):
 
     # total elapsed time
     analysis["total_elapsed_time"] = df["elapsed_time"].sum()
-    
+
     # total elevation gain
     analysis["total_elevation_gain"] = df["total_elevation_gain"].sum()
-    
+
     # total kudos
     analysis["total_kudos"] = df["kudos_count"].sum()
-    
+
     # --- average --------------------------------------------------------
-    
+
     # mean kudos (per non-private activity)
     analysis["mean_kudos"] = analysis["total_kudos"] / df["visibility"].value_counts().drop(index="only_me").values.sum()
 
-    # --- groups ---------------------------------------------------------
+    # --- group by sport type --------------------------------------------
     sport_type_group = df.groupby(by="sport_type")
 
     # distance by sport type
     analysis["distance_by_sport"] = sport_type_group["distance"].sum().to_dict()
-    
+
     # moving time by sport type
     analysis["moving_time_by_sport"] = sport_type_group["moving_time"].sum().to_dict()
-    
+
     # elapsed time by sport type
     analysis["moving_time_by_sport"] = sport_type_group["elapsed_time"].sum().to_dict()
-    
+
     # elevation gain by sport type
     analysis["elevation_gain_by_sport"] = sport_type_group["total_elevation_gain"].sum().to_dict()
-    
+
     # kudos by sport type
     analysis["kudos_by_sport"] = sport_type_group["kudos_count"].sum().to_dict()
-    
+
     # --- weekly ---------------------------------------------------------
     def get_weekly(column, target_df=df):
         if "start_date_dt" not in df.columns:
             df["start_date_dt"] = pd.to_datetime(df["start_date"])
-
         return (target_df
                 .groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))[column]
                 .sum()
-                .rename(index=lambda ts: int(ts.timestamp()) * 1000))
+                .rename(index=lambda ts: int(ts.timestamp()) * 1000)
+                .to_dict())
     
+    def get_weekly_by_sport(column):
+        d = {}
+        for sport in df["sport_type"].unique():
+            d[sport] = get_weekly(column, df[df["sport_type"] == sport])
+        return d
+
+    # weekly stats
+    analysis["weekly_distance"] = get_weekly("distance")
+    analysis["weekly_kudos"] = get_weekly("kudos_count")
+    
+    # weekly stats by sport type
+    analysis["weekly_distance_by_sport"] = get_weekly_by_sport("distance")
+    analysis["weekly_kudos_by_sport"] = get_weekly_by_sport("kudos_count")
+
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
     return convert_np_types_to_plain(analysis)
 
