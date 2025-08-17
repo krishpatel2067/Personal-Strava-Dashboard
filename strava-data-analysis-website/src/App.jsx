@@ -60,14 +60,12 @@ function App() {
           // the epoch timestamps of all weeks since account creation
           data.week_starts = Object.keys(data.weekly_distance).sort();
 
+          // different sports were first recorded on different dates (so some week epochs for some sports are missing)
           for (const [sport, distanceData] of Object.entries(data.weekly_distance_by_sport)) {
-            console.log(sport);
-            console.log(distanceData);
             // fill non-existent keys to 0; sort by keys (oldest first); retain only the distance
             data.weekly_distance_by_sport[sport] = Object.entries(fillKeys(data.weekly_distance, distanceData))
               .sort((a, b) => a[0] - b[0])
               .map(([_, value]) => value);
-            console.log(data.weekly_distance_by_sport[sport]);
           }
 
           // console.log({ data, metadata });

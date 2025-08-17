@@ -1,27 +1,7 @@
 import ReactECharts from "echarts-for-react";
 
-function StackedLineChart({ option: optionProp, title, data: dataProp, xAxis, applyFunc }) {
-  if (dataProp != null && xAxis != null) {
-    // const data = Object.fromEntries(Object.entries(dataProp).map(([category, dataValue]) => {
-    //   console.log(category);
-    //   return [
-    //     category,
-    //     Object.fromEntries(xAxis.map((xAxisValue) => {
-    //       if (xAxisValue in dataValue) {
-    //         console.log(`\tretained ${xAxisValue}`);
-    //         return [xAxisValue, dataValue[xAxisValue]];
-    //       } else {
-    //         console.log(`\tfilled ${xAxisValue} with 0`);
-    //         return [xAxisValue, 0];
-    //       }
-    //     }))
-    //   ];
-    // }));
-    const data = dataProp;
-
-    // console.log(xAxis.length);
-    // console.log(Object.entries(data).length);
-
+function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc }) {
+  if (data != null && xAxis != null) {
     const option = optionProp ?? {
       title: {
         text: title
