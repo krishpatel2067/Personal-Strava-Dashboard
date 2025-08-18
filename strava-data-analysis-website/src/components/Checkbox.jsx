@@ -16,7 +16,10 @@ function Checkbox({ label, defaultValue, onChange }) {
 
   return (
     <div className="Checkbox" onClick={onClickHandler}>
-      <button className="checkbox" data-checked={checked}></button>
+      <button className="checkbox" data-checked={checked}>
+        {/* todo: replace with SVG */}
+        <span className="checkmark">&#10004;</span>
+      </button>
       <span>{label}</span>
     </div>
   );
