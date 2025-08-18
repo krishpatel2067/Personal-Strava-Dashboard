@@ -1,20 +1,24 @@
 import { useState } from "react";
 import "./Checkbox.css";
 
-function Checkbox({ defaultValue, onChange }) {
+function Checkbox({ label, defaultValue, onChange }) {
   const [checked, setChecked] = useState(defaultValue ?? false);
 
-  const onClickHandler = () => {
+  const onClickHandler = (event) => {
+    event.preventDefault();
     const newChecked = !checked;
     setChecked(newChecked);
 
     if (onChange != null) {
-      onChange(newChecked);
+      onChange(label, newChecked);
     }
   }
 
   return (
-    <button className="Checkbox" onClick={onClickHandler} data-checked={checked}></button>
+    <div className="Checkbox" onClick={onClickHandler}>
+      <button className="checkbox" data-checked={checked}></button>
+      <span>{label}</span>
+    </div>
   );
 }
 

@@ -1,8 +1,12 @@
 .Checkbox {
+  cursor: pointer;
+}
+
+.Checkbox .checkbox {
   border-radius: 4px;
   border: 2px solid #1b5c9d;
 }
 
-.Checkbox[data-checked=true] {
+.Checkbox .checkbox[data-checked=true] {
   background-color: #1b5c9d;
 }
