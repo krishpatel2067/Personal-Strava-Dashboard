@@ -11,7 +11,7 @@ function Checkbox({ defaultValue, onChange }) {
   }
 
   return (
-    <button className={"Checkbox"} onClick={onClickHandler} data-checked={checked}></button>
+    <button className="Checkbox" onClick={onClickHandler} data-checked={checked}></button>
   );
 }
 
