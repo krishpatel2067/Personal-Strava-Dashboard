@@ -7,7 +7,10 @@ function Checkbox({ defaultValue, onChange }) {
   const onClickHandler = () => {
     const newChecked = !checked;
     setChecked(newChecked);
-    onChange(newChecked);
+
+    if (onChange != null) {
+      onChange(newChecked);
+    }
   }
 
   return (
