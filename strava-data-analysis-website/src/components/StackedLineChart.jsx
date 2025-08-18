@@ -2,6 +2,7 @@ import ReactECharts from "echarts-for-react";
 import { mergeObjects, useTheme } from "../util";
 import { useEffect, useState } from "react";
 import Checkbox from "./Checkbox";
+import "./StackedLineChart.css";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, yAxis }) {
   const [categories, setCategories] = useState({});
