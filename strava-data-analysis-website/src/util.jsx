@@ -17,7 +17,6 @@ function mergeObjects(baseObj, addObj, override = true, copy = true) {
 
   for (const key in addObj) {
     if (override) {
-      console.log("override", override)
       result[key] = addObj[key];
     } else {
       if (!(key in baseObj)) {
