@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Textbox({ defaultValue }) {
+function Textbox({ defaultValue, onChange }) {
   const [input, setInput] = useState(defaultValue ?? "");
 
   const onChangeWrapper = (event) => {

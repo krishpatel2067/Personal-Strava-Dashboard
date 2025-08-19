@@ -3,10 +3,14 @@ import { mergeObjects, useTheme } from "../util";
 import { useEffect, useState } from "react";
 import Checkbox from "./Checkbox";
 import "./StackedLineChart.css";
+import Textbox from "./Textbox";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, yAxis }) {
   const [categories, setCategories] = useState({});
   const [option, setOption] = useState({});
+  const [formError, setFormError] = useState("");
+  // for filtering based on "show the past x datapoints" (aka x-axis range)
+  const [filterFunc, setFilterFunc] = useState(() => () => true);
 
   useEffect(() => {
     setCategories(Object.fromEntries(Object.keys(data).map(key => [key, true])));
@@ -22,9 +26,32 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
     };
     setCategories(newCategories);
     setOptionState(newCategories);
-  }
+  };
 
-  const setOptionState = (newCategories = categories) => {
+  const onTextboxChange = (input) => {
+    if (input === "") {
+      const newFilterFunc = () => true;
+      setFilterFunc(() => newFilterFunc);
+      setOptionState(undefined, newFilterFunc);
+    }
+
+    const numPastDatapoints = Number(input);
+
+    if (isNaN(numPastDatapoints)) {
+      setFormError("Enter a valid number");
+      return;
+    } if (numPastDatapoints <= 0) {
+      setFormError("Enter a positive number");
+      return;
+    }
+
+    const LENGTH = xAxis.data.length;
+    const newFilterFunc = (_, index) => index >= LENGTH - numPastDatapoints;
+    setFilterFunc(() => newFilterFunc);
+    setOptionState(undefined, newFilterFunc);
+  };
+
+  const setOptionState = (newCategories = categories, newFilterFunc = filterFunc) => {
     const newOption = optionProp ?? {
       title: {
         text: title
@@ -33,9 +60,12 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
         show: true,
         trigger: "axis",
       },
-      xAxis: mergeObjects({
+      // priorities (lowest to highest): default xAxis obj, given xAxis obj, xAxis obj with filtered data, 
+      xAxis: mergeObjects(mergeObjects({
         type: "category",
-      }, xAxis),
+      }, xAxis), {
+        data: xAxis.data.filter(newFilterFunc),
+      }),
       yAxis: mergeObjects({
         type: "value",
       }, yAxis),
@@ -48,9 +78,9 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
             showSymbol: false,
             data: (
               (applyFunc != null) ?
-                Object.values(valueData).map(datapoint => applyFunc(datapoint))
+                Object.values(valueData).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
                 :
-                Object.values(valueData)
+                Object.values(valueData).filter(newFilterFunc)
             )
           });
         }
@@ -58,22 +88,19 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
       }, [])
     };
     setOption(newOption);
-  }
+  };
 
   return (
     <div className="StackedLineChart">
       <form className="controls">
-        <p className="form-error">{ }</p>
-        <p>
-          <span>Show </span>
-          <div className="textbox-container">
-            <input
-              type="text"
-            />
-            {/* tool tip */}
-          </div>
-          <span> weeks back</span>
-        </p>
+        <p className="form-error">{formError}</p>
+        <div className="textbox-container">
+          <span>Show the past </span>
+          <Textbox
+            onChange={onTextboxChange}
+          />
+          <span> weeks</span>
+        </div>
         <div className="checkbox-container">
           {Object.keys(categories).map((category, index) => (
             <Checkbox
