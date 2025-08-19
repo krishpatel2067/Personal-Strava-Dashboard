@@ -1,3 +1,5 @@
+import "./Tooltip.css";
+
 function Tooltip({ content }) {
   return (
     <div className="Tooltip">
