@@ -128,6 +128,7 @@ function App() {
               yAxis={{
                 name: "Distance (mi)",
               }}
+              showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
             />
           }
           loaded={loaded}
