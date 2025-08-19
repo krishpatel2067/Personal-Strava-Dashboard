@@ -7,6 +7,7 @@
 }
 
 .Tooltip .content {
+  margin-top: 4px;
   display: none;
   position: absolute;
   background-color: white;
