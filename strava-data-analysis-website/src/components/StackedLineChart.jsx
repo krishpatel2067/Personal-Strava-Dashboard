@@ -5,7 +5,7 @@ import Checkbox from "./Checkbox";
 import "./StackedLineChart.css";
 import Textbox from "./Textbox";
 
-function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, yAxis, showPastDatapointsContent }) {
+function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, yAxis, showPastDatapointsContent, tooltip }) {
   const [categories, setCategories] = useState({});
   const [option, setOption] = useState({});
   const [formError, setFormError] = useState("");
@@ -95,6 +95,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
 
   return (
     <div className="StackedLineChart">
+      {tooltip}
       <form className="controls">
         <p className="form-error">{formError}</p>
         <div className="textbox-container">
