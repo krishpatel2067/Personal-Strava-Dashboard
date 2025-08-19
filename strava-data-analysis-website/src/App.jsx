@@ -85,7 +85,34 @@ function App() {
 
   return (
     <div className="App">
-      {/* add intro! */}
+      <header>
+        <div className="banner">
+          <h1>Personal Strava Dashboard</h1>
+          <p>Krish A. Patel</p>
+        </div>
+        <h2>Background</h2>
+        <p>
+          Since the fall 2021 season of cross country, I have had a passion for running, and from summer 2023, I have been using Strava to post my runs, walks, and other workouts. Lucky for me, Strava has a web API to get a user's activities, and that's how the idea for his project started.
+        </p>
+        <h2>About</h2>
+        <p>
+          Personal Strava Dashboard is a statically hosted site that displays the summary statistics calculated from all my Strava activities. Every day, two serverless cloud functions are scheduled to run automatically: one fetches the raw data from Strava, and the other analyzes that data to prepare a clean set of statistics. Finally, this website displays those numbers via cards.
+        </p>
+        <h2>Technologies Used</h2>
+        <ul>
+          <li><b>Strava API v3</b>: Authorizes access to my Strava data</li>
+          <li><b>Firebase</b>
+            <ul>
+              <li><b>Storage</b>: Holds both the JSON files containing the latest raw and analyzed data</li>
+              <li><b>Functions</b>: Automatically fetches (via JavaScript) and analyzes (via Python and Pandas) the data</li>
+              <li><b>Firestore</b>: Stores the necessary credentials for accessing my Strava data</li>
+              <li><b>Hosting</b>: Hosts this site</li>
+            </ul>
+          </li>
+          <li><b>React</b>: Creates the structure and logic of this website</li>
+          <li><b>Apache ECharts</b>: Displays various visualizations</li>
+        </ul>
+      </header>
       <main>
         <StatCard
           name="Total Distance"
