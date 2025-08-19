@@ -80,15 +80,46 @@ function App() {
           console.log("Error while fetching analysis.json:", err.message);
         });
     }
+
+    const startGradientAnimation = () => {
+      const banner = document.querySelector(".App .banner");
+      const options = {
+        duration: 1000 * Math.floor(Math.random() * 11 + 10),
+        easing: "ease-in-out",
+        direction: "alternate",
+        iterations: Infinity
+      };
+      banner.animate([
+        {
+          "--x": `${Math.floor(Math.random() * 101)}%`,
+          "--y": `${Math.floor(Math.random() * 101)}%`
+        },
+        {
+          "--x": `${Math.floor(Math.random() * 101)}%`,
+          "--y": `${Math.floor(Math.random() * 101)}%`
+        }
+      ], options);
+
+      banner.animate([
+        {
+          "--stop": `${Math.floor(Math.random() * 81 + 20)}%`,
+        },
+        {
+          "--stop": `${Math.floor(Math.random() * 81 + 20)}%`
+        }
+      ], options);
+    }
+
     fetchAnalysis();
+    startGradientAnimation();
   }, []);
 
   return (
     <div className="App">
       <header>
         <div className="banner">
-          <h1>Personal Strava Dashboard</h1>
-          <p>Krish A. Patel</p>
+          <h1 className="title">Personal Strava Dashboard</h1>
+          <h2 className="subtitle">Krish A. Patel</h2>
         </div>
         <h2>Background</h2>
         <p>

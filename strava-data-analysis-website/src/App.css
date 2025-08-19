@@ -6,6 +6,11 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 body,
 html,
 #root,
@@ -19,6 +24,70 @@ html,
 .App {
   display: grid;
   grid-template-rows: 1fr auto;
+}
+
+@property --x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --y {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --stop {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.banner {
+  background:
+    radial-gradient(circle at var(--x) var(--y),
+      #ff5a00,
+      transparent var(--stop)),
+    conic-gradient(from var(--angle) at 150% 150%,
+      #ff5a00,
+      transparent,
+      #ff5a00);
+  background-color: white;
+  height: 100svh;
+  align-content: center;
+  display: grid;
+  gap: 32px;
+  animation: spin ease-in-out infinite 5s alternate;
+}
+
+@keyframes spin {
+  from {
+    --angle: 180deg
+  }
+
+  to {
+    --angle: 360deg;
+  }
+}
+
+.banner * {
+  text-align: center;
+}
+
+.banner .title {
+  font-size: 4em;
+}
+
+.banner .subtitle {
+  font-weight: lighter;
+  font-size: 2em;
 }
 
 main {
