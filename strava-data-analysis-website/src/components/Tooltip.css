@@ -1,0 +1,10 @@
+/* computers */
+@media(hover: hover) and (pointer: fine) {
+  .Tooltip .content {
+    opacity: 0;
+  }
+  
+  .Tooltip .activator:hover ~ .Tooltip .content {
+    opacity: 1;
+  }
+}
