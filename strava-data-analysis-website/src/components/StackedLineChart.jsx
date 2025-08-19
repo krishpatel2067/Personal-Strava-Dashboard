@@ -114,7 +114,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
             </>
           )}
         </div>
-        <div className="checkbox-container">
+        {/* <div className="checkbox-container">
           {Object.keys(categories).map((category, index) => (
             <Checkbox
               key={index}
@@ -123,7 +123,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
               onChange={onCheckboxChange}
             />
           ))}
-        </div>
+        </div> */}
       </form>
       <ReactECharts
         option={option}
