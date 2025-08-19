@@ -7,7 +7,7 @@
 }
 
 .Tooltip .content {
-  opacity: 0;
+  display: none;
   position: absolute;
   background-color: white;
   padding: 16px;
@@ -22,12 +22,12 @@
 
 /* computers: hover */
 .Tooltip .activator:hover~:is(.Tooltip .content) {
-  opacity: 1;
+  display: block;
 }
 
 @media (pointer: coarse) {
   /* touchscreens: press */
   .Tooltip .content[data-visible=true] {
-    opacity: 1;
+    display: block;
   }
 }
