@@ -59,12 +59,12 @@ html,
       #ff5a00,
       transparent,
       #ff5a00);
-  background-color: white;
+  background-color: rgb(0, 0, 0);
   height: 100svh;
   align-content: center;
   display: grid;
   gap: 32px;
-  animation: spin ease-in-out infinite 5s alternate;
+  animation: spin ease-in-out infinite 10s alternate;
 }
 
 @keyframes spin {
@@ -79,6 +79,7 @@ html,
 
 .banner * {
   text-align: center;
+  color: white;
 }
 
 .banner .title {
