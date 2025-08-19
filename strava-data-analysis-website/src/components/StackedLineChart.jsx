@@ -19,14 +19,14 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
 
   const isDarkTheme = useTheme();
 
-  const onCheckboxChange = (label, checked) => {
-    const newCategories = {
-      ...categories,
-      [label]: checked
-    };
-    setCategories(newCategories);
-    setOptionState(newCategories);
-  };
+  // const onCheckboxChange = (label, checked) => {
+  //   const newCategories = {
+  //     ...categories,
+  //     [label]: checked
+  //   };
+  //   setCategories(newCategories);
+  //   setOptionState(newCategories);
+  // };
 
   const onTextboxChange = (input) => {
     if (input === "") {

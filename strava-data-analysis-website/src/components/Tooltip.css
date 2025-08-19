@@ -1,3 +1,7 @@
+.Tooltip {
+  /* position: relative; */
+}
+
 .Tooltip .activator {
   border-radius: 1lh;
   aspect-ratio: 1;
@@ -7,14 +11,15 @@
 }
 
 .Tooltip .content {
-  margin-top: 4px;
-  display: none;
-  position: absolute;
+  visibility: hidden;
+  width: auto;
+  position: fixed;
   background-color: white;
   padding: 16px;
   border: var(--bord-col) 2px solid;
   box-shadow: 0 10px 25px 0 var(--shadow-col);
   border-radius: 8px;
+  box-sizing: border-box;
   z-index: 999;
 }
 
@@ -24,12 +29,12 @@
 
 /* computers: hover */
 .Tooltip .activator:hover~:is(.Tooltip .content) {
-  display: block;
+  visibility: visible;
 }
 
 @media (pointer: coarse) {
   /* touchscreens: press */
   .Tooltip .content[data-visible=true] {
-    display: block;
+    visibility: visible;
   }
 }
