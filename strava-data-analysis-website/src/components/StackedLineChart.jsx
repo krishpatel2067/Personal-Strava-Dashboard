@@ -63,6 +63,17 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
   return (
     <div className="StackedLineChart">
       <form className="controls">
+        <p className="form-error">{ }</p>
+        <p>
+          <span>Show </span>
+          <div className="textbox-container">
+            <input
+              type="text"
+            />
+            {/* tool tip */}
+          </div>
+          <span> weeks back</span>
+        </p>
         <div className="checkbox-container">
           {Object.keys(categories).map((category, index) => (
             <Checkbox
