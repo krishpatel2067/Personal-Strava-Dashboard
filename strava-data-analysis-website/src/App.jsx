@@ -130,17 +130,17 @@ function App() {
                 name: "Distance (mi)",
               }}
               showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
-              tooltip={<Tooltip
-                content={(
-                  <p>
-                    <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now
-                    <br />
-                    <b>Toggling series</b>: Click its respective name in the legend.
-                  </p>
-                )}
-              />}
             />
           }
+          tooltip={<Tooltip
+            content={(
+              <p>
+                <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now
+                <br />
+                <b>Toggling series</b>: Click its respective name in the legend.
+              </p>
+            )}
+          />}
           loaded={loaded}
         />
       </main>

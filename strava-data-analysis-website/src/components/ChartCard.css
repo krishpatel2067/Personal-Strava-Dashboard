@@ -1,0 +1,8 @@
+.ChartCard .top-container {
+  display: flex;
+  align-items: center;
+}
+
+.ChartCard h2 {
+  flex-grow: 1;
+}

@@ -1,5 +1,9 @@
-.StackedLineChart .checkbox-container {
+/* .StackedLineChart .checkbox-container {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+} */
+
+.StackedLineChart .textbox-container > * {
+  display: inline;
 }
