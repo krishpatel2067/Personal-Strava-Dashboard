@@ -33,10 +33,12 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
       const newFilterFunc = () => true;
       setFilterFunc(() => newFilterFunc);
       setOptionState(undefined, newFilterFunc);
+      setFormError("");
+      return;
     }
-
+    
     const numPastDatapoints = Number(input);
-
+    
     if (isNaN(numPastDatapoints)) {
       setFormError("Enter a valid number");
       return;
@@ -44,7 +46,8 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
       setFormError("Enter a positive number");
       return;
     }
-
+    
+    setFormError("");
     const LENGTH = xAxis.data.length;
     const newFilterFunc = (_, index) => index >= LENGTH - numPastDatapoints;
     setFilterFunc(() => newFilterFunc);
