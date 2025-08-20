@@ -178,6 +178,17 @@ function App() {
           units="hrs"
           loaded={loaded}
         />
+        <StatCard
+          name="Total Elevation Gain"
+          stat={data.total_elevation_gain}
+          units="m"
+          loaded={loaded}
+        />
+        <StatCard
+          name="Total Kudos"
+          stat={data.total_kudos}
+          loaded={loaded}
+        />
         <TableCard
           name="Distance by Sport"
           // sort by distance, descending
