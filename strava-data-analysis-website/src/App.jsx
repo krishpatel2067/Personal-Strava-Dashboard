@@ -268,9 +268,14 @@ function App() {
       </main>
       <footer>
         <div className="inner-container">
-          Last fetched: {new Date(metadata?.fetched_at).toLocaleString()}
-          <br />
-          Last analyzed: {new Date(metadata?.analyzed_at).toLocaleString()}
+          <p>
+            <b>Last fetched</b>: {new Date(metadata?.fetched_at).toLocaleString()}
+            <br />
+            <b>Last analyzed</b>: {new Date(metadata?.analyzed_at).toLocaleString()}
+          </p>
+          <p>
+            &#169; {new Date().getFullYear()} Krish A. Patel
+          </p>
         </div>
       </footer>
     </div>
