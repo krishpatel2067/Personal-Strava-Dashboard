@@ -128,6 +128,8 @@ function App() {
             </div>
           </div>
         </div>
+      </header>
+      <section className="info">
         <h2>Background</h2>
         <p>
           Since the fall 2021 season of cross country, I have had a passion for running, and from summer 2023, I have been using Strava to post my runs, walks, and other workouts. Lucky for me, Strava has a web API to get a user's activities, and that's how the idea for his project started.
@@ -150,7 +152,7 @@ function App() {
           <li><b>React</b>: Creates the structure and logic of this website</li>
           <li><b>Apache ECharts</b>: Displays various visualizations</li>
         </ul>
-      </header>
+      </section>
       <main>
         <StatCard
           name="Total Distance"
