@@ -155,20 +155,30 @@ function App() {
         <p>
           Personal Strava Dashboard is a statically hosted site that displays the summary statistics calculated from all my Strava activities. Every day, two serverless cloud functions are scheduled to run automatically: one fetches the raw data from Strava, and the other analyzes that data to prepare a clean set of statistics. Finally, this website displays those numbers via cards.
         </p>
+        <h3>Features</h3>
+        <ul>
+          <li><b>Graph interactivity</b>: On top of built-in ECharts interactivity, some visualizations offer, for instance, the ability to restrict the x-axis to "zoom" in and out on the graph.</li>
+          <li><b>Responsive design</b>: Works on both desktop and mobile. However, the graphs are much easier to interact with on desktop.</li>
+          <li><b>Light and dark mode</b>: Automatically adheres to the device theme.</li>
+        </ul>
         <h3>Technologies Used</h3>
         <ul>
-          <li><b>Strava API v3</b>: Authorizes access to my Strava data</li>
+          <li><b>Strava API v3</b>: Authorizes access to my Strava data.</li>
           <li><b>Firebase</b>
             <ul>
-              <li><b>Storage</b>: Holds both the JSON files containing the latest raw and analyzed data</li>
-              <li><b>Functions</b>: Automatically fetches (via JavaScript) and analyzes (via Python and Pandas) the data</li>
-              <li><b>Firestore</b>: Stores the necessary credentials for accessing my Strava data</li>
-              <li><b>Hosting</b>: Hosts this site</li>
+              <li><b>Storage</b>: Holds both the JSON files containing the latest raw and analyzed data.</li>
+              <li><b>Functions</b>: Automatically fetches (via JavaScript) and analyzes (via Python and Pandas) the data.</li>
+              <li><b>Firestore</b>: Stores the necessary credentials for accessing my Strava data.</li>
+              <li><b>Hosting</b>: Hosts this site.</li>
             </ul>
           </li>
-          <li><b>React</b>: Creates the structure and logic of this website</li>
-          <li><b>Apache ECharts</b>: Displays various visualizations</li>
+          <li><b>React</b>: Creates the structure and logic of this website.</li>
+          <li><b>Apache ECharts</b>: Displays various visualizations.</li>
         </ul>
+        <h3>Future Plans</h3>
+        <p>
+          Apart from internal changes (such as refining the codebase), my main plan is to incrementally add new stats and visualizations as I think of them. A smaller plan is to explore better grid options since the current flexbox method has some awkward edge cases.
+        </p>
       </section>
       <main>
         <h2>Stats</h2>
