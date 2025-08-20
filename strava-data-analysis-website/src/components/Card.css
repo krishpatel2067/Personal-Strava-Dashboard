@@ -4,8 +4,7 @@
   border-radius: 8px;
   display: grid;
   gap: 8px;
-  align-content: space-between;
-  height: max-content;
+  align-content: center;
   break-inside: avoid-column;
   flex-grow: 1;
 }
@@ -16,7 +15,6 @@
 
 .Card span {
   line-height: 1em;
-  /* display: inline-block; */
 }
 
 .Card h2 {
