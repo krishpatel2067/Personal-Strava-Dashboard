@@ -7,7 +7,7 @@ function TableCard({ name, data, headers, applyFunc: applyFuncProp, loaded, styl
     const applyFunc = applyFuncProp != null ? applyFuncProp : (val) => val;
     return (
       <div className="TableCard Card" style={style}>
-        <h2 className="name secondary">{name}</h2>
+        <h3 className="name secondary">{name}</h3>
         <div className="data-container">
           <table>
             <thead>

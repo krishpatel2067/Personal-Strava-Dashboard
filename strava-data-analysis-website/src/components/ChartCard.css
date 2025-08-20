@@ -3,7 +3,7 @@
   align-items: center;
 }
 
-.ChartCard h2 {
+.ChartCard .name {
   flex-grow: 1;
 }
 

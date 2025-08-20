@@ -6,7 +6,7 @@ function ChartCard({ name, chart, loaded, tooltip, style }) {
     return (
       <div className="ChartCard Card" style={style}>
         <div className="top-container">
-          <h2 className="name secondary">{name}</h2>
+          <h3 className="name secondary">{name}</h3>
           {tooltip}
         </div>
         <div className="data-container">
