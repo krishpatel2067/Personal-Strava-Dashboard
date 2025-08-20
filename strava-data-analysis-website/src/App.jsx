@@ -234,7 +234,7 @@ function App() {
           tooltip={<Tooltip
             content={(
               <p>
-                <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now
+                <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now, and x must be positive. Leave blank to show all available weeks.
                 <br />
                 <b>Toggling series</b>: Click its respective name in the legend.
               </p>
