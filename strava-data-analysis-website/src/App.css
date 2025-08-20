@@ -42,14 +42,11 @@ body {
   font-size: 1.5rem;
 }
 
-.App p,
-.App li,
-.App span {
+.App :is(p, li, span) {
   font-size: 1.1rem;
 }
 
-.App p,
-.App li {
+.App :is(h2, h3, p, li) {
   line-height: 1.75rem;
 }
 
