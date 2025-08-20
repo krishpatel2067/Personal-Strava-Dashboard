@@ -11,6 +11,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
   const [formError, setFormError] = useState("");
   // for filtering based on "show the past x datapoints" (aka x-axis range)
   const [filterFunc, setFilterFunc] = useState(() => () => true);
+  const { colors } = useTheme();
 
   useEffect(() => {
     setCategories(Object.fromEntries(Object.keys(data).map(key => [key, true])));
@@ -36,9 +37,9 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
       setFormError("");
       return;
     }
-    
+
     const numPastDatapoints = Number(input);
-    
+
     if (isNaN(numPastDatapoints)) {
       setFormError("Enter a valid number");
       return;
@@ -46,7 +47,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
       setFormError("Enter a positive number");
       return;
     }
-    
+
     setFormError("");
     const LENGTH = xAxis.data.length;
     const newFilterFunc = (_, index) => index >= LENGTH - numPastDatapoints;
@@ -63,6 +64,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
         show: true,
         trigger: "axis",
       },
+      backgroundColor: colors.backgroundColor,
       // priorities (lowest to highest): default xAxis obj, given xAxis obj, xAxis obj with filtered data, 
       xAxis: mergeObjects(mergeObjects({
         type: "category",

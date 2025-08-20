@@ -29,18 +29,23 @@ function mergeObjects(baseObj, addObj, override = true, copy = true) {
 }
 
 function useTheme() {
-    const [isDarkTheme, setIsDarkTheme] = useState(
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    );  
-    const mqListener = e => setIsDarkTheme(e.matches);
-    
-    useEffect(() => {
-      const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
-      darkThemeMq.addEventListener("change", mqListener);
-      return () => darkThemeMq.removeEventListener("change", mqListener);
-    }, []);
-    
-    return isDarkTheme;
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+  const mqListener = e => setIsDarkTheme(e.matches);
+
+  useEffect(() => {
+    const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+    darkThemeMq.addEventListener("change", mqListener);
+    return () => darkThemeMq.removeEventListener("change", mqListener);
+  }, []);
+
+  const computedStyles = getComputedStyle(document.documentElement);
+  const colors = {
+    backgroundColor: computedStyles.getPropertyValue(`--bkg-col-` + (isDarkTheme ? "dark" : "light")),
+  };
+  console.log(colors.backgroundColor);
+  return { isDarkTheme, colors };
 }
 
 export { mergeObjects, useTheme };

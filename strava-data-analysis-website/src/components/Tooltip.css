@@ -1,11 +1,7 @@
-.Tooltip {
-  /* position: relative; */
-}
-
 .Tooltip .activator {
   border-radius: 1lh;
   aspect-ratio: 1;
-  background-color: white;
+  background-color: var(--bkg-col);
   border: var(--bord-col) 2px solid;
   font-weight: bolder;
 }
@@ -14,7 +10,7 @@
   visibility: hidden;
   width: auto;
   position: fixed;
-  background-color: white;
+  background-color: var(--bkg-col);
   padding: 16px;
   border: var(--bord-col) 2px solid;
   box-shadow: 0 10px 25px 0 var(--shadow-col);
