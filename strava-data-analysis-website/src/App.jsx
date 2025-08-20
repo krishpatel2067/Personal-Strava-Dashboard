@@ -63,14 +63,20 @@ function App() {
           data.week_starts = Object.keys(data.weekly_distance).sort();
 
           // different sports were first recorded on different dates (so some week epochs for some sports are missing)
-          for (const [sport, distanceData] of Object.entries(data.weekly_distance_by_sport)) {
-            // fill non-existent keys to 0; sort by keys (oldest first); retain only the distance
-            data.weekly_distance_by_sport[sport] = Object.entries(fillKeys(data.weekly_distance, distanceData))
-              .sort((a, b) => a[0] - b[0])
-              .map(([_, value]) => value);
+          for (const [weekKey, totalKey] of [
+            ["weekly_distance_by_sport", "weekly_distance"], 
+            ["weekly_kudos_by_sport", "weekly_kudos"]
+          ]) {
+            for (const [sport, weekData] of Object.entries(data[weekKey])) {
+              // fill non-existent keys to 0; sort by keys (oldest first); retain only the value (not key)
+              data[weekKey][sport] = Object.entries(fillKeys(data[totalKey], weekData))
+                .sort((a, b) => a[0] - b[0])
+                .map(([_, value]) => value);
+            }
           }
 
           data.weekly_distance_by_sport["Total"] = Object.values(data.weekly_distance);
+          data.weekly_kudos_by_sport["Total"] = Object.values(data.weekly_kudos);
 
           // console.log({ data, metadata });
           setMetadata(metadata);
@@ -195,6 +201,35 @@ function App() {
               }}
               yAxis={{
                 name: "Distance (mi)",
+              }}
+              showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+            />
+          }
+          tooltip={<Tooltip
+            content={(
+              <p>
+                <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now
+                <br />
+                <b>Toggling series</b>: Click its respective name in the legend.
+              </p>
+            )}
+          />}
+          loaded={loaded}
+        />
+        <ChartCard
+          name="Kudos Per Week"
+          chart={
+            <StackedLineChart
+              data={data.weekly_kudos_by_sport}
+              xAxis={{
+                name: "Date",
+                data: loaded ?
+                  data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
+                  :
+                  []
+              }}
+              yAxis={{
+                name: "Kudos Count",
               }}
               showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
             />
