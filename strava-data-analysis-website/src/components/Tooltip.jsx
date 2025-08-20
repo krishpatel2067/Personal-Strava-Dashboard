@@ -11,7 +11,7 @@ function Tooltip({ content }) {
 
   useEffect(() => {
     const updateRelativePosition = () => {
-      const activator = document.querySelector(".Tooltip .activator");
+      const activator = ref.current;
       const content = document.querySelector(".Tooltip .content");
       const activatorRect = activator.getBoundingClientRect();
       const x = activatorRect.x + activatorRect.width / 2;
