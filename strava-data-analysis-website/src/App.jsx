@@ -7,6 +7,7 @@ import TableCard from './components/TableCard';
 import ChartCard from './components/ChartCard';
 import StackedLineChart from './components/StackedLineChart';
 import Tooltip from './components/ToolTip';
+import downArrow from "./assets/down_arrow.svg";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
@@ -120,6 +121,11 @@ function App() {
         <div className="banner">
           <h1 className="title">Personal Strava Dashboard</h1>
           <h2 className="subtitle">Krish A. Patel</h2>
+          <div className="scroll-hint">
+            <p>Scroll</p>
+            <img src={downArrow} />
+          </div>
+          <div className="fade"></div>
         </div>
         <h2>Background</h2>
         <p>

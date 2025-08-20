@@ -26,6 +26,8 @@ html,
   grid-template-rows: 1fr auto;
 }
 
+/* --- Banner ----------------------------------- */
+
 @property --x {
   syntax: "<percentage>";
   inherits: false;
@@ -51,6 +53,7 @@ html,
 }
 
 .banner {
+  position: relative;
   background:
     radial-gradient(circle at var(--x) var(--y),
       #ff5a00,
@@ -90,6 +93,23 @@ html,
   font-weight: lighter;
   font-size: 2em;
 }
+
+.banner .scroll-hint {
+  position: absolute;
+  bottom: 16px;
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  justify-content: center;
+  justify-items: center;
+}
+
+.banner .scroll-hint img {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---------------------------------------------- */
 
 main {
   margin: 0 auto;
