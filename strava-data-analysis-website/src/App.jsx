@@ -21,6 +21,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+const TOOLTIPS = {
+  chartCard: (
+    <p>
+      <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now, and x must be positive. Leave blank to show all available weeks.
+      <br />
+      <b>Toggling series</b>: Click its respective name in the legend.
+    </p>
+  )
+};
+
 function mToMi(m) {
   return m / 1609;
 }
@@ -231,15 +241,7 @@ function App() {
               showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
             />
           }
-          tooltip={<Tooltip
-            content={(
-              <p>
-                <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now, and x must be positive. Leave blank to show all available weeks.
-                <br />
-                <b>Toggling series</b>: Click its respective name in the legend.
-              </p>
-            )}
-          />}
+          tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
           loaded={loaded}
         />
         <ChartCard
@@ -260,15 +262,7 @@ function App() {
               showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
             />
           }
-          tooltip={<Tooltip
-            content={(
-              <p>
-                <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now
-                <br />
-                <b>Toggling series</b>: Click its respective name in the legend.
-              </p>
-            )}
-          />}
+          tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
           loaded={loaded}
         />
       </main>
