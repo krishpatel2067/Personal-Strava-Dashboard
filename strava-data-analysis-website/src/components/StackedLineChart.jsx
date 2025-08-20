@@ -128,7 +128,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
       <ReactECharts
         option={option}
         notMerge={true}
-        style={{ width: "100%", height: "400px" }}
+        style={{ maxWidth: "100%", height: "400px" }}
         theme={isDarkTheme ? "dark" : "light"}
       />
     </div>

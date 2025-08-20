@@ -1,10 +1,10 @@
 import "./Card.css";
 import "./ChartCard.css";
 
-function ChartCard({ name, chart, loaded, tooltip }) {
+function ChartCard({ name, chart, loaded, tooltip, style }) {
   if (loaded) {
     return (
-      <div className="ChartCard Card">
+      <div className="ChartCard Card" style={style}>
         <div className="top-container">
           <h2 className="name secondary">{name}</h2>
           {tooltip}

@@ -119,8 +119,20 @@ main, section {
   margin: 0 auto;
   max-width: 750px;
   width: calc(100% - 32px);
-  display: grid;
 }
+
+main {
+  /* --n-cols: 3;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* main > * {
+  margin-bottom: 12px;
+} */
 
 footer {
   background-color: whitesmoke;

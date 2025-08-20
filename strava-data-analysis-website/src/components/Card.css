@@ -5,7 +5,9 @@
   display: grid;
   gap: 8px;
   align-content: space-between;
-  height: fit-content;
+  height: max-content;
+  break-inside: avoid-column;
+  flex-grow: 1;
 }
 
 .Card .data-container {

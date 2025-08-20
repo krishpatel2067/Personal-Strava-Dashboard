@@ -1,20 +1,17 @@
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "../util";
 
-function PieChart({ option: optionProp, title, data }) {
+function PieChart({ option: optionProp, seriesTitle, data }) {
   const isDarkTheme = useTheme();
   const option = optionProp ?? {
-    title: {
-      text: title
-    },
     tooltip: {
       show: true,
     },
     series: [
       {
-        name: title,
+        name: seriesTitle,
         type: "pie",
-        radius: 150,
+        radius: "50%",
         center: ["50%", "50%"],
         data: data
       }
@@ -25,7 +22,7 @@ function PieChart({ option: optionProp, title, data }) {
     <div className="PieChart">
       <ReactECharts
         option={option}
-        style={{ width: "400px", height: "400px" }}
+        style={{ width: "300px", height: "300px" }}
         theme={isDarkTheme ? "dark" : "light"}
       />
     </div>

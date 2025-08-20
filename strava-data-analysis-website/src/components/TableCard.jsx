@@ -2,10 +2,10 @@ import "./Card.css";
 import PieChart from "./PieChart";
 import "./TableCard.css";
 
-function TableCard({ name, data, headers, applyFunc, loaded }) {
+function TableCard({ name, data, headers, applyFunc, loaded, style }) {
   if (loaded) {
     return (
-      <div className="TableCard Card">
+      <div className="TableCard Card" style={style}>
         <h2 className="name secondary">{name}</h2>
         <div className="data-container">
           <table>
@@ -30,7 +30,7 @@ function TableCard({ name, data, headers, applyFunc, loaded }) {
             </tbody>
           </table>
           <PieChart
-            title={name}
+            seriesTitle={name}
             data={data.map(item => ({ value: applyFunc(item[1]), name: item[0] }))}
           />
         </div>
