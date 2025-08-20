@@ -137,7 +137,7 @@ function App() {
         <div className="banner">
           <div className="container">
             <h1 className="title">Personal Strava Dashboard</h1>
-            <h2 className="subtitle">Krish A. Patel</h2>
+            <p className="subtitle">Krish A. Patel</p>
             <div className="scroll-hint">
               <p>Scroll</p>
               <img src={downArrow} />
@@ -146,15 +146,16 @@ function App() {
         </div>
       </header>
       <section className="info">
-        <h2>Background</h2>
+        <h2>Info</h2>
+        <h3>Background</h3>
         <p>
           Since the fall 2021 season of cross country, I have had a passion for running, and from summer 2023, I have been using Strava to post my runs, walks, and other workouts. Lucky for me, Strava has a web API to get a user's activities, and that's how the idea for his project started.
         </p>
-        <h2>About</h2>
+        <h3>About</h3>
         <p>
           Personal Strava Dashboard is a statically hosted site that displays the summary statistics calculated from all my Strava activities. Every day, two serverless cloud functions are scheduled to run automatically: one fetches the raw data from Strava, and the other analyzes that data to prepare a clean set of statistics. Finally, this website displays those numbers via cards.
         </p>
-        <h2>Technologies Used</h2>
+        <h3>Technologies Used</h3>
         <ul>
           <li><b>Strava API v3</b>: Authorizes access to my Strava data</li>
           <li><b>Firebase</b>
@@ -170,101 +171,104 @@ function App() {
         </ul>
       </section>
       <main>
-        <StatCard
-          name="Total Distance"
-          stat={mToMi(data.total_distance)}
-          units="mi"
-          loaded={loaded}
-        />
-        <StatCard
-          name="Total Moving Time"
-          stat={sToHrs(data.total_moving_time)}
-          units="hrs"
-          loaded={loaded}
-        />
-        <StatCard
-          name="Total Elapsed Time"
-          stat={sToHrs(data.total_elapsed_time)}
-          units="hrs"
-          loaded={loaded}
-        />
-        <StatCard
-          name="Total Elevation Gain"
-          stat={data.total_elevation_gain}
-          units="m"
-          loaded={loaded}
-        />
-        <StatCard
-          name="Total Kudos"
-          stat={data.total_kudos}
-          loaded={loaded}
-        />
-        <TableCard
-          name="Distance by Sport"
-          // sort by distance, descending
-          data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
-          headers={["", "Distance (mi)"]}
-          applyFunc={(val) => Math.round(mToMi(val))}
-          loaded={loaded}
-        />
-        <TableCard
-          name="Elevation Gain by Sport"
-          // sort by elevation gain, descending
-          data={Object.entries(data.elevation_gain_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
-          headers={["", "Elevation Gain (m)"]}
-          applyFunc={Math.round}
-          loaded={loaded}
-        />
-        <TableCard
-          name="Kudos by Sport"
-          // sort by kudos, descending
-          data={Object.entries(data.kudos_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
-          headers={["", "Kudos Count"]}
-          loaded={loaded}
-        />
-        <ChartCard
-          name="Distance Per Week"
-          chart={
-            <StackedLineChart
-              data={data.weekly_distance_by_sport}
-              applyFunc={distance => Math.round(mToMi(distance))}
-              xAxis={{
-                name: "Date",
-                data: loaded ?
-                  data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
-                  :
-                  []
-              }}
-              yAxis={{
-                name: "Distance (mi)",
-              }}
-              showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
-            />
-          }
-          tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-          loaded={loaded}
-        />
-        <ChartCard
-          name="Kudos Per Week"
-          chart={
-            <StackedLineChart
-              data={data.weekly_kudos_by_sport}
-              xAxis={{
-                name: "Date",
-                data: loaded ?
-                  data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
-                  :
-                  []
-              }}
-              yAxis={{
-                name: "Kudos Count",
-              }}
-              showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
-            />
-          }
-          tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-          loaded={loaded}
-        />
+        <h2>Stats</h2>
+        <div className="container">
+          <StatCard
+            name="Total Distance"
+            stat={mToMi(data.total_distance)}
+            units="mi"
+            loaded={loaded}
+          />
+          <StatCard
+            name="Total Moving Time"
+            stat={sToHrs(data.total_moving_time)}
+            units="hrs"
+            loaded={loaded}
+          />
+          <StatCard
+            name="Total Elapsed Time"
+            stat={sToHrs(data.total_elapsed_time)}
+            units="hrs"
+            loaded={loaded}
+          />
+          <StatCard
+            name="Total Elevation Gain"
+            stat={data.total_elevation_gain}
+            units="m"
+            loaded={loaded}
+          />
+          <StatCard
+            name="Total Kudos"
+            stat={data.total_kudos}
+            loaded={loaded}
+          />
+          <TableCard
+            name="Distance by Sport"
+            // sort by distance, descending
+            data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+            headers={["", "Distance (mi)"]}
+            applyFunc={(val) => Math.round(mToMi(val))}
+            loaded={loaded}
+          />
+          <TableCard
+            name="Elevation Gain by Sport"
+            // sort by elevation gain, descending
+            data={Object.entries(data.elevation_gain_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+            headers={["", "Elevation Gain (m)"]}
+            applyFunc={Math.round}
+            loaded={loaded}
+          />
+          <TableCard
+            name="Kudos by Sport"
+            // sort by kudos, descending
+            data={Object.entries(data.kudos_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+            headers={["", "Kudos Count"]}
+            loaded={loaded}
+          />
+          <ChartCard
+            name="Distance Per Week"
+            chart={
+              <StackedLineChart
+                data={data.weekly_distance_by_sport}
+                applyFunc={distance => Math.round(mToMi(distance))}
+                xAxis={{
+                  name: "Date",
+                  data: loaded ?
+                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
+                    :
+                    []
+                }}
+                yAxis={{
+                  name: "Distance (mi)",
+                }}
+                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+              />
+            }
+            tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
+            loaded={loaded}
+          />
+          <ChartCard
+            name="Kudos Per Week"
+            chart={
+              <StackedLineChart
+                data={data.weekly_kudos_by_sport}
+                xAxis={{
+                  name: "Date",
+                  data: loaded ?
+                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
+                    :
+                    []
+                }}
+                yAxis={{
+                  name: "Kudos Count",
+                }}
+                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+              />
+            }
+            tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
+            loaded={loaded}
+          />
+        </div>
       </main>
       <footer>
         <div className="inner-container">

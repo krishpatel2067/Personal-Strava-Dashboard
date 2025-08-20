@@ -32,6 +32,10 @@ body {
   grid-template-rows: 1fr auto;
 }
 
+h2 {
+  text-align: center;
+}
+
 /* --- Banner ----------------------------------- */
 
 @property --x {
@@ -137,7 +141,7 @@ section {
   width: calc(100% - 32px);
 }
 
-main {
+main .container {
   /* --n-cols: 3;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) */
