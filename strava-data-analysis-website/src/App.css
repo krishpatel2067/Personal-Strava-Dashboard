@@ -11,6 +11,7 @@
 
   color-scheme: light dark;
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
 }
 
 body,
@@ -32,8 +33,24 @@ body {
   grid-template-rows: 1fr auto;
 }
 
-h2 {
+.App h2 {
+  font-size: 2rem;
   text-align: center;
+}
+
+.App h3 {
+  font-size: 1.5rem;
+}
+
+.App p,
+.App li,
+.App span {
+  font-size: 1.1rem;
+}
+
+.App p,
+.App li {
+  line-height: 1.75rem;
 }
 
 /* --- Banner ----------------------------------- */
@@ -103,15 +120,16 @@ h2 {
 }
 
 .App .banner .title {
-  font-size: 4em;
+  font-size: 4rem;
 }
 
 .App .banner .subtitle {
   font-weight: lighter;
-  font-size: 2em;
+  font-size: 2rem;
 }
 
 .App .banner .scroll-hint {
+  font-size: 1rem;
   position: absolute;
   bottom: 16px;
   width: 100%;
@@ -134,14 +152,14 @@ h2 {
 
 /* ---------------------------------------------- */
 
-main,
-section {
+.App main,
+.App section {
   margin: 0 auto;
   max-width: 750px;
   width: calc(100% - 32px);
 }
 
-main .container {
+.App main .container {
   /* --n-cols: 3;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) */
