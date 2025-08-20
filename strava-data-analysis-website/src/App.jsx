@@ -64,7 +64,7 @@ function App() {
 
           // different sports were first recorded on different dates (so some week epochs for some sports are missing)
           for (const [weekKey, totalKey] of [
-            ["weekly_distance_by_sport", "weekly_distance"], 
+            ["weekly_distance_by_sport", "weekly_distance"],
             ["weekly_kudos_by_sport", "weekly_kudos"]
           ]) {
             for (const [sport, weekData] of Object.entries(data[weekKey])) {
@@ -167,14 +167,14 @@ function App() {
           loaded={loaded}
         />
         <StatCard
-          name="Total Elapsed Time"
-          stat={sToHrs(data.total_elapsed_time)}
+          name="Total Moving Time"
+          stat={sToHrs(data.total_moving_time)}
           units="hrs"
           loaded={loaded}
         />
         <StatCard
-          name="Total Moving Time"
-          stat={sToHrs(data.total_moving_time)}
+          name="Total Elapsed Time"
+          stat={sToHrs(data.total_elapsed_time)}
           units="hrs"
           loaded={loaded}
         />
