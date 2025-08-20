@@ -59,7 +59,7 @@ function App() {
 
           console.log({ data, metadata });
 
-          // the epoch timestamps of all weeks since account creation
+          // the epoch timestamps of all weeks since account creation (distance is the superset)
           data.week_starts = Object.keys(data.weekly_distance).sort();
 
           // different sports were first recorded on different dates (so some week epochs for some sports are missing)
