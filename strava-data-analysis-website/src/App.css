@@ -52,22 +52,21 @@ html,
   initial-value: 0deg;
 }
 
-.banner {
-  position: relative;
+.App .banner {
+  --fade-h: 100px;
   background:
     radial-gradient(circle at var(--x) var(--y),
-      #ff5a00,
+      #ff5a0055,
       transparent var(--stop)),
     conic-gradient(from var(--angle) at 150% 150%,
-      #ff5a00,
+      #ff5a0055,
       transparent,
-      #ff5a00);
-  background-color: rgb(0, 0, 0);
-  height: 100svh;
-  align-content: center;
-  display: grid;
-  gap: 32px;
+      #ff5a0055);
+  background-color: white;
+  /* background-color: #ff5a00; */
+  height: calc(100svh + var(--fade-h));
   animation: spin ease-in-out infinite 10s alternate;
+  mask-image: linear-gradient(black calc(100% - var(--fade-h)), transparent);
 }
 
 @keyframes spin {
@@ -80,21 +79,29 @@ html,
   }
 }
 
-.banner * {
-  text-align: center;
-  color: white;
+.App .banner .container {
+  position: relative;
+  display: grid;
+  gap: 32px;
+  align-content: center;
+  height: 100svh;
 }
 
-.banner .title {
+.App .banner .container * {
+  text-align: center;
+  color: black;
+}
+
+.App .banner .title {
   font-size: 4em;
 }
 
-.banner .subtitle {
+.App .banner .subtitle {
   font-weight: lighter;
   font-size: 2em;
 }
 
-.banner .scroll-hint {
+.App .banner .scroll-hint {
   position: absolute;
   bottom: 16px;
   width: 100%;
@@ -104,9 +111,10 @@ html,
   justify-items: center;
 }
 
-.banner .scroll-hint img {
+.App .banner .scroll-hint img {
   width: 15px;
   height: 15px;
+  filter: brightness(0);
 }
 
 /* ---------------------------------------------- */

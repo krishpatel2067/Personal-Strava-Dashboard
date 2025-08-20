@@ -119,13 +119,14 @@ function App() {
     <div className="App">
       <header>
         <div className="banner">
-          <h1 className="title">Personal Strava Dashboard</h1>
-          <h2 className="subtitle">Krish A. Patel</h2>
-          <div className="scroll-hint">
-            <p>Scroll</p>
-            <img src={downArrow} />
+          <div className="container">
+            <h1 className="title">Personal Strava Dashboard</h1>
+            <h2 className="subtitle">Krish A. Patel</h2>
+            <div className="scroll-hint">
+              <p>Scroll</p>
+              <img src={downArrow} />
+            </div>
           </div>
-          <div className="fade"></div>
         </div>
         <h2>Background</h2>
         <p>
