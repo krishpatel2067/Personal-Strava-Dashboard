@@ -1,9 +1,12 @@
 .Tooltip .activator {
-  border-radius: 1lh;
+  --sz: 25px;
+  border-radius: calc(var(--sz) / 2);
   aspect-ratio: 1;
   background-color: var(--bkg-col);
   border: var(--bord-col) 2px solid;
   font-weight: bolder;
+  width: var(--sz);
+  height: var(--sz);
 }
 
 .Tooltip .content {
@@ -29,6 +32,10 @@
 }
 
 @media (pointer: coarse) {
+  .Tooltip .activator {
+    --sz: 40px;
+  }
+
   /* touchscreens: press */
   .Tooltip .content[data-visible=true] {
     visibility: visible;
