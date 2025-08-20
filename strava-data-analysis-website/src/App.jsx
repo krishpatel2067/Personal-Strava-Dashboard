@@ -197,6 +197,21 @@ function App() {
           applyFunc={(val) => Math.round(mToMi(val))}
           loaded={loaded}
         />
+        <TableCard
+          name="Elevation Gain by Sport"
+          // sort by elevation gain, descending
+          data={Object.entries(data.elevation_gain_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+          headers={["", "Elevation Gain (m)"]}
+          applyFunc={Math.round}
+          loaded={loaded}
+        />
+        <TableCard
+          name="Kudos by Sport"
+          // sort by kudos, descending
+          data={Object.entries(data.kudos_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+          headers={["", "Kudos Count"]}
+          loaded={loaded}
+        />
         <ChartCard
           name="Distance Per Week"
           chart={

@@ -5,13 +5,15 @@ import Checkbox from "./Checkbox";
 import "./StackedLineChart.css";
 import Textbox from "./Textbox";
 
-function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, yAxis, showPastDatapointsContent }) {
+function StackedLineChart({ option: optionProp, title, data, xAxis,
+  applyFunc: applyFuncProp, yAxis, showPastDatapointsContent }) {
   const [categories, setCategories] = useState({});
   const [option, setOption] = useState({});
   const [formError, setFormError] = useState("");
   // for filtering based on "show the past x datapoints" (aka x-axis range)
   const [filterFunc, setFilterFunc] = useState(() => () => true);
   const { colors } = useTheme();
+  const applyFunc = applyFuncProp != null ? applyFuncProp : (val) => val;
 
   useEffect(() => {
     setCategories(Object.fromEntries(Object.keys(data).map(key => [key, true])));
@@ -81,12 +83,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis, applyFunc, y
             name: category,
             type: "line",
             showSymbol: false,
-            data: (
-              (applyFunc != null) ?
-                Object.values(valueData).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
-                :
-                Object.values(valueData).filter(newFilterFunc)
-            )
+            data: Object.values(valueData).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
           });
         }
         return arr;

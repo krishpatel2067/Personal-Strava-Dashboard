@@ -2,8 +2,9 @@ import "./Card.css";
 import PieChart from "./PieChart";
 import "./TableCard.css";
 
-function TableCard({ name, data, headers, applyFunc, loaded, style }) {
+function TableCard({ name, data, headers, applyFunc: applyFuncProp, loaded, style }) {
   if (loaded) {
+    const applyFunc = applyFuncProp != null ? applyFuncProp : (val) => val;
     return (
       <div className="TableCard Card" style={style}>
         <h2 className="name secondary">{name}</h2>
