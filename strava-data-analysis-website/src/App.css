@@ -1,6 +1,6 @@
 :root {
   --shadow-col: #00000099;
-  --bord-col: #ccc;
+  --bord-col: light-dark(#ccc, #666);
 
   /* for communication with JSX */
   --bkg-col-light: white;

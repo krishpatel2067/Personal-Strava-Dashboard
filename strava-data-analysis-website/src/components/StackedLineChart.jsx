@@ -95,7 +95,6 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   return (
     <div className="StackedLineChart">
       <form className="controls">
-        <p className="form-error">{formError}</p>
         <div className="textbox-container">
           {(showPastDatapointsContent != null) ? (
             showPastDatapointsContent(
@@ -113,6 +112,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
             </>
           )}
         </div>
+        <p className="form-error">{formError}</p>
         {/* <div className="checkbox-container">
           {Object.keys(categories).map((category, index) => (
             <Checkbox
