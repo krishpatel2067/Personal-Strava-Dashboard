@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./Textbox.css";
 
 function Textbox({ defaultValue, onChange }) {
   const [input, setInput] = useState(defaultValue ?? "");
