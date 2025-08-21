@@ -75,7 +75,8 @@ function App() {
           // different sports were first recorded on different dates (so some week epochs for some sports are missing)
           for (const [weekKey, totalKey] of [
             ["weekly_distance_by_sport", "weekly_distance"],
-            ["weekly_kudos_by_sport", "weekly_kudos"]
+            ["weekly_kudos_by_sport", "weekly_kudos"],
+            ["weekly_activities_by_sport", "weekly_activities"]
           ]) {
             for (const [sport, weekData] of Object.entries(data[weekKey])) {
               // fill non-existent keys to 0; sort by keys (oldest first); retain only the value (not key)
@@ -87,6 +88,7 @@ function App() {
 
           data.weekly_distance_by_sport["Total"] = Object.values(data.weekly_distance);
           data.weekly_kudos_by_sport["Total"] = Object.values(data.weekly_kudos);
+          data.weekly_activities_by_sport["Total"] = Object.values(data.weekly_activities);
 
           // console.log({ data, metadata });
           setMetadata(metadata);
@@ -289,6 +291,28 @@ function App() {
                 }}
                 yAxis={{
                   name: "Kudos Count",
+                }}
+                pastDatapointsDefaultValue={25}
+                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+              />
+            }
+            tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
+            loaded={loaded}
+          />
+          <ChartCard
+            name="Activities Per Week"
+            chart={
+              <StackedLineChart
+                data={data.weekly_activities_by_sport}
+                xAxis={{
+                  name: "Date",
+                  data: loaded ?
+                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
+                    :
+                    []
+                }}
+                yAxis={{
+                  name: "Activities Count",
                 }}
                 pastDatapointsDefaultValue={25}
                 showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
