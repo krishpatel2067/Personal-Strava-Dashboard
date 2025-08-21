@@ -212,6 +212,16 @@ function App() {
             stat={data.total_kudos}
             loaded={loaded}
           />
+          <StatCard
+            name="Total Activities"
+            stat={data.total_activities}
+            loaded={loaded}
+          />
+          <StatCard
+            name="Total Recorded Activities"
+            stat={data.total_recorded_activities}
+            loaded={loaded}
+          />
           <TableCard
             name="Distance by Sport"
             // sort by distance, descending
@@ -233,6 +243,13 @@ function App() {
             // sort by kudos, descending
             data={Object.entries(data.kudos_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
             headers={["", "Kudos Count"]}
+            loaded={loaded}
+          />
+          <TableCard
+            name="Activities by Sport"
+            // sort by activities, descending
+            data={Object.entries(data.activities_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
+            headers={["", "Activities Count"]}
             loaded={loaded}
           />
           <ChartCard
