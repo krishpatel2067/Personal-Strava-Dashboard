@@ -1,13 +1,11 @@
 import ReactECharts from "echarts-for-react";
 import { mergeObjects, useTheme } from "../util";
 import { useEffect, useState } from "react";
-import Checkbox from "./Checkbox";
 import "./StackedLineChart.css";
 import Textbox from "./Textbox";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis,
   applyFunc: applyFuncProp, yAxis, showPastDatapointsContent }) {
-  const [categories, setCategories] = useState({});
   const [option, setOption] = useState({});
   const [formError, setFormError] = useState("");
   // for filtering based on "show the past x datapoints" (aka x-axis range)
@@ -16,20 +14,10 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   const applyFunc = applyFuncProp != null ? applyFuncProp : (val) => val;
 
   useEffect(() => {
-    setCategories(Object.fromEntries(Object.keys(data).map(key => [key, true])));
     setOptionState();
   }, [data]);
 
   const isDarkTheme = useTheme();
-
-  // const onCheckboxChange = (label, checked) => {
-  //   const newCategories = {
-  //     ...categories,
-  //     [label]: checked
-  //   };
-  //   setCategories(newCategories);
-  //   setOptionState(newCategories);
-  // };
 
   const onTextboxChange = (input) => {
     if (input === "") {
@@ -54,10 +42,10 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     const LENGTH = xAxis.data.length;
     const newFilterFunc = (_, index) => index >= LENGTH - numPastDatapoints;
     setFilterFunc(() => newFilterFunc);
-    setOptionState(undefined, newFilterFunc);
+    setOptionState(newFilterFunc);
   };
 
-  const setOptionState = (newCategories = categories, newFilterFunc = filterFunc) => {
+  const setOptionState = (newFilterFunc = filterFunc) => {
     const newOption = optionProp ?? {
       title: {
         text: title
@@ -71,21 +59,19 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       xAxis: mergeObjects(mergeObjects({
         type: "category",
       }, xAxis), {
-        data: xAxis.data.filter(newFilterFunc),
+        data: xAxis.data,
       }),
       yAxis: mergeObjects({
         type: "value",
       }, yAxis),
       legend: {},
       series: Object.entries(data).reduce((arr, [category, valueData]) => {
-        if (newCategories[category]) {
-          arr.push({
-            name: category,
-            type: "line",
-            showSymbol: false,
-            data: Object.values(valueData).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
-          });
-        }
+        arr.push({
+          name: category,
+          type: "line",
+          showSymbol: false,
+          data: Object.values(valueData).map(datapoint => applyFunc(datapoint))
+        });
         return arr;
       }, [])
     };
@@ -113,16 +99,6 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
           )}
         </div>
         <p className="form-error">{formError}</p>
-        {/* <div className="checkbox-container">
-          {Object.keys(categories).map((category, index) => (
-            <Checkbox
-              key={index}
-              label={category}
-              defaultValue={true}
-              onChange={onCheckboxChange}
-            />
-          ))}
-        </div> */}
       </form>
       <ReactECharts
         option={option}
