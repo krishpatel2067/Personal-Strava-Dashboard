@@ -30,6 +30,7 @@ const TOOLTIPS = {
     </p>
   )
 };
+const PAST_DP_CONT = (textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>;
 
 function mToMi(m) {
   return m / 1609;
@@ -70,7 +71,10 @@ function App() {
           console.log({ data, metadata });
 
           // the epoch timestamps of all weeks since account creation (distance is the superset)
-          data.week_starts = Object.keys(data.weekly_distance).sort();
+          // data.week_starts = Object.keys(data.weekly_distance).sort();
+          data.week_starts = Object.keys(data.weekly_distance)
+            .sort()
+            .map(epoch => new Date(Number(epoch)).toLocaleDateString());
 
           // different sports were first recorded on different dates (so some week epochs for some sports are missing)
           for (const [weekKey, totalKey] of [
@@ -273,16 +277,13 @@ function App() {
                 applyFunc={distance => Math.round(mToMi(distance))}
                 xAxis={{
                   name: "Date",
-                  data: loaded ?
-                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
-                    :
-                    []
+                  data: loaded ? data.week_starts : []
                 }}
                 yAxis={{
                   name: "Distance (mi)",
                 }}
                 pastDatapointsDefaultValue={25}
-                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+                showPastDatapointsContent={PAST_DP_CONT}
               />
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
@@ -295,16 +296,13 @@ function App() {
                 data={data.weekly_kudos_by_sport}
                 xAxis={{
                   name: "Date",
-                  data: loaded ?
-                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
-                    :
-                    []
+                  data: loaded ? data.week_starts : []
                 }}
                 yAxis={{
                   name: "Kudos Count",
                 }}
                 pastDatapointsDefaultValue={25}
-                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+                showPastDatapointsContent={PAST_DP_CONT}
               />
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
@@ -317,21 +315,19 @@ function App() {
                 data={data.weekly_activities_by_sport}
                 xAxis={{
                   name: "Date",
-                  data: loaded ?
-                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
-                    :
-                    []
+                  data: loaded ? data.week_starts : []
                 }}
                 yAxis={{
                   name: "Activities Count",
                 }}
                 pastDatapointsDefaultValue={25}
-                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+                showPastDatapointsContent={PAST_DP_CONT}
               />
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
             loaded={loaded}
           />
+          {/* TODO: perhaps make cumulative a checkbox option so you can do it on any line chart! */}
           <ChartCard
             name="Cumulative Activities Per Week"
             chart={
@@ -339,16 +335,13 @@ function App() {
                 data={data.weekly_cumulative_activites_by_sport}
                 xAxis={{
                   name: "Date",
-                  data: loaded ?
-                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
-                    :
-                    []
+                  data: loaded ? data.week_starts : []
                 }}
                 yAxis={{
                   name: "Cumulative Activities Count",
                 }}
                 pastDatapointsDefaultValue={25}
-                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+                showPastDatapointsContent={PAST_DP_CONT}
               />
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
