@@ -5,7 +5,7 @@ import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import StatCard from './components/StatCard';
 import TableCard from './components/TableCard';
 import ChartCard from './components/ChartCard';
-import StackedLineChart from './components/StackedLineChart';
+import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/ToolTip';
 import downArrow from "./assets/down_arrow.svg";
 

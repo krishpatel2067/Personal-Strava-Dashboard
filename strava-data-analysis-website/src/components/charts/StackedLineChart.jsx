@@ -1,8 +1,8 @@
 import ReactECharts from "echarts-for-react";
-import { mergeObjects, useTheme } from "../util";
+import { mergeObjects, useTheme } from "../../util";
 import { useEffect, useState } from "react";
 import "./StackedLineChart.css";
-import Textbox from "./Textbox";
+import Textbox from "../Textbox";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis,
   applyFunc: applyFuncProp, yAxis, pastDatapointsDefaultValue, showPastDatapointsContent }) {

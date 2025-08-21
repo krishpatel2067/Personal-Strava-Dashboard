@@ -1,5 +1,5 @@
 import "./Card.css";
-import PieChart from "./PieChart";
+import PieChart from "./charts/PieChart";
 import "./TableCard.css";
 
 function TableCard({ name, data, headers, applyFunc: applyFuncProp, loaded, style }) {

@@ -1,5 +1,5 @@
 import ReactECharts from "echarts-for-react";
-import { useTheme } from "../util";
+import { useTheme } from "../../util";
 
 function PieChart({ option: optionProp, seriesTitle, data }) {
   const { colors } = useTheme();
