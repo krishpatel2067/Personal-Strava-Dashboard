@@ -46,6 +46,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   };
 
   const setOptionState = (newFilterFunc = filterFunc) => {
+    const filteredXAxis =xAxis.data.filter(newFilterFunc);
     const newOption = optionProp ?? {
       title: {
         text: title
@@ -59,7 +60,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       xAxis: mergeObjects(mergeObjects({
         type: "category",
       }, xAxis), {
-        data: xAxis.data.filter(newFilterFunc),
+        data: filteredXAxis,
       }),
       yAxis: mergeObjects({
         type: "value",
@@ -69,7 +70,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
         arr.push({
           name: category,
           type: "line",
-          showSymbol: false,
+          showSymbol: filteredXAxis.length <= 50,
           data: Object.values(valueData).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
         });
         return arr;
