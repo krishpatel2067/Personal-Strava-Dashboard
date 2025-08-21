@@ -169,7 +169,7 @@ function App() {
               <li><b>Storage</b>: Holds both the JSON files containing the latest raw and analyzed data.</li>
               <li><b>Functions</b>: Automatically fetches (via JavaScript) and analyzes (via Python and Pandas) the data.</li>
               <li><b>Firestore</b>: Stores the necessary credentials for accessing my Strava data.</li>
-              <li><b>Hosting</b>: Hosts this site.</li>
+              <li><b>Hosting</b>: Statically hosts this site.</li>
             </ul>
           </li>
           <li><b>React</b>: Creates the structure and logic of this website.</li>
