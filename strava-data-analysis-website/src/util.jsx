@@ -44,7 +44,6 @@ function useTheme() {
   const colors = {
     backgroundColor: computedStyles.getPropertyValue(`--bkg-col-` + (isDarkTheme ? "dark" : "light")),
   };
-  console.log(colors.backgroundColor);
   return { isDarkTheme, colors };
 }
 
