@@ -57,6 +57,12 @@ def analyze(data):
     # total kudos
     analysis["total_kudos"] = df["kudos_count"].sum()
 
+    # total activities
+    analysis["total_activities"] = df.shape[0]
+
+    # total recorded activities
+    analysis["total_recorded_activities"] = df["manual"].value_counts()[False]
+
     # --- average --------------------------------------------------------
 
     # mean kudos (per non-private activity)
@@ -79,17 +85,30 @@ def analyze(data):
 
     # kudos by sport type
     analysis["kudos_by_sport"] = sport_type_group["kudos_count"].sum().to_dict()
+    
+    # activities by sport type
+    analysis["activities_by_sport"] = df["sport_type"].value_counts().to_dict()
 
     # --- weekly ---------------------------------------------------------
     def get_weekly(column, target_df=df):
         if "start_date_dt" not in df.columns:
             df["start_date_dt"] = pd.to_datetime(df["start_date"])
-        return (target_df
-                .groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))[column]
-                .sum()
-                .rename(index=lambda ts: int(ts.timestamp()) * 1000)
-                .to_dict())
-    
+
+        if column == "_activities":
+            # not a real column
+            # number of activities per week
+            return (target_df
+                    .groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))["id"]
+                    .count()
+                    .rename(index=lambda ts: int(ts.timestamp()) * 1000)
+                    .to_dict())
+        else:
+            return (target_df
+                    .groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))[column]
+                    .sum()
+                    .rename(index=lambda ts: int(ts.timestamp()) * 1000)
+                    .to_dict())
+
     def get_weekly_by_sport(column):
         d = {}
         for sport in df["sport_type"].unique():
@@ -99,10 +118,12 @@ def analyze(data):
     # weekly stats
     analysis["weekly_distance"] = get_weekly("distance")
     analysis["weekly_kudos"] = get_weekly("kudos_count")
-    
+    analysis["weekly_activities"] = get_weekly("_activities")
+
     # weekly stats by sport type
     analysis["weekly_distance_by_sport"] = get_weekly_by_sport("distance")
     analysis["weekly_kudos_by_sport"] = get_weekly_by_sport("kudos_count")
+    analysis["weekly_activities_by_sport"] = get_weekly_by_sport("_activities")
 
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
     return convert_np_types_to_plain(analysis)
