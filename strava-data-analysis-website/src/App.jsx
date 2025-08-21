@@ -90,6 +90,17 @@ function App() {
           data.weekly_kudos_by_sport["Total"] = Object.values(data.weekly_kudos);
           data.weekly_activities_by_sport["Total"] = Object.values(data.weekly_activities);
 
+          data.weekly_cumulative_activites_by_sport = {};
+
+          for (const [sport, activitiesData] of Object.entries(data.weekly_activities_by_sport)) {
+            data.weekly_cumulative_activites_by_sport[sport] =
+              Object.values(activitiesData)
+                .reduce((arrSoFar, value) => {
+                  arrSoFar.push((arrSoFar.at(-1) ?? 0) + value);
+                  return arrSoFar;
+                }, []);
+          }
+
           // console.log({ data, metadata });
           setMetadata(metadata);
           setData(data);
@@ -313,6 +324,28 @@ function App() {
                 }}
                 yAxis={{
                   name: "Activities Count",
+                }}
+                pastDatapointsDefaultValue={25}
+                showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
+              />
+            }
+            tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
+            loaded={loaded}
+          />
+          <ChartCard
+            name="Cumulative Activities Per Week"
+            chart={
+              <StackedLineChart
+                data={data.weekly_cumulative_activites_by_sport}
+                xAxis={{
+                  name: "Date",
+                  data: loaded ?
+                    data.week_starts.map(epoch => new Date(Number(epoch)).toLocaleDateString())
+                    :
+                    []
+                }}
+                yAxis={{
+                  name: "Cumulative Activities Count",
                 }}
                 pastDatapointsDefaultValue={25}
                 showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
