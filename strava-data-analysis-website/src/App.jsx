@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import { initializeApp } from 'firebase/app';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
-import StatCard from './components/StatCard';
-import TableCard from './components/TableCard';
-import ChartCard from './components/ChartCard';
+import StatCard from './components/cards/StatCard';
+import TableCard from './components/cards/TableCard';
+import ChartCard from './components/cards/ChartCard';
 import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
