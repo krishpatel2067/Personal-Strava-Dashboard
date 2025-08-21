@@ -23,7 +23,7 @@ function TableCard({ name, data, headers, applyFunc: applyFuncProp, loaded, styl
                   <th>{rowHeader}</th>
                   {rowData && [].concat(rowData).map((value, index2) => (
                     <td key={index2}>
-                      {applyFunc(value)}
+                      {applyFunc(value).toLocaleString()}
                     </td>
                   ))}
                 </tr>
