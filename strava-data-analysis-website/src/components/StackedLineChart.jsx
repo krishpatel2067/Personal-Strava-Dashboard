@@ -5,7 +5,7 @@ import "./StackedLineChart.css";
 import Textbox from "./Textbox";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis,
-  applyFunc: applyFuncProp, yAxis, showPastDatapointsContent }) {
+  applyFunc: applyFuncProp, yAxis, pastDatapointsDefaultValue, showPastDatapointsContent }) {
   const [option, setOption] = useState({});
   const [formError, setFormError] = useState("");
   // for filtering based on "show the past x datapoints" (aka x-axis range)
@@ -23,7 +23,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     if (input === "") {
       const newFilterFunc = () => true;
       setFilterFunc(() => newFilterFunc);
-      setOptionState(undefined, newFilterFunc);
+      setOptionState(newFilterFunc);
       setFormError("");
       return;
     }
@@ -39,8 +39,8 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     }
 
     setFormError("");
-    const LENGTH = xAxis.data.length;
-    const newFilterFunc = (_, index) => index >= LENGTH - numPastDatapoints;
+    const length = xAxis.data.length;
+    const newFilterFunc = (_, index) => index >= length - numPastDatapoints;
     setFilterFunc(() => newFilterFunc);
     setOptionState(newFilterFunc);
   };
@@ -59,7 +59,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       xAxis: mergeObjects(mergeObjects({
         type: "category",
       }, xAxis), {
-        data: xAxis.data,
+        data: xAxis.data.filter(newFilterFunc),
       }),
       yAxis: mergeObjects({
         type: "value",
@@ -70,7 +70,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
           name: category,
           type: "line",
           showSymbol: false,
-          data: Object.values(valueData).map(datapoint => applyFunc(datapoint))
+          data: Object.values(valueData).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
         });
         return arr;
       }, [])
@@ -85,6 +85,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
           {(showPastDatapointsContent != null) ? (
             showPastDatapointsContent(
               <Textbox
+                defaultValue={pastDatapointsDefaultValue}
                 onChange={onTextboxChange}
               />
             )
@@ -92,6 +93,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
             <>
               <span>Show the past </span>
               <Textbox
+                defaultValue={pastDatapointsDefaultValue}
                 onChange={onTextboxChange}
               />
               <span> datapoints</span>

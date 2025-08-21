@@ -251,6 +251,7 @@ function App() {
                 yAxis={{
                   name: "Distance (mi)",
                 }}
+                pastDatapointsDefaultValue={25}
                 showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
               />
             }
@@ -272,6 +273,7 @@ function App() {
                 yAxis={{
                   name: "Kudos Count",
                 }}
+                pastDatapointsDefaultValue={25}
                 showPastDatapointsContent={(textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>}
               />
             }

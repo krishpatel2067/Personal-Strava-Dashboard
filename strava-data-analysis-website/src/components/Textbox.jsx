@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Textbox({ defaultValue, onChange }) {
   const [input, setInput] = useState(defaultValue ?? "");
+
+  useEffect(() => {
+    onChange(input);
+  }, []);
 
   const onChangeWrapper = (event) => {
     event.preventDefault();
@@ -20,7 +24,6 @@ function Textbox({ defaultValue, onChange }) {
         value={input}
         onChange={onChangeWrapper}
       />
-      {/* tool tip */}
     </div>
   );
 }
