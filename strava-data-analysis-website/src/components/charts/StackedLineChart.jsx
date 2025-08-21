@@ -13,10 +13,6 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   const { colors } = useTheme();
   const applyFunc = applyFuncProp != null ? applyFuncProp : (val) => val;
 
-  useEffect(() => {
-    setOptionState();
-  }, [data]);
-
   const isDarkTheme = useTheme();
 
   const onTextboxChange = (input) => {
