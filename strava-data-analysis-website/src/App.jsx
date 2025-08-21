@@ -6,7 +6,7 @@ import StatCard from './components/StatCard';
 import TableCard from './components/TableCard';
 import ChartCard from './components/ChartCard';
 import StackedLineChart from './components/charts/StackedLineChart';
-import Tooltip from './components/ToolTip';
+import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
 
 const firebaseConfig = {
