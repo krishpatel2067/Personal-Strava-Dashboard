@@ -63,12 +63,11 @@ function App() {
 
       getDownloadURL(analysisRef)
         .then(async url => {
-          console.log(url);
-
           const res = await fetch(url);
           let { data, metadata } = await res.json();
 
-          console.log({ data, metadata });
+          // TOGGLE
+          // console.log({ data, metadata });
 
           // the epoch timestamps of all weeks since account creation (distance is the superset)
           // data.week_starts = Object.keys(data.weekly_distance).sort();
