@@ -24,7 +24,9 @@ const app = initializeApp(firebaseConfig);
 const TOOLTIPS = {
   chartCard: (
     <p>
-      <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now, and x must be positive. Leave blank to show all available weeks.
+      <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now, both inclusive. <i>x</i> must be positive. Leave blank to show all available weeks.
+      <br />
+      <b>Show only weeks from [date1] to [date2]</b>: Start x-axis range from the week that includes <i>date1</i> to the week that includes <i>date2</i>, both inclusive.
       <br />
       <b>Cumulative</b>: Toggle to view data cumulatively or not.
       <br />
