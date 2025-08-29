@@ -60,6 +60,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   }
 
   const setOptionState = (newFilterFunc = filterFunc, newCumFunc = cumFunc) => {
+    // restrict x-axis based on date filter func
     const filteredXAxis = xAxis.data.filter(newFilterFunc);
     const newOption = optionProp ?? {
       title: {
@@ -85,7 +86,9 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
           name: category,
           type: "line",
           showSymbol: filteredXAxis.length <= 50,
-          data: newCumFunc(Object.values(valueData)).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
+          data: newCumFunc(Object.values(valueData))      // whether or not it's cumulative
+            .filter(newFilterFunc)                        // filter by date
+            .map(datapoint => applyFunc(datapoint))       // e.g., any formatting for each point
         });
         return arr;
       }, [])
