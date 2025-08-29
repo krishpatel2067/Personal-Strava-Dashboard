@@ -43,7 +43,6 @@ function sToHrs(s) {
 function fillKeys(superset, subset, defaultValue = 0) {
   for (const key in superset) {
     if (!(key in subset)) {
-      // console.log(`\tfilled ${key} with 0`);
       subset[key] = defaultValue;
     }
   }
@@ -70,7 +69,6 @@ function App() {
           // console.log({ data, metadata });
 
           // the epoch timestamps of all weeks since account creation (distance is the superset)
-          // data.week_starts = Object.keys(data.weekly_distance).sort();
           data.week_starts = Object.keys(data.weekly_distance)
             .sort()
             .map(epoch => new Date(Number(epoch)).toLocaleDateString());
@@ -93,7 +91,6 @@ function App() {
           data.weekly_kudos_by_sport["Total"] = Object.values(data.weekly_kudos);
           data.weekly_activities_by_sport["Total"] = Object.values(data.weekly_activities);
 
-          // console.log({ data, metadata });
           setMetadata(metadata);
           setData(data);
           setLoaded(true);
