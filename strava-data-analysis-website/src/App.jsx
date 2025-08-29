@@ -34,7 +34,6 @@ const TOOLTIPS = {
     </p>
   )
 };
-const PAST_DP_CONT = (textbox) => <><span>Show the past </span>{textbox}<span> weeks</span></>;
 
 function mToMi(m) {
   return m / 1609;
@@ -271,8 +270,7 @@ function App() {
                 yAxis={{
                   name: "Distance (mi)",
                 }}
-                pastDatapointsDefaultValue={25}
-                showPastDatapointsContent={PAST_DP_CONT}
+                pastWeeksDefaultValue={25}
               />
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
@@ -290,8 +288,7 @@ function App() {
                 yAxis={{
                   name: "Kudos Count",
                 }}
-                pastDatapointsDefaultValue={25}
-                showPastDatapointsContent={PAST_DP_CONT}
+                pastWeeksDefaultValue={25}
               />
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
@@ -309,8 +306,7 @@ function App() {
                 yAxis={{
                   name: "Activities Count",
                 }}
-                pastDatapointsDefaultValue={25}
-                showPastDatapointsContent={PAST_DP_CONT}
+                pastWeeksDefaultValue={25}
               />
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}

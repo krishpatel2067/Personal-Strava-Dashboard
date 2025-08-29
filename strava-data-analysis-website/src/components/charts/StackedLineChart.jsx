@@ -6,15 +6,15 @@ import Textbox from "../core/Textbox";
 import Checkbox from "../core/Checkbox";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis,
-  applyFunc: applyFuncProp, yAxis, pastDatapointsDefaultValue, showPastDatapointsContent }) {
+  applyFunc: applyFuncProp, yAxis, pastWeeksDefaultValue }) {
   const [option, setOption] = useState({});
   // form
   const [filterType, setFilterType] = useState("weeksPast");
-  const [weeksPast, setWeeksPast] = useState(String(pastDatapointsDefaultValue) ?? "25");
+  const [weeksPast, setWeeksPast] = useState(String(pastWeeksDefaultValue) ?? "25");
   const [dateBounds, setDateBounds] = useState({
     dateFrom: formatDate(xAxis.data.at(
-      pastDatapointsDefaultValue <= xAxis.data.length ?
-        -pastDatapointsDefaultValue
+      pastWeeksDefaultValue <= xAxis.data.length ?
+        -pastWeeksDefaultValue
         : 0),
       "mm/dd/yyyy", "yyyy-mm-dd"),
     dateTo: formatDate(xAxis.data.at(-1), "mm/dd/yyyy", "yyyy-mm-dd"),
@@ -174,27 +174,14 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
               checked={filterType === "weeksPast"}
             />
             <span className="textbox-container">
-              {(showPastDatapointsContent != null) ? (
-                showPastDatapointsContent(
+              <span>Show the past </span>
                   <input
                     type="number"
                     value={weeksPast}
                     onChange={onWeeksPastTextboxChange}
                     disabled={filterType !== "weeksPast"}
                   />
-                )
-              ) : (
-                <>
-                  <span>Show the past </span>
-                  <input
-                    type="number"
-                    value={weeksPast}
-                    onChange={onWeeksPastTextboxChange}
-                    disabled={filterType !== "weeksPast"}
-                  />
-                  <span> datapoints</span>
-                </>
-              )}
+                  <span> weeks</span>
             </span>
           </label>
           <label>
