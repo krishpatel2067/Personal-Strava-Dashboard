@@ -47,4 +47,11 @@ function useTheme() {
   return { isDarkTheme, colors };
 }
 
-export { mergeObjects, useTheme };
+function getCumulative(arr) {
+  return arr.reduce((soFar, value) => {
+    soFar.push((soFar.at(-1) ?? 0) + value);
+    return soFar;
+  }, []);
+}
+
+export { mergeObjects, useTheme, getCumulative };

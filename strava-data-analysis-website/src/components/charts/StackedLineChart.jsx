@@ -1,8 +1,9 @@
 import ReactECharts from "echarts-for-react";
-import { mergeObjects, useTheme } from "../../util";
-import { useEffect, useState } from "react";
+import { mergeObjects, useTheme, getCumulative } from "../../util";
+import { useState } from "react";
 import "./StackedLineChart.css";
 import Textbox from "../core/Textbox";
+import Checkbox from "../core/Checkbox";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis,
   applyFunc: applyFuncProp, yAxis, pastDatapointsDefaultValue, showPastDatapointsContent }) {
@@ -10,6 +11,8 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   const [formError, setFormError] = useState("");
   // for filtering based on "show the past x datapoints" (aka x-axis range)
   const [filterFunc, setFilterFunc] = useState(() => () => true);
+  // for calculating cumulative data
+  const [cumFunc, setCumFunc] = useState(() => (arr) => arr);
   const { colors } = useTheme();
   const applyFunc = applyFuncProp != null ? applyFuncProp : (val) => val;
 
@@ -41,8 +44,23 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     setOptionState(newFilterFunc);
   };
 
-  const setOptionState = (newFilterFunc = filterFunc) => {
-    const filteredXAxis =xAxis.data.filter(newFilterFunc);
+  const onCheckboxChange = (label, input) => {
+    if (label === "Cumulative") {
+      let newCumFunc;
+
+      if (input === true) {
+        newCumFunc = (arr) => getCumulative(arr)
+      } else {
+        newCumFunc = (arr) => arr;
+      }
+
+      setCumFunc(() => newCumFunc);
+      setOptionState(undefined, newCumFunc);
+    }
+  }
+
+  const setOptionState = (newFilterFunc = filterFunc, newCumFunc = cumFunc) => {
+    const filteredXAxis = xAxis.data.filter(newFilterFunc);
     const newOption = optionProp ?? {
       title: {
         text: title
@@ -67,7 +85,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
           name: category,
           type: "line",
           showSymbol: filteredXAxis.length <= 50,
-          data: Object.values(valueData).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
+          data: newCumFunc(Object.values(valueData)).filter(newFilterFunc).map(datapoint => applyFunc(datapoint))
         });
         return arr;
       }, [])
@@ -78,6 +96,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   return (
     <div className="StackedLineChart">
       <form className="controls">
+        <Checkbox label="Cumulative" onChange={onCheckboxChange} />
         <div className="textbox-container">
           {(showPastDatapointsContent != null) ? (
             showPastDatapointsContent(
