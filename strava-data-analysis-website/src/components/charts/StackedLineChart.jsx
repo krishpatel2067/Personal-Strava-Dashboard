@@ -12,7 +12,11 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   const [filterType, setFilterType] = useState("weeksPast");
   const [weeksPast, setWeeksPast] = useState(String(pastDatapointsDefaultValue) ?? "25");
   const [dateBounds, setDateBounds] = useState({
-    dateFrom: formatDate(xAxis.data[0], "mm/dd/yyyy", "yyyy-mm-dd"),
+    dateFrom: formatDate(xAxis.data.at(
+      pastDatapointsDefaultValue <= xAxis.data.length ?
+        -pastDatapointsDefaultValue
+        : 0),
+      "mm/dd/yyyy", "yyyy-mm-dd"),
     dateTo: formatDate(xAxis.data.at(-1), "mm/dd/yyyy", "yyyy-mm-dd"),
   });
   const [formError, setFormError] = useState("");
