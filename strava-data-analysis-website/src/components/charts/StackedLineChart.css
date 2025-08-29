@@ -13,7 +13,7 @@
 
 .StackedLineChart .filter-choices {
   display: grid;
-  gap: 8px;s
+  gap: 8px;
 }
 
 .StackedLineChart .filter-choices label:has(input[type="radio"]:not(:checked)) {
