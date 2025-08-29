@@ -2,7 +2,6 @@ import ReactECharts from "echarts-for-react";
 import { mergeObjects, useTheme, getCumulative, formatDate } from "../../util";
 import { useEffect, useState } from "react";
 import "./StackedLineChart.css";
-import Textbox from "../core/Textbox";
 import Checkbox from "../core/Checkbox";
 
 function StackedLineChart({ option: optionProp, title, data, xAxis,

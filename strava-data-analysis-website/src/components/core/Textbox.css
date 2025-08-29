@@ -1,7 +1,0 @@
-.Textbox input[type="text"] {
-  width: 50px;
-  border: light-dark(black, white) solid 1px;
-  background-color: var(--bkg-col);
-  border-radius: 6px;
-  padding: 4px 8px;
-}
