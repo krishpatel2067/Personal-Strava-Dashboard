@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Textbox.css";
 
-function Textbox({ defaultValue, onChange }) {
+function Textbox({ defaultValue, onChange, disabled }) {
   const [input, setInput] = useState(defaultValue ?? "");
 
   useEffect(() => {
@@ -24,6 +24,7 @@ function Textbox({ defaultValue, onChange }) {
         type="text"
         value={input}
         onChange={onChangeWrapper}
+        disabled={disabled}
       />
     </div>
   );

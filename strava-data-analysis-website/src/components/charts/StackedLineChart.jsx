@@ -1,6 +1,6 @@
 import ReactECharts from "echarts-for-react";
-import { mergeObjects, useTheme, getCumulative } from "../../util";
-import { useState } from "react";
+import { mergeObjects, useTheme, getCumulative, formatDate } from "../../util";
+import { useEffect, useState } from "react";
 import "./StackedLineChart.css";
 import Textbox from "../core/Textbox";
 import Checkbox from "../core/Checkbox";
@@ -8,6 +8,13 @@ import Checkbox from "../core/Checkbox";
 function StackedLineChart({ option: optionProp, title, data, xAxis,
   applyFunc: applyFuncProp, yAxis, pastDatapointsDefaultValue, showPastDatapointsContent }) {
   const [option, setOption] = useState({});
+  // form
+  const [filterType, setFilterType] = useState("weeksPast");
+  const [weeksPast, setWeeksPast] = useState(String(pastDatapointsDefaultValue) ?? "25");
+  const [dateBounds, setDateBounds] = useState({
+    dateFrom: formatDate(xAxis.data[0], "mm/dd/yyyy", "yyyy-mm-dd"),
+    dateTo: formatDate(xAxis.data.at(-1), "mm/dd/yyyy", "yyyy-mm-dd"),
+  });
   const [formError, setFormError] = useState("");
   // for filtering based on "show the past x datapoints" (aka x-axis range)
   const [filterFunc, setFilterFunc] = useState(() => () => true);
@@ -18,8 +25,15 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
 
   const isDarkTheme = useTheme();
 
-  const onTextboxChange = (input) => {
-    if (input === "") {
+  useEffect(() => {
+    onRadioChange({ target: { value: filterType } });
+  }, []);
+
+  const onWeeksPastTextboxChange = (e) => {
+    const value = e.target.value;
+    setWeeksPast(value);
+
+    if (value === "") {
       const newFilterFunc = () => true;
       setFilterFunc(() => newFilterFunc);
       setOptionState(newFilterFunc);
@@ -27,12 +41,9 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       return;
     }
 
-    const numPastDatapoints = Number(input);
+    const numPastDatapoints = Number(value);
 
-    if (isNaN(numPastDatapoints)) {
-      setFormError("Enter a valid number");
-      return;
-    } if (numPastDatapoints <= 0) {
+    if (numPastDatapoints <= 0) {
       setFormError("Enter a positive number");
       return;
     }
@@ -57,6 +68,54 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       setCumFunc(() => newCumFunc);
       setOptionState(undefined, newCumFunc);
     }
+  }
+
+  const onRadioChange = (e) => {
+    const value = e.target.value;
+    setFilterType(value);
+
+    if (value === "weeksPast") {
+      onWeeksPastTextboxChange({ target: { value: String(weeksPast) } });
+    } else if (value === "weeksBetween") {
+      onDateChange({ target: { name: "weekFrom", value: dateBounds.weekFrom } });
+      onDateChange({ target: { name: "weekTo", value: dateBounds.weekTo } });
+    }
+  }
+
+  const onDateChange = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    const newDateBounds = {
+      ...dateBounds,
+      [name]: value,
+    };
+
+    setDateBounds(newDateBounds);
+
+    const getIndex = (date) => {
+      const newDate = new Date(formatDate(date, "yyyy-mm-dd", "mm/dd/yyyy")).getTime();
+      let index = 0;
+
+      while (index < LENGTH && newDate >= new Date(xAxis.data[index]).getTime()) {
+        index++;
+      }
+
+      if (index > 0) {
+        index -= 1;
+      }
+
+      return index;
+    }
+
+    const LENGTH = xAxis.data.length
+    let indexStart = 0, indexEnd = LENGTH - 1;
+
+    indexStart = getIndex(newDateBounds.dateFrom);
+    indexEnd = getIndex(newDateBounds.dateTo);
+
+    const newFilterFunc = (_, index) => index >= indexStart && index <= indexEnd;
+    setFilterFunc(() => newFilterFunc);
+    setOptionState(newFilterFunc);
   }
 
   const setOptionState = (newFilterFunc = filterFunc, newCumFunc = cumFunc) => {
@@ -100,24 +159,67 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     <div className="StackedLineChart">
       <form className="controls">
         <Checkbox label="Cumulative" onChange={onCheckboxChange} />
-        <div className="textbox-container">
-          {(showPastDatapointsContent != null) ? (
-            showPastDatapointsContent(
-              <Textbox
-                defaultValue={pastDatapointsDefaultValue}
-                onChange={onTextboxChange}
+        <div className="filter-choices">
+
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="weeksPast"
+              onChange={onRadioChange}
+              checked={filterType === "weeksPast"}
+            />
+            <span className="textbox-container">
+              {(showPastDatapointsContent != null) ? (
+                showPastDatapointsContent(
+                  <input
+                    type="number"
+                    value={weeksPast}
+                    onChange={onWeeksPastTextboxChange}
+                    disabled={filterType !== "weeksPast"}
+                  />
+                )
+              ) : (
+                <>
+                  <span>Show the past </span>
+                  <input
+                    type="number"
+                    value={weeksPast}
+                    onChange={onWeeksPastTextboxChange}
+                    disabled={filterType !== "weeksPast"}
+                  />
+                  <span> datapoints</span>
+                </>
+              )}
+            </span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="weeksBetween"
+              checked={filterType === "weeksBetween"}
+              onChange={onRadioChange}
+            />
+            <span className="textbox-container">
+              <span>Show only weeks from </span>
+              <input
+                type="date"
+                name="dateFrom"
+                onChange={onDateChange}
+                value={dateBounds.dateFrom}
+                disabled={filterType !== "weeksBetween"}
               />
-            )
-          ) : (
-            <>
-              <span>Show the past </span>
-              <Textbox
-                defaultValue={pastDatapointsDefaultValue}
-                onChange={onTextboxChange}
+              <span> to </span>
+              <input
+                type="date"
+                name="dateTo"
+                onChange={onDateChange}
+                value={dateBounds.dateTo}
+                disabled={filterType !== "weeksBetween"}
               />
-              <span> datapoints</span>
-            </>
-          )}
+            </span>
+          </label>
         </div>
         <p className="form-error">{formError}</p>
       </form>

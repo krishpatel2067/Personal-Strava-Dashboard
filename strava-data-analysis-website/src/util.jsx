@@ -54,4 +54,33 @@ function getCumulative(arr) {
   }, []);
 }
 
-export { mergeObjects, useTheme, getCumulative };
+function formatDate(dateStr, from, to) {
+  const date = {
+    month: 0,
+    day: 0,
+    year: 0,
+  };
+  let result = "";
+
+  if (from === "mm/dd/yyyy") {
+    const split = dateStr.split("/");
+    date.month = Number(split[0]);
+    date.day = Number(split[1]);
+    date.year = Number(split[2]);
+  } else if (from === "yyyy-mm-dd") {
+    const split = dateStr.split("-");
+    date.year = Number(split[0]);
+    date.month = Number(split[1]);
+    date.day = Number(split[2]);
+  }
+
+  if (to  === "yyyy-mm-dd") {
+    result = `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
+  } else if (to === "mm/dd/yyyy") {
+    result = `${String(date.month).padStart(2, "0")}/${String(date.day).padStart(2, "0")}/${date.year}`;
+  }
+
+  return result;
+}
+
+export { mergeObjects, useTheme, getCumulative, formatDate };
