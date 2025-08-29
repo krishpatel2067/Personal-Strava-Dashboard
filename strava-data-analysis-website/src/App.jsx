@@ -26,6 +26,8 @@ const TOOLTIPS = {
     <p>
       <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now, and x must be positive. Leave blank to show all available weeks.
       <br />
+      <b>Cumulative</b>: Toggle to view data cumulatively or not.
+      <br />
       <b>Toggling series</b>: Click its respective name in the legend.
     </p>
   )
