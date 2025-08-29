@@ -1,0 +1,35 @@
+.Checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.Checkbox,
+.Checkbox .checkbox {
+  cursor: pointer;
+}
+
+.Checkbox .checkbox {
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  border: 2px solid #1b5c9d;
+  padding: 0;
+  align-content: center;
+}
+
+.Checkbox .checkbox[data-checked=true] {
+  background-color: #1b5c9d;
+}
+
+.Checkbox .checkbox .checkmark {
+  display: block;
+  opacity: 0;
+  font-size: 12.5px;
+  line-height: 0px;
+  color: white;
+}
+
+.Checkbox .checkbox[data-checked=true] .checkmark {
+  opacity: 1;
+}
