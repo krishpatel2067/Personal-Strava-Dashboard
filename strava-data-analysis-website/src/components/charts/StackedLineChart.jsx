@@ -164,7 +164,6 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       <form className="controls">
         <Checkbox label="Cumulative" onChange={onCheckboxChange} />
         <div className="filter-choices">
-
           <label>
             <input
               type="radio"
