@@ -20,7 +20,7 @@ function Checkbox({ label, defaultValue, onChange }) {
         {/* todo: replace with SVG */}
         <span className="checkmark">&#10004;</span>
       </button>
-      <span>{label}</span>
+      <span className="label">{label}</span>
     </div>
   );
 }
