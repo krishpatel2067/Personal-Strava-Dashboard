@@ -181,3 +181,7 @@ footer .inner-container {
   text-align: center;
   color: var(--secondary-txt-col);
 }
+
+footer a {
+  color: inherit;
+}

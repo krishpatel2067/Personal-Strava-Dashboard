@@ -355,6 +355,7 @@ function App() {
             <br />
             <b>Last analyzed</b>: {new Date(metadata?.analyzed_at).toLocaleString()}
           </p>
+          <p>This website is not affiliated with <a href="https://www.strava.com/" target="_blank">Strava</a>.</p>
           <p>
             &#169; {new Date().getFullYear()} Krish A. Patel
           </p>
