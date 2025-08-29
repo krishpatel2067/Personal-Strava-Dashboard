@@ -8,6 +8,7 @@ import ChartCard from './components/cards/ChartCard';
 import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
+// TODO: style text and date inputs; figure out how to show Monday-based weeks
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
