@@ -8,7 +8,7 @@ import ChartCard from './components/cards/ChartCard';
 import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
-// TODO: fix date input issue with non en-US locale; style text and date inputs; figure out how to show Monday-based weeks; animate "scroll" text; make tooltip render over graph tooltip
+// TODO: style text and date inputs; tooltip show that weeks are Monday-based; animate "scroll" text; make tooltip render over graph tooltip
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
