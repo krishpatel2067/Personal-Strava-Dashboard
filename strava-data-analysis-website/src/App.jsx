@@ -74,8 +74,8 @@ function App() {
 
           // the epoch timestamps of all weeks since account creation (distance is the superset)
           data.week_starts = Object.keys(data.weekly_distance)
-            .sort()
-            .map(epoch => new Date(Number(epoch)).toLocaleDateString());
+            .map((key) => Number(key))
+            .sort();
 
           // different sports were first recorded on different dates (so some week epochs for some sports are missing)
           for (const [weekKey, totalKey] of [
@@ -136,6 +136,9 @@ function App() {
     fetchAnalysis();
     startGradientAnimation();
   }, []);
+
+  // equalize the time zone offset then convert to locale date string for localization without auto-adjusting dates by time zone
+  const xAxisApplyFunc = (epoch) => new Date(epoch + new Date().getTimezoneOffset() * 60 * 1000).toLocaleDateString()
 
   return (
     <div className="App">
@@ -264,6 +267,7 @@ function App() {
               <StackedLineChart
                 data={data.weekly_distance_by_sport}
                 applyFunc={distance => Math.round(mToMi(distance))}
+                xAxisApplyFunc={xAxisApplyFunc}
                 xAxis={{
                   name: "Date",
                   data: loaded ? data.week_starts : []
@@ -282,6 +286,7 @@ function App() {
             chart={
               <StackedLineChart
                 data={data.weekly_kudos_by_sport}
+                xAxisApplyFunc={xAxisApplyFunc}
                 xAxis={{
                   name: "Date",
                   data: loaded ? data.week_starts : []
@@ -300,6 +305,7 @@ function App() {
             chart={
               <StackedLineChart
                 data={data.weekly_activities_by_sport}
+                xAxisApplyFunc={xAxisApplyFunc}
                 xAxis={{
                   name: "Date",
                   data: loaded ? data.week_starts : []
