@@ -128,17 +128,28 @@ body {
 .App .banner .scroll-hint {
   font-size: 1rem;
   position: absolute;
-  bottom: 16px;
+  bottom: 32px;
   width: 100%;
   display: grid;
-  gap: 8px;
+  gap: 4px;
   justify-content: center;
   justify-items: center;
 }
 
-.App .banner .scroll-hint img {
+.App .banner .scroll-hint .down-arrow {
   width: 15px;
   height: 15px;
+  animation: bob 1s infinite alternate linear;
+}
+
+@keyframes bob {
+  from {
+    transform: translateY(0px);
+  }
+
+  to {
+    transform: translateY(10px);
+  }
 }
 
 @media(prefers-color-scheme: light) {

@@ -151,7 +151,7 @@ function App() {
             <p className="subtitle">Krish A. Patel</p>
             <div className="scroll-hint">
               <p>Scroll</p>
-              <img src={downArrow} />
+              <img src={downArrow} className="down-arrow" />
             </div>
           </div>
         </div>
