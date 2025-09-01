@@ -8,7 +8,7 @@ import ChartCard from './components/cards/ChartCard';
 import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
-// TODO: style text and date inputs; tooltip show that weeks are Monday-based; animate "scroll" text; make tooltip render over graph tooltip
+// TODO: style text and date inputs; animate "scroll" text; make tooltip render over graph tooltip
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
@@ -32,6 +32,8 @@ const TOOLTIPS = {
       <b>Cumulative</b>: Toggle to view data cumulatively or not.
       <br />
       <b>Toggling series</b>: Click its respective name in the legend.
+      <br />
+      Weeks start on Monday (to match Strava).
     </p>
   )
 };
