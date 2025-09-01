@@ -137,11 +137,12 @@ body {
       height: 3em;
       font-size: 1em;
       border-radius: 1.5em;
-      background-color: rgb(255 255 255 / 0.125);
       display: flex;
       align-items: center;
       gap: 8px;
       -webkit-tap-highlight-color: transparent;
+      background-color: light-dark(rgb(255 90 0 / 0.25), rgb(255 255 255 / 0.1));
+      --hov-act-col: light-dark(rgb(255 90 0 / 0.5), rgb(255 255 255 / 0.2));
 
       @media (hover: hover) and (pointer: fine) {
         & {
@@ -149,13 +150,13 @@ body {
         }
 
         &:hover {
-          background-color: rgb(255 255 255 / 0.25);
+          background-color: var(--hov-act-col);
         }
       }
 
       @media (pointer: coarse) {
         &:active {
-          background-color: rgb(255 255 255 / 0.25);
+          background-color: var(--hov-act-col);
         }
       }
 
