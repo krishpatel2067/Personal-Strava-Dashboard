@@ -9,7 +9,7 @@ import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
 import githubIcon from "./assets/github_icon.svg";
-// TODO: style text and date inputs; animate "scroll" text; make tooltip render over graph tooltip
+// TODO: add personal contacts; style text and date inputs; make tooltip render over graph tooltip
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
