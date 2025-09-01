@@ -8,6 +8,7 @@ import ChartCard from './components/cards/ChartCard';
 import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
+import githubIcon from "./assets/github_icon.svg";
 // TODO: style text and date inputs; animate "scroll" text; make tooltip render over graph tooltip
 
 const firebaseConfig = {
@@ -149,6 +150,10 @@ function App() {
           <div className="container">
             <h1 className="title">Personal Strava Dashboard</h1>
             <p className="subtitle">Krish A. Patel</p>
+            <a href="https://github.com/krishpatel2067/Personal-Strava-Dashboard" target="_blank" className="repo">
+              <img src={githubIcon} />
+              <span>Repository</span>
+            </a>
             <div className="scroll-hint">
               <p>Scroll</p>
               <img src={downArrow} className="down-arrow" />

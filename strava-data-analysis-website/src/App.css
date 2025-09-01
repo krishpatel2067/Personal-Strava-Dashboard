@@ -125,6 +125,54 @@ body {
   font-size: 2rem;
 }
 
+.App {
+  & .banner {
+    & .repo {
+      width: fit-content;
+      margin: 0 auto;
+      text-decoration: none;
+      color: light-dark(black, white);
+      padding: 0px 1rem;
+      line-height: 3em;
+      height: 3em;
+      font-size: 1em;
+      border-radius: 1.5em;
+      background-color: rgb(255 255 255 / 0.125);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+
+      @media (hover: hover) and (pointer: fine) {
+        & {
+          transition: background-color 200ms linear;
+        }
+
+        &:hover {
+          background-color: rgb(255 255 255 / 0.25);
+        }
+      }
+
+      @media (pointer: coarse) {
+        &:active {
+          background-color: rgb(255 255 255 / 0.25);
+        }
+      }
+
+      & img {
+        width: 25px;
+        height: 25px;
+
+        @media (prefers-color-scheme: dark) {
+          & {
+            filter: brightness(0) invert(1);
+          }
+        }
+      }
+    }
+  }
+}
+
 .App .banner .scroll-hint {
   font-size: 1rem;
   position: absolute;
