@@ -256,24 +256,32 @@ footer {
     gap: 32px;
 
     & .icon {
+      --hov-act-filter: brightness(0) invert(1) brightness(0.8);
+      -webkit-tap-highlight-color: transparent;
       width: 30px;
       height: 30px;
       filter: brightness(0) invert(1) brightness(0.6);
-      transition: filter 200ms linear;
-
+      
       @media(prefers-color-scheme: light) {
         & {
+          --hov-act-filter: brightness(0) invert(1) brightness(0.2);
           filter: brightness(0) invert(1) brightness(0.4);
         }
       }
+      
+      @media(hover: hover) and (pointer: fine) {
+        & {
+          transition: filter 200ms linear;
+        }
 
-      &:hover {
-        filter: brightness(0) invert(1) brightness(0.8);
+        &:hover {
+          filter: var(--hov-act-filter);
+        }
+      }
 
-        @media(prefers-color-scheme: light) {
-          & {
-            filter: brightness(0) invert(1) brightness(0.2);
-          }
+      @media(pointer: coarse) {
+        &:active {
+          filter: var(--hov-act-filter)
         }
       }
     }
