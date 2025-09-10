@@ -9,7 +9,9 @@ import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
 import downArrow from "./assets/down_arrow.svg";
 import githubIcon from "./assets/github_icon.svg";
-// TODO: add personal contacts; style text and date inputs; make tooltip render over graph tooltip
+import linkedinIcon from "./assets/linkedin_icon.svg";
+import stravaIcon from "./assets/strava_icon.svg";
+// TODO: add personal contacts; style text and date inputs; make tooltip render over graph tooltip; add tip to interact with graphs
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
@@ -330,6 +332,18 @@ function App() {
       </main>
       <footer>
         <div className="inner-container">
+          <p>Connect with me</p>
+          <div className="contacts-container">
+            <a href="https://www.linkedin.com/in/krishpatel2067/" target="_blank" className="contact">
+              <img src={linkedinIcon} className="icon" />
+            </a>
+            <a href="https://github.com/krishpatel2067" target="_blank" className="contact">
+              <img src={githubIcon} className="icon" />
+            </a>
+            <a href="https://www.strava.com/athletes/120371207" target="_blank" className="contact">
+              <img src={stravaIcon} className="icon" />
+            </a>
+          </div>
           <p>
             <b>Last fetched</b>: {new Date(metadata?.fetched_at).toLocaleString()}
             <br />

@@ -233,15 +233,44 @@ footer {
   margin-top: 32px;
   background-color: light-dark(whitesmoke, #2f2f2f);
   padding: 16px 0;
-}
 
-footer .inner-container {
-  margin: 0 auto;
-  width: calc(100% - 32px);
-  text-align: center;
-  color: var(--secondary-txt-col);
-}
+  & .inner-container {
+    margin: 0 auto;
+    width: calc(100% - 32px);
+    text-align: center;
+    color: var(--secondary-txt-col);
+  }
 
-footer a {
-  color: inherit;
+  & a {
+    color: inherit;
+  }
+
+  & .contacts-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+
+    & .icon {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0) invert(1) brightness(0.6);
+      transition: filter 200ms linear;
+
+      @media(prefers-color-scheme: light) {
+        & {
+          filter: brightness(0) invert(1) brightness(0.4);
+        }
+      }
+
+      &:hover {
+        filter: brightness(0) invert(1) brightness(0.8);
+        @media(prefers-color-scheme: light) {
+          & {
+            filter: brightness(0) invert(1) brightness(0.2);
+          }
+        }
+      }
+    }
+  }
 }
