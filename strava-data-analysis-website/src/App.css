@@ -1,4 +1,6 @@
 :root {
+  --accent-col: 255, 90, 0;
+  --accent-col-rgb: rgb(255, 90, 0);
   --shadow-col: #00000099;
   --bord-col: light-dark(#ccc, #666);
 
@@ -9,6 +11,7 @@
   --bkg-col: light-dark(var(--bkg-col-light), var(--bkg-col-dark));
   --secondary-txt-col: light-dark(#666, #999);
 
+  accent-color: var(--accent-col-rgb);
   color-scheme: light dark;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
@@ -80,12 +83,12 @@ body {
   --fade-h: 100px;
   background:
     radial-gradient(circle at var(--x) var(--y),
-      #ff5a0055,
+      rgba(var(--accent-col), 0.33),
       transparent var(--stop)),
-    conic-gradient(from var(--angle) at 150% 150%,
-      #ff5a0055,
+      conic-gradient(from var(--angle) at 150% 150%,
+      rgba(var(--accent-col), 0.33),
       transparent,
-      #ff5a0055);
+      rgba(var(--accent-col), 0.33));
   background-color: var(--bkg-col);
   /* background-color: #ff5a00; */
   height: calc(100svh + var(--fade-h));
@@ -141,8 +144,8 @@ body {
       align-items: center;
       gap: 8px;
       -webkit-tap-highlight-color: transparent;
-      background-color: light-dark(rgb(255 90 0 / 0.25), rgb(255 255 255 / 0.1));
-      --hov-act-col: light-dark(rgb(255 90 0 / 0.5), rgb(255 255 255 / 0.2));
+      background-color: light-dark(rgba(var(--accent-col), 0.25), rgb(255 255 255 / 0.1));
+      --hov-act-col: light-dark(rgba(var(--accent-col), 0.5), rgb(255 255 255 / 0.2));
 
       @media (hover: hover) and (pointer: fine) {
         & {

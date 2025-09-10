@@ -14,13 +14,13 @@
   width: 25px;
   height: 25px;
   border-radius: 6px;
-  border: 2px solid #1b5c9d;
+  border: 2px solid var(--accent-col-rgb);
   padding: 0;
   align-content: center;
 }
 
 .Checkbox .checkbox[data-checked=true] {
-  background-color: #1b5c9d;
+  background-color: var(--accent-col-rgb);
 }
 
 .Checkbox .label {
