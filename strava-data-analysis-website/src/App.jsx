@@ -11,7 +11,7 @@ import downArrow from "./assets/down_arrow.svg";
 import githubIcon from "./assets/github_icon.svg";
 import linkedinIcon from "./assets/linkedin_icon.svg";
 import stravaIcon from "./assets/strava_icon.svg";
-// TODO: add personal contacts; style text and date inputs; make tooltip render over graph tooltip; add tip to interact with graphs
+// TODO: style text and date inputs; make tooltip render over graph tooltip; add tip to interact with graphs
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_API_KEY,
