@@ -255,20 +255,23 @@ footer {
     align-items: center;
     gap: 32px;
 
+    & a:has(.icon) {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     & .icon {
       --hov-act-filter: brightness(0) invert(1) brightness(0.8);
-      -webkit-tap-highlight-color: transparent;
       width: 30px;
       height: 30px;
       filter: brightness(0) invert(1) brightness(0.6);
-      
+
       @media(prefers-color-scheme: light) {
         & {
           --hov-act-filter: brightness(0) invert(1) brightness(0.2);
           filter: brightness(0) invert(1) brightness(0.4);
         }
       }
-      
+
       @media(hover: hover) and (pointer: fine) {
         & {
           transition: filter 200ms linear;
