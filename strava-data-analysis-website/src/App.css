@@ -85,7 +85,7 @@ body {
     radial-gradient(circle at var(--x) var(--y),
       rgba(var(--accent-col), 0.33),
       transparent var(--stop)),
-      conic-gradient(from var(--angle) at 150% 150%,
+    conic-gradient(from var(--angle) at 150% 150%,
       rgba(var(--accent-col), 0.33),
       transparent,
       rgba(var(--accent-col), 0.33));
@@ -163,13 +163,14 @@ body {
         }
       }
 
-      & img {
+      & .icon {
         width: 25px;
         height: 25px;
+        filter: brightness(0) invert(1);
 
-        @media (prefers-color-scheme: dark) {
+        @media (prefers-color-scheme: light) {
           & {
-            filter: brightness(0) invert(1);
+            filter: brightness(0) invert(0);
           }
         }
       }
@@ -268,6 +269,7 @@ footer {
 
       &:hover {
         filter: brightness(0) invert(1) brightness(0.8);
+
         @media(prefers-color-scheme: light) {
           & {
             filter: brightness(0) invert(1) brightness(0.2);

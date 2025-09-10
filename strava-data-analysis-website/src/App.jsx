@@ -153,7 +153,7 @@ function App() {
             <h1 className="title">Personal Strava Dashboard</h1>
             <p className="subtitle">Krish A. Patel</p>
             <a href="https://github.com/krishpatel2067/Personal-Strava-Dashboard" target="_blank" className="repo">
-              <img src={githubIcon} />
+              <img src={githubIcon} className="icon" />
               <span>Repository</span>
             </a>
             <div className="scroll-hint">
