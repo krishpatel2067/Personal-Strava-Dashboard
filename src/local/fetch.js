@@ -135,12 +135,12 @@ async function getData(numEntries = 10) {
         let numFetchesNow = 0;
         let numFetchesToday = numFetchesSoFar;
         let showExpDateMsg = true;
-        let apiLimitNow = 10;                   // prevent excessive API use at once
+        let apiLimitNow = 15;                   // prevent excessive API use at once
 
         // keep fetching until empty pages are returned
         while ((tempData == null || (tempData != null && tempData.length > 0))) {
             if (numFetchesNow > apiLimitNow || numFetchesToday > API_LIMIT) {
-                logger.info(`Preset daily API limit of ${API_LIMIT} or now API limit of ${apiLimitNow} reached. No more data will be fetched. If you were expecting data, try increasing the \`apiLimitNow\` variable.`);
+                console.log(`Preset daily API limit of ${API_LIMIT} or now API limit of ${apiLimitNow} reached. No more data will be fetched. If you were expecting data, try increasing the \`apiLimitNow\` variable.`);
                 break;
             }
 
