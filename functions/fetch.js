@@ -1,6 +1,6 @@
 import { getStorage, getDownloadURL } from "firebase-admin/storage";
 import { getFirestore } from "firebase-admin/firestore";
-import logger from "firebase-functions/logger";
+import { info, warn } from "firebase-functions/logger";
 
 import path from "path";
 import { readFile } from "fs/promises";
@@ -22,8 +22,8 @@ async function initFirestore(secretDb) {
         const docRef = secretDb.doc(SECRET_DOC_PATH);
         await docRef.set(secretLocal);
     } catch (err) {
-        logger.info("Error while initializing Firestore:");
-        logger.warn(err.message);
+        info("Error while initializing Firestore:");
+        warn(err.message);
     }
 }
 
@@ -32,13 +32,13 @@ async function retrieveAccessToken(secretDb, forceUseAuthCode = false, showExpDa
     const secret = (await docRef.get()).data();
 
     if (secret.REFRESH_TOKEN === undefined || forceUseAuthCode === true) {
-        logger.info("Using auth code to grant access token.");
+        info("Using auth code to grant access token.");
 
         if (secret.AUTH_CODE === undefined) {
             throw new Error("Error in retrieving access token: auth code not defined.");
         }
 
-        logger.info("Using auth code: " + secret.AUTH_CODE);
+        info("Using auth code: " + secret.AUTH_CODE);
 
         const params = new URLSearchParams();
         params.append("client_id", secret.CLIENT_ID);
@@ -55,17 +55,17 @@ async function retrieveAccessToken(secretDb, forceUseAuthCode = false, showExpDa
         secret.REFRESH_TOKEN = resJson.refresh_token;
         secret.ACCESS_TOKEN = resJson.access_token;
         secret.ATHLETE = resJson.athlete;
-        logger.info("Access token received: " + secret.ACCESS_TOKEN);
-        logger.info("Refresh token: " + secret.REFRESH_TOKEN);
+        info("Access token received: " + secret.ACCESS_TOKEN);
+        info("Refresh token: " + secret.REFRESH_TOKEN);
     } else if (secret.EXPIRES_AT === undefined || secret.EXPIRES_AT - Date.now() / 1000 <= 3600) {
         // if access token doesn't exist or it is going to expire in an hour
-        logger.info("Access token does not exist, or it is already expired or will expire in 1 hour.");
+        info("Access token does not exist, or it is already expired or will expire in 1 hour.");
 
         if (secret.EXPIRES_AT !== undefined) {
-            logger.info("Access token expires at: " + new Date(secret.EXPIRES_AT * 1000));
+            info("Access token expires at: " + new Date(secret.EXPIRES_AT * 1000));
         }
 
-        logger.info("Old access token: " + secret.ACCESS_TOKEN);
+        info("Old access token: " + secret.ACCESS_TOKEN);
 
         const params = new URLSearchParams();
         params.append("client_id", secret.CLIENT_ID);
@@ -81,15 +81,15 @@ async function retrieveAccessToken(secretDb, forceUseAuthCode = false, showExpDa
         secret.EXPIRES_IN = resJson.expires_in;
         secret.REFRESH_TOKEN = resJson.refresh_token;
         secret.ACCESS_TOKEN = resJson.access_token;
-        logger.info("Access token received: " + secret.ACCESS_TOKEN);
-        logger.info("Refresh token: " + secret.REFRESH_TOKEN);
+        info("Access token received: " + secret.ACCESS_TOKEN);
+        info("Refresh token: " + secret.REFRESH_TOKEN);
     }
     if (showExpDateMsg === true) {
-        logger.info("Access token expires on " + new Date(secret.EXPIRES_AT * 1000));
+        info("Access token expires on " + new Date(secret.EXPIRES_AT * 1000));
     }
     // write to secretDb
     docRef.set(secret).then(res => {
-        logger.log(`New secret stored in Firestore at ${res.writeTime.toDate()}`);
+        info(`New secret stored in Firestore at ${res.writeTime.toDate()}`);
     });
     return secret.ACCESS_TOKEN;
 }
@@ -122,32 +122,32 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     const datastoreFile = bucket.file(DS_FILE_PATH);
     let datastore = null;
     const exists = await datastoreFile.exists().catch(err => {
-        logger.info("Error checking whether datastore exists:");
-        logger.warn(err.message);
+        info("Error checking whether datastore exists:");
+        warn(err.message);
     });
 
     if (exists[0] === true) {
-        logger.info(`Datastore found at ${DS_FILE_PATH}`);
+        info(`Datastore found at ${DS_FILE_PATH}`);
 
         const url = await getDownloadURL(datastoreFile).catch(err => {
-            logger.info("Error while getting datastore's download URL:");
-            logger.warn(err.message);
+            info("Error while getting datastore's download URL:");
+            warn(err.message);
         });
         const res = await fetch(url).catch(err => {
-            logger.info("Error while fetching datastore:");
-            logger.warn(err.message);
+            info("Error while fetching datastore:");
+            warn(err.message);
         });
         datastore = await res.json().catch(err => {
-            logger.info("Error while converting fetched datastore to JSON:");
-            logger.warn(err.message);
+            info("Error while converting fetched datastore to JSON:");
+            warn(err.message);
         });
     } else {
-        logger.info(`Datastore does not exist at ${DS_FILE_PATH}`);
+        info(`Datastore does not exist at ${DS_FILE_PATH}`);
     }
 
     if (datastore === null || datastore.fetchedAt === undefined || Date.now() - datastore.fetchedAt > 24 * 3600 * 1000 || forceNew === true) {
         // fetch new data
-        logger.info("(Datastore not found) or (saved data is undated or older than 1 day) or (`forceNew` is true). Fetching new data...");
+        info("(Datastore not found) or (saved data is undated or older than 1 day) or (`forceNew` is true). Fetching new data...");
 
         // check API limit for today
         const docRef = secretDb.doc(SECRET_DOC_PATH);
@@ -164,8 +164,8 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             numFetchesSoFar = 0;
         }
 
-        logger.info("Last fetched: " + new Date(lastFetched));
-        logger.info("Num fetches today: " + numFetchesSoFar);
+        info("Last fetched: " + new Date(lastFetched));
+        info("Num fetches today: " + numFetchesSoFar);
 
         // fetch all data to conserve API requests
         const perPage = MAX_PER_PAGE;
@@ -216,9 +216,9 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             showExpDateMsg = false;
         }
 
-        logger.info("New last fetched date: " + new Date(lastFetched));
-        logger.info("Num fetches now: " + numFetchesNow);
-        logger.info("Num fetches today: " + numFetchesToday);
+        info("New last fetched date: " + new Date(lastFetched));
+        info("Num fetches now: " + numFetchesNow);
+        info("Num fetches today: " + numFetchesToday);
 
         secret.LAST_FETCHED = lastFetched;
         secret.NUM_FETCHES_TODAY = numFetchesToday;
@@ -237,24 +237,24 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             contentType: "application/json",
         })
             .then(() => {
-                logger.log(`New datastore uploaded successfully to ${DS_FILE_PATH}`);
+                info(`New datastore uploaded successfully to ${DS_FILE_PATH}`);
 
                 getDownloadURL(datastoreFile)
                     .then(url => {
-                        logger.log("Datastore download URL:");
-                        logger.log(url);
+                        info("Datastore download URL:");
+                        info(url);
                     })
                     .catch(err => {
-                        logger.info(`Failed to get download URL for the new datastore ${DS_FILE_PATH}: `);
-                        logger.warn(err.message);
+                        info(`Failed to get download URL for the new datastore ${DS_FILE_PATH}: `);
+                        warn(err.message);
                     });
             })
             .catch(err => {
-                logger.log(`Error in uploading datastore to ${DS_FILE_PATH}`);
-                logger.warn(err.message);
+                info(`Error in uploading datastore to ${DS_FILE_PATH}`);
+                warn(err.message);
             });
     } else {
-        logger.info("Fetch of new data denied: either set `forceNew` to true or wait for at least 24 hours from the last fetch of new data.");
+        info("Fetch of new data denied: either set `forceNew` to true or wait for at least 24 hours from the last fetch of new data.");
     }
 }
 

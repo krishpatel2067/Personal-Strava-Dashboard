@@ -17,7 +17,7 @@
     {
       "source": "functions",
       "codebase": "default",
-      "runtime": "nodejs20",
+      "runtime": "nodejs24",
       "ignore": [
         "node_modules",
         ".git",
@@ -42,7 +42,7 @@
         "firebase-debug.*.log",
         "*.local"
       ],
-      "runtime": "python313"
+      "runtime": "python312"
     }
   ],
   "emulators": {
@@ -61,6 +61,9 @@
     },
     "hosting": {
       "port": 5000
+    },
+    "pubsub": {
+      "port": 8085
     }
   },
   "storage": {

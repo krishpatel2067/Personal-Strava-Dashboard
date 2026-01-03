@@ -4,7 +4,7 @@
   "description": "Perform data analysis on my Strava activity data.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "emulate": "firebase emulators:start"
   },
   "keywords": [
     "Strava",
@@ -15,10 +15,9 @@
   "author": "Krish A. Patel",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "firebase": "^11.9.0",
-    "node-fetch": "^3.3.2",
-    "nodemon": "^3.1.10"
+    "firebase": "^11.10.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^15.1.0"
   }
 }
