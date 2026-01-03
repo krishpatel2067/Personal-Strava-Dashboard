@@ -13,6 +13,7 @@
     "node": "20"
   },
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "cross-fetch": "^4.1.0",
     "firebase-admin": "^12.6.0",

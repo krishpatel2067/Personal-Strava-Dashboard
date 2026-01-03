@@ -1,8 +1,10 @@
-const { getStorage, getDownloadURL } = require("firebase-admin/storage");
-const { getFirestore } = require("firebase-admin/firestore");
-const logger = require("firebase-functions/logger");
+import { getStorage, getDownloadURL } from "firebase-admin/storage";
+import { getFirestore } from "firebase-admin/firestore";
+import logger from "firebase-functions/logger";
 
-// const path = require("path");
+import path from "path";
+import { readFile } from "fs/promises";
+
 const MAX_PER_PAGE = 200;       // Strava's max page size is 200
 const API_LIMIT = 750;          // Strava's read limit is 1000, but try to stay under
 const DS_FILE = "data.json";
@@ -13,12 +15,17 @@ const SECRET_COLLEC_PATH = "secret";
 const SECRET_DOC_PATH = `${SECRET_COLLEC_PATH}/secret`;
 
 // function for local emulator
-// async function __initFirestore(secretDb) {
-//     const secretJsonPath = path.join(__dirname, "secret.json");
-//     const secretLocal = require(secretJsonPath);
-//     const docRef = secretDb.doc(SECRET_DOC_PATH);
-//     await docRef.set(secretLocal);
-// }
+async function initFirestore(secretDb) {
+    try {
+        const secretJsonPath = path.join(process.cwd(), "secret.json");
+        const secretLocal = await readFile(secretJsonPath);
+        const docRef = secretDb.doc(SECRET_DOC_PATH);
+        await docRef.set(secretLocal);
+    } catch (err) {
+        logger.info("Error while initializing Firestore:");
+        logger.warn(err.message);
+    }
+}
 
 async function retrieveAccessToken(secretDb, forceUseAuthCode = false, showExpDateMsg = true) {
     const docRef = secretDb.doc(SECRET_DOC_PATH);
@@ -251,4 +258,4 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     }
 }
 
-module.exports = { retrieveAllData };
+export { retrieveAllData };
