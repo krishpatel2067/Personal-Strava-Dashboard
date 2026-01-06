@@ -4,7 +4,8 @@
   "description": "Perform data analysis on my Strava activity data.",
   "main": "index.js",
   "scripts": {
-    "emulate": "firebase emulators:start"
+    "emulate": "firebase emulators:start",
+    "shell": "npx firebase functions:shell"
   },
   "keywords": [
     "Strava",

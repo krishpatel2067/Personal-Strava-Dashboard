@@ -115,7 +115,6 @@ async function fetchData(secretDb, perPage = 1, page = 1, showExpDateMsg = true)
 
 async function retrieveAllData(app, bucketName, forceNew = false) {
     // Use default database in emulator if multi-db isn't supported
-    console.log(process.env);
     const dbId = process.env.FUNCTIONS_EMULATOR ? undefined : SECRET_DB_ID;
     const secretDb = getFirestore(app, dbId);
     await initFirestore(secretDb);
@@ -173,18 +172,25 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         // fetch all data to conserve API requests
         const perPage = MAX_PER_PAGE;
         const maxPages = -1;                      // -1 means all the pages that exist
-        const apiLimitNow = 15;                   // prevent excessive API use at once
+        const apiLimitNow = 1;                   // prevent excessive API use at once
 
-        let newData = [];
+        let newData = null;
         let tempData = null;
 
-        let page = (secret.LAST_PAGE_FETCHED === undefined || secret.LAST_PAGE_FETCHED === -1) ?
-            1 : secret.LAST_PAGE_FETCHED + 1;
+        let page = null;
         let numEntriesGot = 0;
         let numFetchesNow = 0;
         let numFetchesToday = numFetchesSoFar;
         let showExpDateMsg = true;
         let interrupted = false;
+
+        if (secret.LAST_PAGE_FETCHED === undefined || secret.LAST_PAGE_FETCHED === -1) {
+            page = 1;
+            newData = [];
+        } else {
+            page = secret.LAST_PAGE_FETCHED + 1;
+            newData = datastore.data;
+        }
 
         // keep fetching until empty pages are returned
         while (tempData == null || (tempData != null && tempData.length > 0)) {
@@ -203,9 +209,11 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             }
 
             if (maxPages > 0 && page > maxPages) {
+                interrupted = true;
                 break;
             }
 
+            // TODO: if size of last page fetched is less than curr page size, then some activities may have been missed
             const [response, dataJson] = await fetchData(secretDb, perPage, page, showExpDateMsg);
 
             if (response.status === 429) {
@@ -223,6 +231,10 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             showExpDateMsg = false;
         }
 
+        // if interrupted, decrement since interrupted page wasn't fetched
+        // otherwise, decrement since last fetch in while loop is empty
+        page--;
+
         info("New last fetched date: " + new Date(lastFetched));
         info("Num fetches now: " + numFetchesNow);
         info("Num fetches today: " + numFetchesToday);
@@ -239,6 +251,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         datastoreFile.save(JSON.stringify({
             metadata: {
                 fetchedAt: Date.now(),
+                partialFetch: interrupted,
             },
             data: newData,
         }), {
