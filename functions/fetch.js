@@ -9,19 +9,43 @@ const MAX_PER_PAGE = 10;       // Strava's max page size
 const API_LIMIT_DAILY = 1000;   // Strava's daily read limit is 1000
 const API_LIMIT_NOW = 1;      // Safety limit for a single execution
 const DS_FILE_PATH = "private/data.json";
-const SECRET_DOC_PATH = "secret/secret";
+const SECRET_DOC_PATH = "main/secret";
+const METADATA_DOC_PATH = "main/fetch_metadata";
 const CONCURRENCY_LIMIT = 5;    // Number of concurrent API requests
 
 /**
  * Initializes Firestore with local secrets for emulation.
  */
-async function initFirestore(secretDb) {
+async function initFirestore(db) {
     try {
         const secretJsonPath = path.join(process.cwd(), "secret.json");
         const secretLocal = JSON.parse(await readFile(secretJsonPath, "utf-8"));
-        const docRef = secretDb.doc(SECRET_DOC_PATH);
-        await docRef.set(secretLocal);
-        info("Firestore initialized with local secret.json");
+
+        const fetchMetadataJsonPath = path.join(process.cwd(), "fetch_metadata.json");
+        const fetchMetadataLocal = JSON.parse(await readFile(fetchMetadataJsonPath, "utf-8"));
+
+        // Split secrets and metadata for initialization
+        const secrets = {
+            CLIENT_ID: secretLocal.CLIENT_ID,
+            CLIENT_SECRET: secretLocal.CLIENT_SECRET,
+            AUTH_CODE: secretLocal.AUTH_CODE,
+            REFRESH_TOKEN: secretLocal.REFRESH_TOKEN,
+            ACCESS_TOKEN: secretLocal.ACCESS_TOKEN,
+            EXPIRES_AT: secretLocal.EXPIRES_AT,
+            ATHLETE: secretLocal.ATHLETE,
+        };
+
+        const metadata = {
+            LAST_PAGE_FETCHED: fetchMetadataLocal.LAST_PAGE_FETCHED ?? -1,
+            NUM_FETCHES_TODAY: fetchMetadataLocal.NUM_FETCHES_TODAY ?? 0,
+            LAST_FETCH_DATE: fetchMetadataLocal.LAST_FETCH_DATE ?? "",
+            LAST_FETCHED: fetchMetadataLocal.LAST_FETCHED ?? 0,
+        };
+
+        await db.doc(SECRET_DOC_PATH).set(secrets);
+        await db.doc(METADATA_DOC_PATH).set(metadata);
+
+        info("Firestore initialized with local secret.json (secret and fetch_metadata)");
     } catch (err) {
         warn("Firestore initialization skipped or failed:", err.message);
     }
@@ -155,24 +179,27 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     }
 
     // Refresh secrets/limits
-    const docRef = db.doc(SECRET_DOC_PATH);
-    const secret = (await docRef.get()).data() || {};
+    const secretDocRef = db.doc(SECRET_DOC_PATH);
+    const metadataDocRef = db.doc(METADATA_DOC_PATH);
+
+    const metadataSnap = await metadataDocRef.get();
+    const metadata = metadataSnap.data() || {};
 
     // Daily Limit check
     const today = new Date().toISOString().split("T")[0];
-    const lastFetchDay = secret.LAST_FETCH_DATE || "";
+    const lastFetchDay = metadata.LAST_FETCH_DATE || "";
     if (lastFetchDay !== today) {
-        secret.NUM_FETCHES_TODAY = 0;
-        secret.LAST_FETCH_DATE = today;
+        metadata.NUM_FETCHES_TODAY = 0;
+        metadata.LAST_FETCH_DATE = today;
     }
 
     const accessToken = await getAccessToken(db);
     const limit = pLimit(CONCURRENCY_LIMIT);
 
     // Determine if we are resuming an interrupted fetch or starting fresh
-    const isResuming = !forceNew && secret.LAST_PAGE_FETCHED !== undefined && secret.LAST_PAGE_FETCHED !== -1;
+    const isResuming = !forceNew && metadata.LAST_PAGE_FETCHED !== undefined && metadata.LAST_PAGE_FETCHED !== -1;
 
-    let page = isResuming ? secret.LAST_PAGE_FETCHED + 1 : 1;
+    let page = isResuming ? metadata.LAST_PAGE_FETCHED + 1 : 1;
     let newData = isResuming ? [...datastore.data] : [];
     let interrupted = false;
     let fetchesDoneNow = 0;
@@ -181,7 +208,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
     while (true) {
         // Enforce safety limits
-        if (fetchesDoneNow >= API_LIMIT_NOW || (secret.NUM_FETCHES_TODAY + fetchesDoneNow) >= API_LIMIT_DAILY) {
+        if (fetchesDoneNow >= API_LIMIT_NOW || (metadata.NUM_FETCHES_TODAY + fetchesDoneNow) >= API_LIMIT_DAILY) {
             warn("Local or global API limit reached. Interrupting...");
             interrupted = true;
             break;
@@ -225,10 +252,10 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     }
 
     // Update state
-    secret.LAST_PAGE_FETCHED = interrupted ? page : -1;
-    secret.NUM_FETCHES_TODAY = (secret.NUM_FETCHES_TODAY || 0) + fetchesDoneNow;
-    secret.LAST_FETCHED = Date.now();
-    await docRef.set(secret);
+    metadata.LAST_PAGE_FETCHED = interrupted ? page : -1;
+    metadata.NUM_FETCHES_TODAY = (metadata.NUM_FETCHES_TODAY || 0) + fetchesDoneNow;
+    metadata.LAST_FETCHED = Date.now();
+    await metadataDocRef.set(metadata);
 
     // Save to storage
     await datastoreFile.save(JSON.stringify({
