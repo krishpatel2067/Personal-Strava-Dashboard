@@ -47,7 +47,7 @@
   ],
   "emulators": {
     "functions": {
-      "port": 5001
+      "port": 5002
     },
     "ui": {
       "enabled": true

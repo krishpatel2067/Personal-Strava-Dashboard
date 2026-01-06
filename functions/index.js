@@ -5,13 +5,13 @@ import { info } from "firebase-functions/logger";
 import path from "path";
 import { readFile } from "fs/promises";
 import { retrieveAllData } from "./fetch.js";
+import serviceAccountKey from "./serviceAccountKey.json" with { type: "json" };
 
 // env vars
 const bucketVar = defineString("STORAGE_BUCKET");
 
-const serviceAccount = await readFile(path.join(process.cwd(), "serviceAccountKey.json"), "utf-8");
 const app = initializeApp({
-    credential: cert(JSON.parse(serviceAccount)),
+    credential: cert(serviceAccountKey),
 });
 
 export const fetchAndStore = onSchedule("every day 01:00", async (event) => {

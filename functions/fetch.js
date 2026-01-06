@@ -18,9 +18,10 @@ const SECRET_DOC_PATH = `${SECRET_COLLEC_PATH}/secret`;
 async function initFirestore(secretDb) {
     try {
         const secretJsonPath = path.join(process.cwd(), "secret.json");
-        const secretLocal = await readFile(secretJsonPath);
+        const secretLocal = JSON.parse(await readFile(secretJsonPath, "utf-8"));
         const docRef = secretDb.doc(SECRET_DOC_PATH);
         await docRef.set(secretLocal);
+        info("Firestore initialized with local secret.json");
     } catch (err) {
         info("Error while initializing Firestore:");
         warn(err.message);
@@ -113,9 +114,11 @@ async function fetchData(secretDb, perPage = 1, page = 1, showExpDateMsg = true)
 }
 
 async function retrieveAllData(app, bucketName, forceNew = false) {
-    // Firestore for secret (e.g. tokens) storage
-    const secretDb = getFirestore(app, SECRET_DB_ID);
-    // await __initFirestore(secretDb);
+    // Use default database in emulator if multi-db isn't supported
+    console.log(process.env);
+    const dbId = process.env.FUNCTIONS_EMULATOR ? undefined : SECRET_DB_ID;
+    const secretDb = getFirestore(app, dbId);
+    await initFirestore(secretDb);
 
     // datastore has fields: { fetchedAt: number, data: Object }
     const bucket = getStorage(app).bucket(bucketName);
@@ -170,28 +173,31 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         // fetch all data to conserve API requests
         const perPage = MAX_PER_PAGE;
         const maxPages = -1;                      // -1 means all the pages that exist
-        const apiLimitNow = 10;                   // prevent excessive API use at once
+        const apiLimitNow = 15;                   // prevent excessive API use at once
 
         let newData = [];
         let tempData = null;
 
-        let page = 1;
+        let page = (secret.LAST_PAGE_FETCHED === undefined || secret.LAST_PAGE_FETCHED === -1) ?
+            1 : secret.LAST_PAGE_FETCHED + 1;
         let numEntriesGot = 0;
         let numFetchesNow = 0;
         let numFetchesToday = numFetchesSoFar;
         let showExpDateMsg = true;
+        let interrupted = false;
 
         // keep fetching until empty pages are returned
-        while ((tempData == null || (tempData != null && tempData.length > 0))) {
+        while (tempData == null || (tempData != null && tempData.length > 0)) {
             if (numFetchesNow > apiLimitNow || numFetchesToday > API_LIMIT) {
-                logger.info(`Preset daily API limit of ${API_LIMIT} or now API limit of ${apiLimitNow} reached. No more data will be fetched. If you were expecting data, try increasing the \`apiLimitNow\` variable.`);
+                info(`Preset daily API limit of ${API_LIMIT} or now API limit of ${apiLimitNow} reached. No more data will be fetched. If you were expecting data, try increasing the \`apiLimitNow\` variable.`);
+                interrupted = true;
                 break;
             }
 
             if (tempData != null) {
                 // according to Strava API, # of entries per page may sometimes be less than requested
                 const pageSize = tempData.length;
-                logger.info(`Page ${page - 1}, entries ${numEntriesGot}-${numEntriesGot + pageSize - 1} received.`);
+                info(`Page ${page - 1}, entries ${numEntriesGot}-${numEntriesGot + pageSize - 1} received.`);
                 numEntriesGot += pageSize;
                 newData = newData.concat(tempData);
             }
@@ -203,8 +209,9 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             const [response, dataJson] = await fetchData(secretDb, perPage, page, showExpDateMsg);
 
             if (response.status === 429) {
-                logger.log("Status code 429 - too many requests. Aborting fetch...");
-                return;
+                info("Status code 429 - too many requests. Aborting fetch...");
+                interrupted = true;
+                break;
             } else {
                 tempData = dataJson;
             }
@@ -222,10 +229,11 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
         secret.LAST_FETCHED = lastFetched;
         secret.NUM_FETCHES_TODAY = numFetchesToday;
+        secret.LAST_PAGE_FETCHED = interrupted ? page - 1 : -1;
 
         // write secret to Firestore
         docRef.set(secret).then(res => {
-            logger.log(`New fetch times stored in Firestore at ${res.writeTime.toDate()}`);
+            info(`New fetch times stored in Firestore at ${res.writeTime.toDate()}`);
         });
 
         datastoreFile.save(JSON.stringify({
