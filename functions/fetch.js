@@ -8,8 +8,6 @@ import { getAccessToken } from "./lib/auth.js";
 import { fetchActivities } from "./lib/activities.js";
 import { getLoggedInAthlete } from "./lib/athlete.js";
 
-const API_LIMIT_DAILY = 1000;
-const API_LIMIT_NOW = 100;
 const DS_FILE_PATH = "private/data.json";
 const SECRET_DOC_PATH = "main/secret";
 const METADATA_DOC_PATH = "main/fetch_metadata";
@@ -77,7 +75,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     }
 
     const lastFetched = datastore.metadata.fetchedAt || 0;
-    const isOld = Date.now() - lastFetched > 24 * 3600 * 1000;
+    const isOld = Date.now() - lastFetched > 24 * 3600 * 1000;      // is older than a day?
 
     if (!isOld && !forceNew) {
         info("Data is up-to-date. Skipping fetch.");
@@ -102,7 +100,6 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     const athlete = await getLoggedInAthlete(accessToken);
     info(`Fetching activities for athlete: ${athlete.firstname} ${athlete.lastname}`);
 
-    // Fetch Activities logic using modular component
     // Resuming fetch from LAST_PAGE_FETCHED + 1
     const startPage = forceNew ? 1 : (metadata.LAST_PAGE_FETCHED || 0) + 1;
     const existingActivities = forceNew ? [] : datastore.data;
@@ -114,8 +111,8 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         interrupted
     } = await fetchActivities(accessToken, {
         startPage,
-        apiLimitDaily: API_LIMIT_DAILY,
-        apiLimitNow: API_LIMIT_NOW,
+        apiLimitDaily: 100,
+        apiLimitNow: 10,
         numFetchesToday: metadata.NUM_FETCHES_TODAY,
         existingData: existingActivities,
     });
@@ -130,13 +127,12 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     await datastoreFile.save(JSON.stringify({
         metadata: {
             fetchedAt: Date.now(),
-            partialFetch: interrupted,
-            athlete: {
-                id: athlete.id,
-                name: `${athlete.firstname} ${athlete.lastname}`
-            }
+            partialFetch: interrupted
         },
-        data: newData,
+        data: {
+            athlete,
+            activities: newData
+        },
     }), {
         contentType: "application/json",
         resumable: false,
