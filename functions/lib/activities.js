@@ -18,8 +18,8 @@ import { info, warn } from "firebase-functions/logger";
  */
 export async function fetchActivities(accessToken, {
     startPage = 1,
-    apiLimitDaily = 1000,
-    apiLimitNow = 100,
+    apiLimitDaily = 100,
+    apiLimitNow = 10,
     numFetchesToday = 0,
     existingData = [],
     perPage = 10,
@@ -34,21 +34,26 @@ export async function fetchActivities(accessToken, {
     info(`Fetching activities starting from page ${startPage}...`);
 
     while (true) {
-        // Enforce safety limits
-        if (fetchesDoneNow >= apiLimitNow || (numFetchesToday + fetchesDoneNow) >= apiLimitDaily) {
-            warn("Local or global API limit reached. Interrupting activities fetch...");
-            interrupted = true;
-            break;
-        }
 
         // Fetch in batches of concurrencyLimit
         const pagesToFetch = Array.from({ length: concurrencyLimit }, (_, i) => (lastSuccessfulPage + 1) + i);
 
-        // TODO: check if api limit exceeded for each promise!!!
         const results = await Promise.allSettled(
-            pagesToFetch.map(p => limit(() => stravaFetch("athlete/activities", accessToken, {
-                params: { per_page: perPage, page: p }
-            })))
+            pagesToFetch.map((p, index) => limit(async () => {
+                // Precise check: would this specific request exceed the limit?
+                const wouldExceedNow = (fetchesDoneNow + index) >= apiLimitNow;
+                const wouldExceedDaily = (numFetchesToday + fetchesDoneNow + index) >= apiLimitDaily;
+
+                if (wouldExceedNow || wouldExceedDaily) {
+                    const error = new Error("Rate limit would be exceeded");
+                    error.isLimitReached = true;
+                    throw error;
+                }
+
+                return stravaFetch("athlete/activities", accessToken, {
+                    params: { per_page: perPage, page: p }
+                });
+            }))
         );
 
         let stopFetching = false;
@@ -76,8 +81,13 @@ export async function fetchActivities(accessToken, {
             } else {
                 // Handle rejection within the batch
                 const err = result.reason;
-                if (err.status === 429) {
-                    warn(`Rate limit hit (429) at page ${currentPageNum}.`);
+                if (err.isLimitReached) {
+                    warn("Local API limit reached. Interrupting activities fetch...");
+                    interrupted = true;
+                    stopFetching = true;
+                    break;
+                } else if (err.status === 429) {
+                    warn(`Rate limit hit (429) at page ${currentPageNum}. Interrupting activities fetch...`);
                     interrupted = true;
                     stopFetching = true;
                     break;
