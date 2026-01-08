@@ -2,8 +2,6 @@ import { initializeApp, cert } from "firebase-admin/app";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { defineString } from "firebase-functions/params";
 import { info } from "firebase-functions/logger";
-import path from "path";
-import { readFile } from "fs/promises";
 import { retrieveAllData } from "./fetch.js";
 import serviceAccountKey from "./serviceAccountKey.json" with { type: "json" };
 

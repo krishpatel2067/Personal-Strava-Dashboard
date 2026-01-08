@@ -37,7 +37,6 @@ export async function getAccessToken(db) {
             EXPIRES_AT: resJson.expires_at,
             REFRESH_TOKEN: resJson.refresh_token,
             ACCESS_TOKEN: resJson.access_token,
-            ATHLETE: resJson.athlete,
         });
 
         await docRef.set(secret);

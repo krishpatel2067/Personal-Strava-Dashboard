@@ -24,22 +24,21 @@ async function initFirestore(db) {
         const fetchMetadataLocal = JSON.parse(await readFile(fetchMetadataJsonPath, "utf-8"));
 
         // Split secrets and metadata for initialization
-        const secrets = {
-            CLIENT_ID: secretLocal.CLIENT_ID,
-            CLIENT_SECRET: secretLocal.CLIENT_SECRET,
-            AUTH_CODE: secretLocal.AUTH_CODE,
-            REFRESH_TOKEN: secretLocal.REFRESH_TOKEN,
-            ACCESS_TOKEN: secretLocal.ACCESS_TOKEN,
-            EXPIRES_AT: secretLocal.EXPIRES_AT,
-            ATHLETE: secretLocal.ATHLETE,
-        };
+        const secretFields = ["CLIENT_ID", "CLIENT_SECRET", "AUTH_CODE", "REFRESH_TOKEN", "ACCESS_TOKEN", "EXPIRES_AT"];
+        const secrets = secretFields.reduce((acc, field) => {
+            if (secretLocal[field]) {
+                acc[field] = secretLocal[field];
+            }
+            return acc;
+        }, {});
 
-        const metadata = {
-            LAST_PAGE_FETCHED: fetchMetadataLocal.LAST_PAGE_FETCHED ?? 0,
-            NUM_FETCHES_TODAY: fetchMetadataLocal.NUM_FETCHES_TODAY ?? 0,
-            LAST_FETCH_DATE: fetchMetadataLocal.LAST_FETCH_DATE ?? "",
-            LAST_FETCHED: fetchMetadataLocal.LAST_FETCHED ?? 0,
-        };
+        const metadataFields = ["LAST_PAGE_FETCHED", "NUM_FETCHES_TODAY", "LAST_FETCH_DATE", "LAST_FETCHED"];
+        const metadata = metadataFields.reduce((acc, field) => {
+            if (fetchMetadataLocal[field]) {
+                acc[field] = fetchMetadataLocal[field];
+            }
+            return acc;
+        }, {});
 
         await db.doc(SECRET_DOC_PATH).set(secrets);
         await db.doc(METADATA_DOC_PATH).set(metadata);
@@ -112,7 +111,8 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     } = await fetchActivities(accessToken, {
         startPage,
         apiLimitDaily: 100,
-        apiLimitNow: 10,
+        apiLimitNow: 1,
+        perPage: 1,
         numFetchesToday: metadata.NUM_FETCHES_TODAY,
         existingData: existingActivities,
     });

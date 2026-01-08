@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "emulate": "firebase emulators:start",
+    "emulate:no-func": "firebase emulators:start --only firestore,storage",
     "shell": "npx firebase functions:shell"
   },
   "keywords": [

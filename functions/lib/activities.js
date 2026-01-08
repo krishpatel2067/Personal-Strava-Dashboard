@@ -22,7 +22,7 @@ export async function fetchActivities(accessToken, {
     apiLimitNow = 10,
     numFetchesToday = 0,
     existingData = [],
-    perPage = 10,
+    perPage = 200,
     concurrencyLimit = 5,
 }) {
     const limit = pLimit(concurrencyLimit);
@@ -51,7 +51,10 @@ export async function fetchActivities(accessToken, {
                 }
 
                 return stravaFetch("athlete/activities", accessToken, {
-                    params: { per_page: perPage, page: p }
+                    params: {
+                        per_page: perPage,
+                        page: p,
+                    }
                 });
             }))
         );
