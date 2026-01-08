@@ -10,3 +10,7 @@ import { stravaFetch } from "./client.js";
 export async function getLoggedInAthlete(accessToken) {
     return stravaFetch("athlete", accessToken);
 }
+
+export async function getStats(athleteId, accessToken) {
+    return stravaFetch(`athletes/${athleteId}/stats`, accessToken);
+}

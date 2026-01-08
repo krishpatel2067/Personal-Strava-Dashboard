@@ -6,7 +6,7 @@ import { readFile } from "fs/promises";
 
 import { getAccessToken } from "./lib/auth.js";
 import { fetchActivities } from "./lib/activities.js";
-import { getLoggedInAthlete } from "./lib/athlete.js";
+import { getLoggedInAthlete, getStats } from "./lib/athlete.js";
 import { getGear } from "./lib/gear.js";
 
 const DS_FILE_PATH = "private/data.json";
@@ -96,8 +96,9 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
     const accessToken = await getAccessToken(db);
 
-    // Fetch detailed athlete info
+    // Fetch detailed athlete info & stats
     const athlete = await getLoggedInAthlete(accessToken);
+    const athleteStats = await getStats(athlete.id, accessToken);
 
     // Fetch gear
     const gear = { shoes: [], bikes: [] };
@@ -137,11 +138,12 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     // Save to storage
     await datastoreFile.save(JSON.stringify({
         metadata: {
-            fetchedAt: Date.now(),
-            partialFetch: interrupted
+            fetched_at: Date.now(),
+            partial_fetch: interrupted
         },
         data: {
             athlete,
+            athlete_stats: athleteStats,
             gear,
             activities: newData
         },
