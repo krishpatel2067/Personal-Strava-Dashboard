@@ -7,6 +7,7 @@ import { readFile } from "fs/promises";
 import { getAccessToken } from "./lib/auth.js";
 import { fetchActivities } from "./lib/activities.js";
 import { getLoggedInAthlete } from "./lib/athlete.js";
+import { getGear } from "./lib/gear.js";
 
 const DS_FILE_PATH = "private/data.json";
 const SECRET_DOC_PATH = "main/secret";
@@ -95,11 +96,21 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
 
     const accessToken = await getAccessToken(db);
 
-    // Fetch Athlete Info (New modular functionality demonstration)
+    // Fetch detailed athlete info
     const athlete = await getLoggedInAthlete(accessToken);
-    info(`Fetching activities for athlete: ${athlete.firstname} ${athlete.lastname}`);
 
-    // Resuming fetch from LAST_PAGE_FETCHED + 1
+    // Fetch gear
+    const gear = { shoes: [], bikes: [] };
+
+    for (const shoe of athlete.shoes) {
+        gear.shoes.push(await getGear(shoe.id, accessToken));
+    }
+
+    for (const bike of athlete.bikes) {
+        gear.bikes.push(await getGear(bike.id, accessToken));
+    }
+
+    // Fetch activities
     const startPage = forceNew ? 1 : (metadata.LAST_PAGE_FETCHED || 0) + 1;
     const existingActivities = forceNew ? [] : datastore.data;
 
@@ -131,6 +142,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         },
         data: {
             athlete,
+            gear,
             activities: newData
         },
     }), {
