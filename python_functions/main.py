@@ -142,7 +142,7 @@ def analyze(data):
 
 
 @scheduler_fn.on_schedule(schedule="every day 02:00")
-def read_and_analyze(event):
+def read_and_analyze():
     analysis_start = time.time() * 1000
     logger.info("Running Python function `read_and_analyze`...")
 
