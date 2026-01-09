@@ -9,7 +9,7 @@ import { fetchActivities } from "./lib/activities.js";
 import { getLoggedInAthlete, getStats } from "./lib/athlete.js";
 import { getGear } from "./lib/gear.js";
 
-const DS_FILE_PATH = "private/data.json";
+const DS_FILE_PATH = "private/raw_data.json";
 const SECRET_DOC_PATH = "main/secret";
 const METADATA_DOC_PATH = "main/fetch_metadata";
 
@@ -54,6 +54,7 @@ async function initFirestore(db) {
  * Main function to retrieve and synchronize all activities.
  */
 async function retrieveAllData(app, bucketName, forceNew = false) {
+    const fetchStart = Date.now();
     const db = getFirestore(app);
     if (process.env.FUNCTIONS_EMULATOR) await initFirestore(db);
 
@@ -136,10 +137,13 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     await metadataDocRef.set(metadata);
 
     // Save to storage
+    const fetchEnd = Date.now();
     await datastoreFile.save(JSON.stringify({
         metadata: {
-            fetched_at: Date.now(),
-            partial_fetch: interrupted
+            fetch_end: fetchEnd,
+            fetch_duration: fetchEnd - fetchStart,
+            partial_fetch: interrupted,
+            processed: false
         },
         data: {
             athlete,
