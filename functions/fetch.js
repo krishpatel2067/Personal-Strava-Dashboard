@@ -125,7 +125,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         startPage,
         apiLimitDaily: 100,
         apiLimitNow: 1,
-        perPage: 1,
+        perPage: 5,
         numFetchesToday: metadata.NUM_FETCHES_TODAY,
         existingData: existingActivities,
     });

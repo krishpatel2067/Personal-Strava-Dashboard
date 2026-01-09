@@ -105,7 +105,7 @@ def analyze(data):
 
     # --- ATHLETE --------------------------------------------------------
     athlete_fields = ["username", "firstname", "lastname", "created_at", "updated_at", "profile", "follower_count", "friend_count", ]
-    athlete = {field: athlete[field] for field in athlete_fields}
+    athlete = {field: data["athlete"][field] for field in athlete_fields}
 
     # --- GEAR ----------------------------------------------------------
     shoe_fields = ["brand_name", "model_name", "distance", "retired"]
