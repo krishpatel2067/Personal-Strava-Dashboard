@@ -39,14 +39,16 @@ def analyze(data):
     activities["total"] = total
 
     # --- average --------------------------------------------------------
+    non_priv_df = df[df["visibility"] != "only_me"]
+
     mean = {
         # mean kudos (per non-private activity)
-        "kudos": activities["total_kudos"] / df["visibility"].value_counts().drop(index="only_me").values.sum()
+        "kudos": non_priv_df["kudos_count"].mean()
     }
 
     activities["mean"] = mean
 
-    # --- peridocially ---------------------------------------------------------
+    # --- periodic -------------------------------------------------------
     def get_periodic(df, col, freq):
         if "start_date_dt" not in df.columns:
             df["start_date_dt"] = pd.to_datetime(df["start_date"])
@@ -67,40 +69,39 @@ def analyze(data):
                     .to_dict())
 
     def get_periodic_by_sport(df, col, freq):
-        return {sport: get_periodic(col, df[df["sport_type"] == sport], freq) for sport in df["sport_type"].unique()}
+        return {sport: get_periodic(df[df["sport_type"] == sport], col, freq) for sport in df["sport_type"].unique()}
 
-    periodic_cols = ["distance", "kudos", "activities"]
-    periodic_by_sport_cols = ["distance_by_sport", "kudos_by_sport", "activities_by_sport"]
+    periodic_cols = {"distance": "distance", "kudos_count": "kudos_count", "activities": "_activities"}
 
     activities["weekly"] = {
-        col: get_periodic(df, col, "W-MON")
-        for col in periodic_cols
+        key: get_periodic(df, col, "W-MON")
+        for key, col in periodic_cols.items()
     } | {
-        col: get_periodic_by_sport(df, col, "W-MON")
-        for col in periodic_by_sport_cols
+        key: get_periodic_by_sport(df, col, "W-MON")
+        for key, col in periodic_cols.items()
     }
     activities["monthly"] = {
-        col: get_periodic(df, col, "M")
-        for col in periodic_cols
+        key: get_periodic(df, col, "MS")
+        for key, col in periodic_cols.items()
     } | {
-        col: get_periodic_by_sport(df, col, "M")
-        for col in periodic_by_sport_cols
+        key: get_periodic_by_sport(df, col, "MS")
+        for key, col in periodic_cols.items()
     }
     activities["yearly"] = {
-        col: get_periodic(df, col, "Y")
-        for col in periodic_cols
+        key: get_periodic(df, col, "YS")
+        for key, col in periodic_cols.items()
     } | {
-        col: get_periodic_by_sport(df, col, "Y")
-        for col in periodic_by_sport_cols
+        key: get_periodic_by_sport(df, col, "YS")
+        for key, col in periodic_cols.items()
     }
 
     # --- ATHLETE --------------------------------------------------------
-    athlete_fields = ["username", "firstname", "lastname", "created_at", "updated_at", "profile", "follower_count", "friend_count", ]
-    athlete = {field: data["athlete"][field] for field in athlete_fields}
+    athlete_fields = ["username", "firstname", "lastname", "created_at", "updated_at", "profile", "follower_count", "friend_count"]
+    athlete = {field: data["athlete"][field] for field in athlete_fields if field in data["athlete"]}
 
     # --- GEAR ----------------------------------------------------------
     shoe_fields = ["brand_name", "model_name", "distance", "retired"]
-    shoes = [{field: shoe[field] for field in shoe_fields} for shoe in data["gear"]["shoes"]]
+    shoes = [{field: shoe[field] for field in shoe_fields if field in shoe} for shoe in data["gear"]["shoes"]]
 
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
     return convert_np_types_to_plain({
