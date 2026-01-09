@@ -1,4 +1,4 @@
-firebase-functions==0.4.3               # Released May 23, 2025
-firebase-admin==6.9.0                   # Released Jun 6, 2025
-pandas==2.3.0                           # Released Jun 4, 2025
-numpy==2.3.2                            # Released Jul 24, 2025
+firebase-functions==0.5.0               # Released Nov 4, 2025
+firebase-admin==7.1.0                   # Released Jul 31, 2025
+pandas==2.3.3                           # Released Sep 25, 2025
+numpy==2.4.0                            # Released Dec 20, 2025
