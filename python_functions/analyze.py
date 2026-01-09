@@ -19,89 +19,80 @@ def analyze(data):
     activities = {}
 
     # --- total ----------------------------------------------------------
+    sport_type_group = df.groupby(by="sport_type")
+    total = {
+        "distance": df["distance"].sum(),
+        "moving_time": df["moving_time"].sum(),
+        "elapsed_time": df["elapsed_time"].sum(),
+        "elevation_gain": df["total_elevation_gain"].sum(),
+        "kudos": df["kudos_count"].sum(),
+        "activities": df.shape[0],
+        "recorded_activities": df["manual"].value_counts()[False],
+        "distance_by_sport": sport_type_group["distance"].sum().to_dict(),
+        "moving_time_by_sport": sport_type_group["moving_time"].sum().to_dict(),
+        "elapsed_time_by_sport": sport_type_group["elapsed_time"].sum().to_dict(),
+        "elevation_gain_by_sport": sport_type_group["total_elevation_gain"].sum().to_dict(),
+        "kudos_by_sport": sport_type_group["kudos_count"].sum().to_dict(),
+        "activities_by_sport": df["sport_type"].value_counts().to_dict()
+    }
 
-    # total distance
-    activities["total_distance"] = df["distance"].sum()
-
-    # total moving time
-    activities["total_moving_time"] = df["moving_time"].sum()
-
-    # total elapsed time
-    activities["total_elapsed_time"] = df["elapsed_time"].sum()
-
-    # total elevation gain
-    activities["total_elevation_gain"] = df["total_elevation_gain"].sum()
-
-    # total kudos
-    activities["total_kudos"] = df["kudos_count"].sum()
-
-    # total activities
-    activities["total_activities"] = df.shape[0]
-
-    # total recorded activities
-    activities["total_recorded_activities"] = df["manual"].value_counts()[False]
+    activities["total"] = total
 
     # --- average --------------------------------------------------------
+    mean = {
+        # mean kudos (per non-private activity)
+        "kudos": activities["total_kudos"] / df["visibility"].value_counts().drop(index="only_me").values.sum()
+    }
 
-    # mean kudos (per non-private activity)
-    activities["mean_kudos"] = activities["total_kudos"] / df["visibility"].value_counts().drop(index="only_me").values.sum()
+    activities["mean"] = mean
 
-    # --- group by sport type --------------------------------------------
-    sport_type_group = df.groupby(by="sport_type")
-
-    # distance by sport type
-    activities["distance_by_sport"] = sport_type_group["distance"].sum().to_dict()
-
-    # moving time by sport type
-    activities["moving_time_by_sport"] = sport_type_group["moving_time"].sum().to_dict()
-
-    # elapsed time by sport type
-    activities["moving_time_by_sport"] = sport_type_group["elapsed_time"].sum().to_dict()
-
-    # elevation gain by sport type
-    activities["elevation_gain_by_sport"] = sport_type_group["total_elevation_gain"].sum().to_dict()
-
-    # kudos by sport type
-    activities["kudos_by_sport"] = sport_type_group["kudos_count"].sum().to_dict()
-
-    # activities by sport type
-    activities["activities_by_sport"] = df["sport_type"].value_counts().to_dict()
-
-    # --- weekly ---------------------------------------------------------
-    def get_weekly(column, target_df=df):
+    # --- peridocially ---------------------------------------------------------
+    def get_periodic(df, col, freq):
         if "start_date_dt" not in df.columns:
             df["start_date_dt"] = pd.to_datetime(df["start_date"])
 
-        if column == "_activities":
-            # not a real column
+        if col == "_activities":
+            # not a real column, just used as a special case to count activities
             # number of activities per week
-            return (target_df
-                    .groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))["id"]
+            return (df
+                    .groupby(pd.Grouper(key="start_date_dt", freq=freq, label="left", closed="left"))["id"]
                     .count()
                     .rename(index=lambda ts: int(ts.timestamp()) * 1000)
                     .to_dict())
         else:
-            return (target_df
-                    .groupby(pd.Grouper(key="start_date_dt", freq="W-MON", label="left", closed="left"))[column]
+            return (df
+                    .groupby(pd.Grouper(key="start_date_dt", freq=freq, label="left", closed="left"))[col]
                     .sum()
                     .rename(index=lambda ts: int(ts.timestamp()) * 1000)
                     .to_dict())
 
-    def get_weekly_by_sport(column):
-        d = {}
-        for sport in df["sport_type"].unique():
-            d[sport] = get_weekly(column, df[df["sport_type"] == sport])
-        return d
+    def get_periodic_by_sport(df, col, freq):
+        return {sport: get_periodic(col, df[df["sport_type"] == sport], freq) for sport in df["sport_type"].unique()}
 
-    # weekly stats
-    activities["weekly_distance"] = get_weekly("distance")
-    activities["weekly_kudos"] = get_weekly("kudos_count")
-    activities["weekly_activities"] = get_weekly("_activities")
+    periodic_cols = ["distance", "kudos", "activities"]
+    periodic_by_sport_cols = ["distance_by_sport", "kudos_by_sport", "activities_by_sport"]
 
-    # weekly stats by sport type
-    activities["weekly_distance_by_sport"] = get_weekly_by_sport("distance")
-    activities["weekly_kudos_by_sport"] = get_weekly_by_sport("kudos_count")
-    activities["weekly_activities_by_sport"] = get_weekly_by_sport("_activities")
+    activities["weekly"] = {
+        col: get_periodic(df, col, "W-MON")
+        for col in periodic_cols
+    } | {
+        col: get_periodic_by_sport(df, col, "W-MON")
+        for col in periodic_by_sport_cols
+    }
+    activities["monthly"] = {
+        col: get_periodic(df, col, "M")
+        for col in periodic_cols
+    } | {
+        col: get_periodic_by_sport(df, col, "M")
+        for col in periodic_by_sport_cols
+    }
+    activities["yearly"] = {
+        col: get_periodic(df, col, "Y")
+        for col in periodic_cols
+    } | {
+        col: get_periodic_by_sport(df, col, "Y")
+        for col in periodic_by_sport_cols
+    }
 
     # --- ATHLETE --------------------------------------------------------
     athlete_fields = ["username", "firstname", "lastname", "created_at", "updated_at", "profile", "follower_count", "friend_count", ]
