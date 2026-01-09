@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 import json
 
-DATA_PATH = "private/data.json"
+DATA_PATH = "private/raw_data.json"
 ANALYSIS_PATH = "public/analysis.json"
 
 cred = credentials.Certificate("./serviceAccountKey.json")
@@ -31,63 +31,58 @@ def convert_np_types_to_plain(dictionary):
 
 
 def analyze(data):
-    df = pd.DataFrame(data)
-    analysis = dict()
-
-    """
-    Notes:
-        Distance in meters
-        Time in seconds
-    """
+    # --- ACTIVITIES -----------------------------------------------------
+    df = pd.DataFrame(data["activities"])
+    activities = {}
 
     # --- total ----------------------------------------------------------
 
     # total distance
-    analysis["total_distance"] = df["distance"].sum()
+    activities["total_distance"] = df["distance"].sum()
 
     # total moving time
-    analysis["total_moving_time"] = df["moving_time"].sum()
+    activities["total_moving_time"] = df["moving_time"].sum()
 
     # total elapsed time
-    analysis["total_elapsed_time"] = df["elapsed_time"].sum()
+    activities["total_elapsed_time"] = df["elapsed_time"].sum()
 
     # total elevation gain
-    analysis["total_elevation_gain"] = df["total_elevation_gain"].sum()
+    activities["total_elevation_gain"] = df["total_elevation_gain"].sum()
 
     # total kudos
-    analysis["total_kudos"] = df["kudos_count"].sum()
+    activities["total_kudos"] = df["kudos_count"].sum()
 
     # total activities
-    analysis["total_activities"] = df.shape[0]
+    activities["total_activities"] = df.shape[0]
 
     # total recorded activities
-    analysis["total_recorded_activities"] = df["manual"].value_counts()[False]
+    activities["total_recorded_activities"] = df["manual"].value_counts()[False]
 
     # --- average --------------------------------------------------------
 
     # mean kudos (per non-private activity)
-    analysis["mean_kudos"] = analysis["total_kudos"] / df["visibility"].value_counts().drop(index="only_me").values.sum()
+    activities["mean_kudos"] = activities["total_kudos"] / df["visibility"].value_counts().drop(index="only_me").values.sum()
 
     # --- group by sport type --------------------------------------------
     sport_type_group = df.groupby(by="sport_type")
 
     # distance by sport type
-    analysis["distance_by_sport"] = sport_type_group["distance"].sum().to_dict()
+    activities["distance_by_sport"] = sport_type_group["distance"].sum().to_dict()
 
     # moving time by sport type
-    analysis["moving_time_by_sport"] = sport_type_group["moving_time"].sum().to_dict()
+    activities["moving_time_by_sport"] = sport_type_group["moving_time"].sum().to_dict()
 
     # elapsed time by sport type
-    analysis["moving_time_by_sport"] = sport_type_group["elapsed_time"].sum().to_dict()
+    activities["moving_time_by_sport"] = sport_type_group["elapsed_time"].sum().to_dict()
 
     # elevation gain by sport type
-    analysis["elevation_gain_by_sport"] = sport_type_group["total_elevation_gain"].sum().to_dict()
+    activities["elevation_gain_by_sport"] = sport_type_group["total_elevation_gain"].sum().to_dict()
 
     # kudos by sport type
-    analysis["kudos_by_sport"] = sport_type_group["kudos_count"].sum().to_dict()
+    activities["kudos_by_sport"] = sport_type_group["kudos_count"].sum().to_dict()
     
     # activities by sport type
-    analysis["activities_by_sport"] = df["sport_type"].value_counts().to_dict()
+    activities["activities_by_sport"] = df["sport_type"].value_counts().to_dict()
 
     # --- weekly ---------------------------------------------------------
     def get_weekly(column, target_df=df):
@@ -116,21 +111,39 @@ def analyze(data):
         return d
 
     # weekly stats
-    analysis["weekly_distance"] = get_weekly("distance")
-    analysis["weekly_kudos"] = get_weekly("kudos_count")
-    analysis["weekly_activities"] = get_weekly("_activities")
+    activities["weekly_distance"] = get_weekly("distance")
+    activities["weekly_kudos"] = get_weekly("kudos_count")
+    activities["weekly_activities"] = get_weekly("_activities")
 
     # weekly stats by sport type
-    analysis["weekly_distance_by_sport"] = get_weekly_by_sport("distance")
-    analysis["weekly_kudos_by_sport"] = get_weekly_by_sport("kudos_count")
-    analysis["weekly_activities_by_sport"] = get_weekly_by_sport("_activities")
+    activities["weekly_distance_by_sport"] = get_weekly_by_sport("distance")
+    activities["weekly_kudos_by_sport"] = get_weekly_by_sport("kudos_count")
+    activities["weekly_activities_by_sport"] = get_weekly_by_sport("_activities")
+
+    # --- ATHLETE --------------------------------------------------------
+    athlete_fields = ["username", "firstname", "lastname", "created_at", "updated_at", "profile", "follower_count", "friend_count", ]
+    athlete = { field: athlete[field] for field in athlete_fields }
+
+    # --- GEAR ----------------------------------------------------------
+    shoe_fields = ["brand_name", "model_name", "distance", "retired"]
+    shoes = [{ field: shoe[field] for field in shoe_fields } for shoe in data["gear"]["shoes"]]
 
     # np.int64 or np.float64 are not JSON serializable, so convert them to their plain counterparts
-    return convert_np_types_to_plain(analysis)
+    activities = {
+        "activities": activities,
+        "athlete": athlete,
+        "athlete_stats": data["athlete_stats"],
+        "gear": {
+            "shoes": shoes,
+            "bikes": []
+        }
+    }
+    return convert_np_types_to_plain(activities)
 
 
 @scheduler_fn.on_schedule(schedule="every day 02:00")
 def read_and_analyze(event):
+    analysis_start = time.time() * 1000
     logger.info("Running Python function `read_and_analyze`...")
 
     bucket = storage.bucket(app=app)
@@ -143,19 +156,23 @@ def read_and_analyze(event):
         with data_blob.open() as data_file:
             overall_data = json.load(data_file)
 
-        fetched_at = overall_data["metadata"]["fetchedAt"]              # in milliseconds
+        if overall_data is None:
+            logger.warning(f"Unable to load {DATA_PATH}")
+            return
+
+        metadata = overall_data["metadata"]
         data = overall_data["data"]
 
-        logger.info(f"Successfully loaded {DATA_PATH}, which was last saved {datetime.fromtimestamp(fetched_at/1000)}")
         analysis = analyze(data)
-
         analysis_blob = bucket.blob(ANALYSIS_PATH)
-        analysis_blob.upload_from_string(
+
+        analysis_end = time.time() * 1000
+        metadata["analysis_end"] = analysis_end
+        metadata["analysis_duration"] = analysis_end - analysis_start
+        
+        analysis_blob.upload_from_string(   
             data=json.dumps({
-                "metadata": {
-                    "analyzed_at": time.time() * 1000,
-                    "fetched_at": fetched_at
-                },
+                "metadata": metadata,
                 "data": analysis
             }),
             content_type="application/json"
@@ -163,4 +180,4 @@ def read_and_analyze(event):
 
         logger.info(f"Successfully uploaded to {ANALYSIS_PATH}")
     else:
-        logger.info(f"Unable to find {DATA_PATH}")
+        logger.warning(f"Unable to find {DATA_PATH}")
