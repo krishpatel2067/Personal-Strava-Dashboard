@@ -3,3 +3,4 @@ firebase-admin==7.1.0                   # Released Jul 31, 2025
 pandas==2.3.3                           # Released Sep 25, 2025
 numpy==2.4.0                            # Released Dec 20, 2025
 pytest==9.0.2                           # Released Dec 6, 2025
+notebook==7.5.1                         # Released Dec 16, 2025

@@ -39,11 +39,10 @@ def analyze(data):
     activities["total"] = total
 
     # --- average --------------------------------------------------------
-    non_priv_df = df[df["visibility"] != "only_me"]
 
     mean = {
         # mean kudos (per non-private activity)
-        "kudos": non_priv_df["kudos_count"].mean()
+        "kudos": df[df["visibility"] != "only_me"]["kudos_count"].mean()
     }
 
     activities["mean"] = mean
@@ -52,6 +51,10 @@ def analyze(data):
     def get_periodic(df, col, freq):
         if "start_date_dt" not in df.columns:
             df["start_date_dt"] = pd.to_datetime(df["start_date"])
+
+        # if freq W-MON:
+        # label = "left" - then the Monday of the week is used as label
+        # closed = "left" - then it considers Monday to Sunday as the week (excluding next Monday)
 
         if col == "_activities":
             # not a real column, just used as a special case to count activities
@@ -71,27 +74,28 @@ def analyze(data):
     def get_periodic_by_sport(df, col, freq):
         return {sport: get_periodic(df[df["sport_type"] == sport], col, freq) for sport in df["sport_type"].unique()}
 
-    periodic_cols = {"distance": "distance", "kudos_count": "kudos_count", "activities": "_activities"}
+    # { alias : col_name }
+    periodic_cols = {"distance": "distance", "kudos": "kudos_count", "activities": "_activities"}
 
     activities["weekly"] = {
         key: get_periodic(df, col, "W-MON")
         for key, col in periodic_cols.items()
     } | {
-        key: get_periodic_by_sport(df, col, "W-MON")
+        key + "_by_sport": get_periodic_by_sport(df, col, "W-MON")
         for key, col in periodic_cols.items()
     }
     activities["monthly"] = {
         key: get_periodic(df, col, "MS")
         for key, col in periodic_cols.items()
     } | {
-        key: get_periodic_by_sport(df, col, "MS")
+        key + "_by_sport": get_periodic_by_sport(df, col, "MS")
         for key, col in periodic_cols.items()
     }
     activities["yearly"] = {
         key: get_periodic(df, col, "YS")
         for key, col in periodic_cols.items()
     } | {
-        key: get_periodic_by_sport(df, col, "YS")
+        key + "_by_sport": get_periodic_by_sport(df, col, "YS")
         for key, col in periodic_cols.items()
     }
 
