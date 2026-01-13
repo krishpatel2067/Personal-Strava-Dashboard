@@ -2,6 +2,9 @@ import pandas as pd
 from numpy import float64 as np_float64, int64 as np_int64
 
 
+def DT_TO_TS(dt): return int(dt.timestamp()) * 1000
+
+
 def convert_np_types_to_plain(dictionary):
     for key, value in dictionary.items():
         if isinstance(value, np_float64):
@@ -21,19 +24,23 @@ def analyze(data):
     # --- total ----------------------------------------------------------
     sport_type_group = df.groupby(by="sport_type")
     total = {
-        "distance": df["distance"].sum(),
-        "moving_time": df["moving_time"].sum(),
-        "elapsed_time": df["elapsed_time"].sum(),
-        "elevation_gain": df["total_elevation_gain"].sum(),
-        "kudos": df["kudos_count"].sum(),
-        "activities": df.shape[0],
-        "recorded_activities": df["manual"].value_counts()[False],
-        "distance_by_sport": sport_type_group["distance"].sum().to_dict(),
-        "moving_time_by_sport": sport_type_group["moving_time"].sum().to_dict(),
-        "elapsed_time_by_sport": sport_type_group["elapsed_time"].sum().to_dict(),
-        "elevation_gain_by_sport": sport_type_group["total_elevation_gain"].sum().to_dict(),
-        "kudos_by_sport": sport_type_group["kudos_count"].sum().to_dict(),
-        "activities_by_sport": df["sport_type"].value_counts().to_dict()
+        "overall": {
+            "distance": df["distance"].sum(),
+            "moving_time": df["moving_time"].sum(),
+            "elapsed_time": df["elapsed_time"].sum(),
+            "elevation_gain": df["total_elevation_gain"].sum(),
+            "kudos": df["kudos_count"].sum(),
+            "activities": df.shape[0],
+            "recorded_activities": df["manual"].value_counts()[False],
+        },
+        "by_sport": {
+            "distance_by_sport": sport_type_group["distance"].sum().to_dict(),
+            "moving_time_by_sport": sport_type_group["moving_time"].sum().to_dict(),
+            "elapsed_time_by_sport": sport_type_group["elapsed_time"].sum().to_dict(),
+            "elevation_gain_by_sport": sport_type_group["total_elevation_gain"].sum().to_dict(),
+            "kudos_by_sport": sport_type_group["kudos_count"].sum().to_dict(),
+            "activities_by_sport": sport_type_group["sport_type"].count().to_dict()
+        }
     }
 
     activities["total"] = total
@@ -48,56 +55,72 @@ def analyze(data):
     activities["mean"] = mean
 
     # --- periodic -------------------------------------------------------
-    def get_periodic(df, col, freq):
-        if "start_date_dt" not in df.columns:
-            df["start_date_dt"] = pd.to_datetime(df["start_date"])
+    # sets to get full range of timestamps without holes and duplicates
+    weekly_ts = set()
+    monthly_ts = set()
+    yearly_ts = set()
 
+    def get_periodic(df, col, freq, ts_set):
         # if freq W-MON:
         # label = "left" - then the Monday of the week is used as label
         # closed = "left" - then it considers Monday to Sunday as the week (excluding next Monday)
+        if "start_date_dt" not in df.columns:
+            df["start_date_dt"] = pd.to_datetime(df["start_date"])
+
+        group = df.groupby(pd.Grouper(key="start_date_dt", freq=freq, label="left", closed="left"))
 
         if col == "_activities":
             # not a real column, just used as a special case to count activities
             # number of activities per week
-            return (df
-                    .groupby(pd.Grouper(key="start_date_dt", freq=freq, label="left", closed="left"))["id"]
-                    .count()
-                    .rename(index=lambda ts: int(ts.timestamp()) * 1000)
-                    .to_dict())
+            series = group["id"].count()
         else:
-            return (df
-                    .groupby(pd.Grouper(key="start_date_dt", freq=freq, label="left", closed="left"))[col]
-                    .sum()
-                    .rename(index=lambda ts: int(ts.timestamp()) * 1000)
-                    .to_dict())
+            series = group[col].sum()
 
-    def get_periodic_by_sport(df, col, freq):
-        return {sport: get_periodic(df[df["sport_type"] == sport], col, freq) for sport in df["sport_type"].unique()}
+        series = series.rename(index=DT_TO_TS)
+        ts_set.update(series.index)
+
+        return series[series != 0].to_dict()
+
+    def get_periodic_by_sport(df, col, freq, ts_set):
+        return {sport: get_periodic(df[df["sport_type"] == sport], col, freq, ts_set) for sport in df["sport_type"].unique()}
 
     # { alias : col_name }
     periodic_cols = {"distance": "distance", "kudos": "kudos_count", "activities": "_activities"}
 
     activities["weekly"] = {
-        key: get_periodic(df, col, "W-MON")
-        for key, col in periodic_cols.items()
-    } | {
-        key + "_by_sport": get_periodic_by_sport(df, col, "W-MON")
-        for key, col in periodic_cols.items()
+        "overall": {
+            key: get_periodic(df, col, "W-MON", weekly_ts)
+            for key, col in periodic_cols.items()
+        },
+        "by_sport": {
+            key: get_periodic_by_sport(df, col, "W-MON", weekly_ts)
+            for key, col in periodic_cols.items()
+        }
     }
     activities["monthly"] = {
-        key: get_periodic(df, col, "MS")
-        for key, col in periodic_cols.items()
-    } | {
-        key + "_by_sport": get_periodic_by_sport(df, col, "MS")
-        for key, col in periodic_cols.items()
+        "overall": {
+            key: get_periodic(df, col, "MS", monthly_ts)
+            for key, col in periodic_cols.items()
+        },
+        "by_sport": {
+            key: get_periodic_by_sport(df, col, "MS", monthly_ts)
+            for key, col in periodic_cols.items()
+        }
     }
     activities["yearly"] = {
-        key: get_periodic(df, col, "YS")
-        for key, col in periodic_cols.items()
-    } | {
-        key + "_by_sport": get_periodic_by_sport(df, col, "YS")
-        for key, col in periodic_cols.items()
+        "overall": {
+            key: get_periodic(df, col, "YS", yearly_ts)
+            for key, col in periodic_cols.items()
+        },
+        "by_sport": {
+            key: get_periodic_by_sport(df, col, "YS", yearly_ts)
+            for key, col in periodic_cols.items()
+        }
     }
+
+    activities["weekly"]["timestamps"] = sorted(list(weekly_ts))             # every Monday 00:00:00
+    activities["monthly"]["timestamps"] = sorted(list(monthly_ts))           # every 1st day of the month 00:00:00
+    activities["yearly"]["timestamps"] = sorted(list(yearly_ts))             # every 1st day of the year 00:00:00
 
     # --- ATHLETE --------------------------------------------------------
     athlete_fields = ["username", "firstname", "lastname", "created_at", "updated_at", "profile", "follower_count", "friend_count"]
