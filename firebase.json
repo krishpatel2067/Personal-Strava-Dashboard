@@ -15,8 +15,8 @@
   },
   "functions": [
     {
-      "source": "functions",
-      "codebase": "default",
+      "source": "fetch_and_store",
+      "codebase": "fetch_and_store",
       "runtime": "nodejs24",
       "ignore": [
         "node_modules",
@@ -33,8 +33,8 @@
       ]
     },
     {
-      "source": "python_functions",
-      "codebase": "python_functions",
+      "source": "read_and_analyze",
+      "codebase": "read_and_analyze",
       "ignore": [
         "venv",
         ".git",
@@ -57,13 +57,13 @@
       "port": 9199
     },
     "firestore": {
-      "port": 8080
+      "port": 8081
     },
     "hosting": {
       "port": 5000
     },
     "pubsub": {
-      "port": 8085
+      "port": 8086
     }
   },
   "storage": {
