@@ -6,7 +6,8 @@
   "scripts": {
     "emulate": "firebase emulators:start",
     "emulate:no-func": "firebase emulators:start --only firestore,storage",
-    "shell": "npx firebase functions:shell"
+    "shell": "npx firebase functions:shell",
+    "cors-update": "gcloud storage buckets update $npm_config_bucket_name --cors-file=cors.json && gcloud storage buckets describe $npm_config_bucket_name --format='json(cors_config)'"
   },
   "keywords": [
     "Strava",
