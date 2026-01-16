@@ -1,5 +1,5 @@
 from firebase_functions import logger, scheduler_fn
-from firebase_admin import initialize_app, get_app, storage, credentials
+from firebase_admin import initialize_app, get_app, storage
 import time
 import json
 from analyze import analyze
@@ -7,14 +7,12 @@ from analyze import analyze
 DATA_PATH = "private/raw_data.json"
 ANALYSIS_PATH = "public/analysis.json"
 
-cred = credentials.Certificate("./serviceAccountKey.json")
-
 try:
     app = get_app()
 except ValueError as err:
     logger.info("Error:")
     logger.info(str(err))
-    app = initialize_app(cred)
+    app = initialize_app()
 
 
 @scheduler_fn.on_schedule(schedule="every day 02:00")
