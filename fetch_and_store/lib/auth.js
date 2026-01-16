@@ -5,6 +5,8 @@ const SECRET_DOC_PATH = "main/secret";
 /**
  * Handles OAuth2 token retrieval and refresh logic.
  * Encapsulates management of access tokens, refresh tokens, and expirations.
+ * @param {Firestore} db - Firestore instance
+ * @return {Promise<string>} - Access token
  */
 export async function getAccessToken(db) {
     const docRef = db.doc(SECRET_DOC_PATH);

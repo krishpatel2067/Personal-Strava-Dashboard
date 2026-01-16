@@ -14,7 +14,7 @@ import { info, warn } from "firebase-functions/logger";
  * @param {Array} [options.existingData=[]] - Data already fetched (for resumption)
  * @param {number} [options.perPage=10] - Page size
  * @param {number} [options.concurrencyLimit=5] - Number of concurrent API requests
- * @returns {Promise<Object>} - Result including data, lastPageFetched, and interrupt status
+ * @return {Promise<Object>} - Result including data, lastPageFetched, and interrupt status
  */
 export async function fetchActivities(accessToken, {
     startPage = 1,
@@ -30,11 +30,11 @@ export async function fetchActivities(accessToken, {
     let data = [...existingData];
     let interrupted = false;
     let fetchesDoneNow = 0;
+    const loop = true;
 
     info(`Fetching activities starting from page ${startPage}...`);
 
-    while (true) {
-
+    while (loop) {
         // Fetch in batches of concurrencyLimit
         const pagesToFetch = Array.from({ length: concurrencyLimit }, (_, i) => (lastSuccessfulPage + 1) + i);
 
@@ -54,9 +54,9 @@ export async function fetchActivities(accessToken, {
                     params: {
                         per_page: perPage,
                         page: p,
-                    }
+                    },
                 });
-            }))
+            })),
         );
 
         let stopFetching = false;
@@ -107,6 +107,6 @@ export async function fetchActivities(accessToken, {
         data,
         lastPageFetched: interrupted ? lastSuccessfulPage : 0,
         fetchesDoneCount: fetchesDoneNow,
-        interrupted
+        interrupted,
     };
 }

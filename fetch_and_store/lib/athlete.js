@@ -5,7 +5,7 @@ import { stravaFetch } from "./client.js";
  * Refer to: https://developers.strava.com/docs/reference/#api-Athletes-getLoggedInAthlete
  * 
  * @param {string} accessToken - Valid Strava access token
- * @returns {Promise<Object>} - Detailed athlete object
+ * @return {Promise<Object>} - Detailed athlete object
  */
 export async function getLoggedInAthlete(accessToken) {
     return stravaFetch("athlete", accessToken);

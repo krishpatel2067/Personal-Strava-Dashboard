@@ -7,7 +7,7 @@ const BASE_URL = "https://www.strava.com/api/v3";
  * @param {string} endpoint - API endpoint starting WITHOUT a slash (e.g., 'athlete/activities')
  * @param {string} accessToken - Valid Strava access token
  * @param {Object} [options={}] - Standard fetch options (method, body, params)
- * @returns {Promise<Object>} - Parsed JSON response
+ * @return {Promise<Object>} - Parsed JSON response
  */
 export async function stravaFetch(endpoint, accessToken, options = {}) {
     const { params, ...fetchOptions } = options;

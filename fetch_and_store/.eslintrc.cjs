@@ -1,10 +1,13 @@
-export default {
+module.exports = {
     env: {
         es6: true,
         node: true,
     },
+    parser: "@babel/eslint-parser",
     parserOptions: {
-        "ecmaVersion": 2018,
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "requireConfigFile": false,
     },
     extends: [
         "eslint:recommended",

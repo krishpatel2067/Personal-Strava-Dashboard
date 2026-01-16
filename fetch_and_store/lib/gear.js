@@ -6,7 +6,7 @@ import { stravaFetch } from "./client.js";
  * 
  * @param {string} gearId - The unique identifier of the gear
  * @param {string} accessToken - Valid Strava access token
- * @returns {Promise<Object>} - Detailed gear object
+ * @return {Promise<Object>} - Detailed gear object
  */
 export async function getGear(gearId, accessToken) {
     return stravaFetch(`gear/${gearId}`, accessToken);

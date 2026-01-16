@@ -33,7 +33,7 @@ describe("fetchActivities", () => {
 
         const result = await fetchActivities("token", {
             startPage: 5,
-            apiLimitNow: 1
+            apiLimitNow: 1,
         });
 
         expect(result.interrupted).toBe(true);
@@ -50,7 +50,7 @@ describe("fetchActivities", () => {
         const result = await fetchActivities("token", {
             startPage: 1,
             numFetchesToday: 95,
-            apiLimitDaily: 97 // Only 2 more fetches allowed
+            apiLimitDaily: 97, // Only 2 more fetches allowed
         });
 
         expect(result.interrupted).toBe(true);
@@ -106,7 +106,7 @@ describe("fetchActivities", () => {
         const result = await fetchActivities("token", {
             startPage: 1,
             concurrencyLimit: concurrencyLimit,
-            apiLimitNow: 100 // Ensure we don't hit the default limit
+            apiLimitNow: 100, // Ensure we don't hit the default limit
         });
 
         expect(result.data.length).toBe(perPage * 2.5); // 10 + 10 + 5

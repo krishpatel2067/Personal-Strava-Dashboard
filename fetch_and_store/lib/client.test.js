@@ -20,7 +20,7 @@ describe("stravaFetch", () => {
                 headers: expect.objectContaining({
                     "Authorization": "Bearer my-token",
                 }),
-            })
+            }),
         );
     });
 
@@ -31,7 +31,7 @@ describe("stravaFetch", () => {
         });
 
         await stravaFetch("activities", "token", {
-            params: { page: 1, per_page: 30 }
+            params: { page: 1, per_page: 30 },
         });
 
         const calledUrl = global.fetch.mock.calls[0][0];

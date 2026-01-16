@@ -15,6 +15,7 @@ const METADATA_DOC_PATH = "main/fetch_metadata";
 
 /**
  * Initializes Firestore with local secrets for emulation.
+ * @param {Firestore} db - Firestore instance
  */
 async function initFirestore(db) {
     try {
@@ -52,6 +53,9 @@ async function initFirestore(db) {
 
 /**
  * Main function to retrieve and synchronize all activities.
+ * @param {FirebaseApp} app - Firebase app instance
+ * @param {string} bucketName - Name of the storage bucket
+ * @param {boolean} [forceNew=false] - Whether to force a new fetch
  */
 async function retrieveAllData(app, bucketName, forceNew = false) {
     const fetchStart = Date.now();
@@ -120,7 +124,7 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
         data: newData,
         lastPageFetched,
         fetchesDoneCount,
-        interrupted
+        interrupted,
     } = await fetchActivities(accessToken, {
         startPage,
         apiLimitDaily: 100,
@@ -143,13 +147,13 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
             fetch_end: fetchEnd,
             fetch_duration: fetchEnd - fetchStart,
             partial_fetch: interrupted,
-            processed: false
+            processed: false,
         },
         data: {
             athlete,
             athlete_stats: athleteStats,
             gear,
-            activities: newData
+            activities: newData,
         },
     }), {
         contentType: "application/json",
