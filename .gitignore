@@ -24,3 +24,4 @@ notes.txt
 *.cache
 
 *.Identifier
+.pytest_cache
