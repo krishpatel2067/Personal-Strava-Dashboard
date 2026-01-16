@@ -59,7 +59,7 @@ async function initFirestore(db) {
  */
 async function retrieveAllData(app, bucketName, forceNew = false) {
     const fetchStart = Date.now();
-    const db = getFirestore(app);
+    const db = getFirestore(app, "strava-data-analysis-secret");
     if (process.env.FUNCTIONS_EMULATOR) await initFirestore(db);
 
     const bucket = getStorage(app).bucket(bucketName);
@@ -128,8 +128,8 @@ async function retrieveAllData(app, bucketName, forceNew = false) {
     } = await fetchActivities(accessToken, {
         startPage,
         apiLimitDaily: 100,
-        apiLimitNow: 1,
-        perPage: 5,
+        apiLimitNow: 15,
+        perPage: 200,
         numFetchesToday: metadata.NUM_FETCHES_TODAY,
         existingData: existingActivities,
     });
