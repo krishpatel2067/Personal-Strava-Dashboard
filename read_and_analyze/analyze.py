@@ -34,12 +34,12 @@ def analyze(data):
             "recorded_activities": df["manual"].value_counts()[False],
         },
         "by_sport": {
-            "distance_by_sport": sport_type_group["distance"].sum().to_dict(),
-            "moving_time_by_sport": sport_type_group["moving_time"].sum().to_dict(),
-            "elapsed_time_by_sport": sport_type_group["elapsed_time"].sum().to_dict(),
-            "elevation_gain_by_sport": sport_type_group["total_elevation_gain"].sum().to_dict(),
-            "kudos_by_sport": sport_type_group["kudos_count"].sum().to_dict(),
-            "activities_by_sport": sport_type_group["sport_type"].count().to_dict()
+            "distance": sport_type_group["distance"].sum().to_dict(),
+            "moving_time": sport_type_group["moving_time"].sum().to_dict(),
+            "elapsed_time": sport_type_group["elapsed_time"].sum().to_dict(),
+            "elevation_gain": sport_type_group["total_elevation_gain"].sum().to_dict(),
+            "kudos": sport_type_group["kudos_count"].sum().to_dict(),
+            "activities": sport_type_group["sport_type"].count().to_dict()
         }
     }
 

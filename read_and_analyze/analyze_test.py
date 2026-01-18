@@ -31,12 +31,12 @@ class TestAnalyze:
                         "recorded_activities": 3,
                     },
                     "by_sport": {
-                        "distance_by_sport": {"Run": 70000, "Walk": 80000},
-                        "moving_time_by_sport": {"Run": 3500, "Walk": 4000},
-                        "elapsed_time_by_sport": {"Run": 25200, "Walk": 28800},
-                        "elevation_gain_by_sport": {"Run": 700, "Walk": 800},
-                        "kudos_by_sport": {"Run": 70, "Walk": 80},
-                        "activities_by_sport": {"Run": 3, "Walk": 2}
+                        "distance": {"Run": 70000, "Walk": 80000},
+                        "moving_time": {"Run": 3500, "Walk": 4000},
+                        "elapsed_time": {"Run": 25200, "Walk": 28800},
+                        "elevation_gain": {"Run": 700, "Walk": 800},
+                        "kudos": {"Run": 70, "Walk": 80},
+                        "activities": {"Run": 3, "Walk": 2}
                     }
                 },
                 "mean": {"kudos": 20}
