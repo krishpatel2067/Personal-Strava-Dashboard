@@ -137,13 +137,15 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       },
       backgroundColor: colors.backgroundColor,
       // priorities (lowest to highest): default xAxis obj, given xAxis obj, xAxis obj with filtered data, 
-      xAxis: Object.assign(xAxis, {
+      xAxis: {
+        ...xAxis,
         type: "category",
         data: filteredXAxis,
-      }),
-      yAxis: Object.assign(yAxis, {
+      },
+      yAxis: {
+        ...yAxis,
         type: "value",
-      }),
+      },
       legend: {},
       series: Object.entries(data).reduce((arr, [category, valueData]) => {
         arr.push({

@@ -1,12 +1,10 @@
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { fillKeys } from "./util";
 
-async function fetchAnalysis(app, setData, setMetadata, setLoaded) {
+async function fetchAndProcessAnalysis(app, setData, setMetadata, setLoaded) {
     const storage = getStorage(app);
     const analysisRef = ref(storage, "public/analysis.json");
 
     try {
-
         const url = await getDownloadURL(analysisRef);
         const res = await fetch(url);
         let { data, metadata } = await res.json();
@@ -15,35 +13,40 @@ async function fetchAnalysis(app, setData, setMetadata, setLoaded) {
             console.log({ data, metadata });
         }
 
-        // the epoch timestamps of all weeks since account creation (distance is the superset)
-        data.week_starts = Object.keys(data.weekly_distance)
-            .map((key) => Number(key))
-            .sort();
+        // fill in 0 for missing timestamp keys
+        // { [period]: { [timestamp]: 0, ... }, ... }
+        const periods = ["weekly", "monthly", "yearly"];
+        const tsDefaults = {};
 
-        // different sports were first recorded on different dates (so some week epochs for some sports are missing)
-        for (const [weekKey, totalKey] of [
-            ["weekly_distance_by_sport", "weekly_distance"],
-            ["weekly_kudos_by_sport", "weekly_kudos"],
-            ["weekly_activities_by_sport", "weekly_activities"]
-        ]) {
-            for (const [sport, weekData] of Object.entries(data[weekKey])) {
-                // fill non-existent keys to 0; sort by keys (oldest first); retain only the value (not key)
-                data[weekKey][sport] = Object.entries(fillKeys(data[totalKey], weekData))
-                    .sort((a, b) => a[0] - b[0])
-                    .map(([_, value]) => value);
-            }
+        for (const period of periods) {
+            tsDefaults[period] = Object.fromEntries(data.activities[period].timestamps.map(ts => [ts, 0]));
         }
 
-        data.weekly_distance_by_sport["Total"] = Object.values(data.weekly_distance);
-        data.weekly_kudos_by_sport["Total"] = Object.values(data.weekly_kudos);
-        data.weekly_activities_by_sport["Total"] = Object.values(data.weekly_activities);
+        for (const period of periods) {
+            // e.g. by_sport, overall, etc., but NOT timestamps
+            for (const key1 of Object.keys(data.activities[period])) {
+                if (key1 === "timestamps") {
+                    continue;
+                }
+
+                // e.g. activities, distance, kudos, etc.
+                for (const key2 of Object.keys(data.activities[period][key1])) {
+                    for (const sport of Object.keys(data.activities[period][key1][key2])) {
+                        data.activities[period][key1][key2][sport] = {
+                            ...tsDefaults[period],
+                            ...data.activities[period][key1][key2][sport]
+                        }
+                    }
+                }
+            }
+        }
 
         setMetadata(metadata);
         setData(data);
         setLoaded(true);
     } catch (err) {
-        console.log("Error while fetching analysis.json:", err.message);
+        console.log("Error while fetching analysis.json:", err);
     }
 }
 
-export { fetchAnalysis };
+export { fetchAndProcessAnalysis };

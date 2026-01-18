@@ -18,23 +18,6 @@ function sToHrs(s) {
   return s / 3600;
 }
 
-/**
- * Fills in missing keys in a subset object with a default value.
- * @param {Object} superset - The object to use as the superset.
- * @param {Object} subset - The object to fill in missing keys for.
- * @param {any} defaultValue - The default value to use for missing keys.
- * @return {Object} The filled-in subset object.
- */
-function fillKeys(superset, subset, defaultValue = 0) {
-  for (const key in superset) {
-    if (!(key in subset)) {
-      subset[key] = defaultValue;
-    }
-  }
-
-  return subset;
-}
-
 function useTheme() {
   const [isDarkTheme, setIsDarkTheme] = useState(
     window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -61,4 +44,4 @@ function getCumulative(arr) {
   }, []);
 }
 
-export { mToMi, sToHrs, fillKeys, useTheme, getCumulative };
+export { mToMi, sToHrs, useTheme, getCumulative };

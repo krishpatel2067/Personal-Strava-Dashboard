@@ -3,7 +3,7 @@ import './App.css'
 import { initializeApp } from 'firebase/app';
 
 import { mToMi, sToHrs } from "./util";
-import { fetchAnalysis } from "./fetch";
+import { fetchAndProcessAnalysis } from "./fetch";
 
 import StatCard from './components/cards/StatCard';
 import TableCard from './components/cards/TableCard';
@@ -79,7 +79,7 @@ function App() {
       ], options);
     }
 
-    fetchAnalysis(app, setData, setMetadata, setLoaded);
+    fetchAndProcessAnalysis(app, setData, setMetadata, setLoaded);
     startGradientAnimation();
   }, []);
 
@@ -142,95 +142,94 @@ function App() {
       <main>
         <h2>Stats</h2>
         <div className="container">
-          <StatCard
-            name="Total Distance"
-            stat={mToMi(data.total_distance)}
-            units="mi"
-            loaded={loaded}
-          />
-          <StatCard
-            name="Total Moving Time"
-            stat={sToHrs(data.total_moving_time)}
-            units="hrs"
-            loaded={loaded}
-          />
-          <StatCard
-            name="Total Elapsed Time"
-            stat={sToHrs(data.total_elapsed_time)}
-            units="hrs"
-            loaded={loaded}
-          />
-          <StatCard
-            name="Total Elevation Gain"
-            stat={data.total_elevation_gain}
-            units="m"
-            loaded={loaded}
-          />
-          <StatCard
-            name="Total Kudos"
-            stat={data.total_kudos}
-            loaded={loaded}
-          />
-          <StatCard
-            name="Total Activities"
-            stat={data.total_activities}
-            loaded={loaded}
-          />
-          <StatCard
-            name="Total Recorded Activities"
-            stat={data.total_recorded_activities}
-            loaded={loaded}
-          />
-          <TableCard
-            name="Distance by Sport"
-            // sort by distance, descending
-            data={Object.entries(data.distance_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
-            headers={["", "Distance (mi)"]}
-            applyFunc={(val) => Math.round(mToMi(val))}
-            loaded={loaded}
-          />
-          <TableCard
-            name="Elevation Gain by Sport"
-            // sort by elevation gain, descending
-            data={Object.entries(data.elevation_gain_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
-            headers={["", "Elevation Gain (m)"]}
-            applyFunc={Math.round}
-            loaded={loaded}
-          />
-          <TableCard
-            name="Kudos by Sport"
-            // sort by kudos, descending
-            data={Object.entries(data.kudos_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
-            headers={["", "Kudos Count"]}
-            loaded={loaded}
-          />
-          <TableCard
-            name="Activities by Sport"
-            // sort by activities, descending
-            data={Object.entries(data.activities_by_sport ?? {}).sort((a, b) => b[1] - a[1])}
-            headers={["", "Activities Count"]}
-            loaded={loaded}
-          />
-          <ChartCard
-            name="Distance Per Week"
-            chart={
-              <StackedLineChart
-                data={data.weekly_distance_by_sport}
-                applyFunc={distance => Math.round(mToMi(distance))}
-                xAxisApplyFunc={xAxisApplyFunc}
-                xAxis={{
-                  name: "Date",
-                  data: loaded ? data.week_starts : []
-                }}
-                yAxis={{
-                  name: "Distance (mi)",
-                }}
-                pastWeeksDefaultValue={25}
-              />
-            }
-            tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-            loaded={loaded}
-          />
+          {
+            loaded ? (
+              <>
+                <StatCard
+                  name="Total Distance"
+                  stat={mToMi(data.activities.total.overall.distance)}
+                  units="mi"
+                />
+                <StatCard
+                  name="Total Moving Time"
+                  stat={sToHrs(data.activities.total.overall.moving_time)}
+                  units="hrs"
+                />
+                <StatCard
+                  name="Total Elapsed Time"
+                  stat={sToHrs(data.activities.total.overall.elapsed_time)}
+                  units="hrs"
+                />
+                <StatCard
+                  name="Total Elevation Gain"
+                  stat={data.activities.total.overall.elevation_gain}
+                  units="m"
+                />
+                <StatCard
+                  name="Total Kudos"
+                  stat={data.activities.total.overall.kudos}
+                />
+                <StatCard
+                  name="Total Activities"
+                  stat={data.activities.total.overall.activities}
+                />
+                <StatCard
+                  name="Total Recorded Activities"
+                  stat={data.activities.total.overall.recorded_activities}
+                />
+                <TableCard
+                  name="Distance by Sport"
+                  // sort by distance, descending
+                  data={Object.entries(data.activities.total.by_sport.distance).sort((a, b) => b[1] - a[1])}
+                  headers={["", "Distance (mi)"]}
+                  applyFunc={(val) => Math.round(mToMi(val))}
+                />
+                <TableCard
+                  name="Elevation Gain by Sport"
+                  // sort by elevation gain, descending
+                  data={Object.entries(data.activities.total.by_sport.elevation_gain).sort((a, b) => b[1] - a[1])}
+                  headers={["", "Elevation Gain (m)"]}
+                  applyFunc={Math.round}
+                />
+
+                <TableCard
+                  name="Kudos by Sport"
+                  // sort by kudos, descending
+                  data={Object.entries(data.activities.total.by_sport.kudos).sort((a, b) => b[1] - a[1])}
+                  headers={["", "Kudos Count"]}
+                />
+
+                <TableCard
+                  name="Activities by Sport"
+                  // sort by activities, descending
+                  data={Object.entries(data.activities.total.by_sport.activities).sort((a, b) => b[1] - a[1])}
+                  headers={["", "Activities Count"]}
+                />
+
+                {/* TODO: fix Total not showing up in chart... */}
+                <ChartCard
+                  name="Distance Per Week"
+                  chart={
+                    <StackedLineChart
+                      data={{
+                        ...data.activities.weekly.by_sport.distance,
+                        "Total": data.activities.weekly.overall.distance
+                      }}
+                      applyFunc={distance => Math.round(mToMi(distance))}
+                      xAxisApplyFunc={xAxisApplyFunc}
+                      xAxis={{
+                        name: "Date",
+                        data: loaded ? data.activities.weekly.timestamps : []
+                      }}
+                      yAxis={{
+                        name: "Distance (mi)",
+                      }}
+                      pastWeeksDefaultValue={25}
+                    />
+                  }
+                  tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
+                />
+                {/*
           <ChartCard
             name="Kudos Per Week"
             chart={
@@ -239,7 +238,7 @@ function App() {
                 xAxisApplyFunc={xAxisApplyFunc}
                 xAxis={{
                   name: "Date",
-                  data: loaded ? data.week_starts : []
+                  data: loaded ? data.activities.weekly.timestamps : []
                 }}
                 yAxis={{
                   name: "Kudos Count",
@@ -258,7 +257,7 @@ function App() {
                 xAxisApplyFunc={xAxisApplyFunc}
                 xAxis={{
                   name: "Date",
-                  data: loaded ? data.week_starts : []
+                  data: loaded ? data.activities.weekly.timestamps : []
                 }}
                 yAxis={{
                   name: "Activities Count",
@@ -268,7 +267,12 @@ function App() {
             }
             tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
             loaded={loaded}
-          />
+          /> */}
+              </>
+            ) : (
+              <p>Loading...</p>
+            )
+          }
         </div>
       </main>
       <footer>
@@ -286,9 +290,9 @@ function App() {
             </a>
           </div>
           <p>
-            <b>Last fetched</b>: {new Date(metadata?.fetched_at).toLocaleString()}
+            <b>Last fetched</b>: {loaded ? new Date(metadata.fetch_end).toLocaleString() : "Loading..."}
             <br />
-            <b>Last analyzed</b>: {new Date(metadata?.analyzed_at).toLocaleString()}
+            <b>Last analyzed</b>: {loaded ? new Date(metadata.analysis_end).toLocaleString() : "Loading..."}
           </p>
           <p>This website is not affiliated with <a href="https://www.strava.com/" target="_blank">Strava</a>.</p>
           <p>
