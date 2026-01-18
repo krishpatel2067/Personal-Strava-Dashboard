@@ -75,7 +75,7 @@ function App() {
           let { data, metadata } = await res.json();
 
           // TOGGLE
-          // console.log({ data, metadata });
+          console.log({ data, metadata });
 
           // the epoch timestamps of all weeks since account creation (distance is the superset)
           data.week_starts = Object.keys(data.weekly_distance)

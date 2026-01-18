@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDetectClickOutside } from "react-detect-click-outside";
+import { useDetectClickOutside } from "../../hooks/useDetectClickOutside";
 import "./Tooltip.css";
 
 const MARGIN = 0;
@@ -40,7 +40,7 @@ function Tooltip({ content }) {
     };
     document.addEventListener("scroll", updateRelativePosition);
     window.addEventListener("resize", updateRelativePosition);
-    
+
     return () => {
       document.removeEventListener("scroll", updateRelativePosition)
       window.removeEventListener("resize", updateRelativePosition);
