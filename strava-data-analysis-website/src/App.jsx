@@ -1,19 +1,23 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 import { initializeApp } from 'firebase/app';
-import { getDownloadURL, getStorage, ref } from 'firebase/storage';
+
+import { mToMi, sToHrs } from "./util";
+import { fetchAnalysis } from "./fetch";
+
 import StatCard from './components/cards/StatCard';
 import TableCard from './components/cards/TableCard';
 import ChartCard from './components/cards/ChartCard';
 import StackedLineChart from './components/charts/StackedLineChart';
 import Tooltip from './components/core/Tooltip';
+
 import downArrow from "./assets/down_arrow.svg";
 import githubIcon from "./assets/github_icon.svg";
 import linkedinIcon from "./assets/linkedin_icon.svg";
 import stravaIcon from "./assets/strava_icon.svg";
 // TODO: style text and date inputs; make tooltip render over graph tooltip; add tip to interact with graphs
 
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: import.meta.env.VITE_APP_API_KEY,
   authDomain: import.meta.env.VITE_APP_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_APP_PROJECT_ID,
@@ -21,9 +25,7 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_APP_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_APP_APP_ID,
   measurementId: import.meta.env.VITE_APP_MEASUREMENT_ID,
-};
-
-const app = initializeApp(firebaseConfig);
+});
 
 const TOOLTIPS = {
   chartCard: (
@@ -41,74 +43,13 @@ const TOOLTIPS = {
   )
 };
 
-function mToMi(m) {
-  return m / 1609;
-}
-
-function sToHrs(s) {
-  return s / 3600;
-}
-
-function fillKeys(superset, subset, defaultValue = 0) {
-  for (const key in superset) {
-    if (!(key in subset)) {
-      subset[key] = defaultValue;
-    }
-  }
-
-  return subset;
-}
-
 function App() {
   const [loaded, setLoaded] = useState(false);
   const [metadata, setMetadata] = useState({});
   const [data, setData] = useState({});
 
   useEffect(() => {
-    const fetchAnalysis = () => {
-      const storage = getStorage(app);
-      const analysisRef = ref(storage, "public/analysis.json");
-
-      getDownloadURL(analysisRef)
-        .then(async url => {
-          const res = await fetch(url);
-          let { data, metadata } = await res.json();
-
-          // TOGGLE
-          console.log({ data, metadata });
-
-          // the epoch timestamps of all weeks since account creation (distance is the superset)
-          data.week_starts = Object.keys(data.weekly_distance)
-            .map((key) => Number(key))
-            .sort();
-
-          // different sports were first recorded on different dates (so some week epochs for some sports are missing)
-          for (const [weekKey, totalKey] of [
-            ["weekly_distance_by_sport", "weekly_distance"],
-            ["weekly_kudos_by_sport", "weekly_kudos"],
-            ["weekly_activities_by_sport", "weekly_activities"]
-          ]) {
-            for (const [sport, weekData] of Object.entries(data[weekKey])) {
-              // fill non-existent keys to 0; sort by keys (oldest first); retain only the value (not key)
-              data[weekKey][sport] = Object.entries(fillKeys(data[totalKey], weekData))
-                .sort((a, b) => a[0] - b[0])
-                .map(([_, value]) => value);
-            }
-          }
-
-          data.weekly_distance_by_sport["Total"] = Object.values(data.weekly_distance);
-          data.weekly_kudos_by_sport["Total"] = Object.values(data.weekly_kudos);
-          data.weekly_activities_by_sport["Total"] = Object.values(data.weekly_activities);
-
-          setMetadata(metadata);
-          setData(data);
-          setLoaded(true);
-        })
-        .catch(err => {
-          console.log("Error while fetching analysis.json:", err.message);
-        });
-    }
-
+    // TODO: remove animation; make static gradient
     const startGradientAnimation = () => {
       const banner = document.querySelector(".App .banner");
       const options = {
@@ -138,7 +79,7 @@ function App() {
       ], options);
     }
 
-    fetchAnalysis();
+    fetchAnalysis(app, setData, setMetadata, setLoaded);
     startGradientAnimation();
   }, []);
 

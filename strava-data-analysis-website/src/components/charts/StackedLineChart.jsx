@@ -1,5 +1,5 @@
 import ReactECharts from "echarts-for-react";
-import { mergeObjects, useTheme, getCumulative, formatDate } from "../../util";
+import { useTheme, getCumulative } from "../../util";
 import { useEffect, useState } from "react";
 import "./StackedLineChart.css";
 import Checkbox from "../core/Checkbox";
@@ -137,14 +137,13 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       },
       backgroundColor: colors.backgroundColor,
       // priorities (lowest to highest): default xAxis obj, given xAxis obj, xAxis obj with filtered data, 
-      xAxis: mergeObjects(mergeObjects({
+      xAxis: Object.assign(xAxis, {
         type: "category",
-      }, xAxis), {
         data: filteredXAxis,
       }),
-      yAxis: mergeObjects({
+      yAxis: Object.assign(yAxis, {
         type: "value",
-      }, yAxis),
+      }),
       legend: {},
       series: Object.entries(data).reduce((arr, [category, valueData]) => {
         arr.push({

@@ -1,31 +1,38 @@
 import { useEffect, useState } from "react";
 
-function mergeObjects(baseObj, addObj, override = true, copy = true) {
-  if (baseObj == null) {
-    return {};
-  }
-  if (addObj == null) {
-    return baseObj;
-  }
+/**
+ * Converts meters to miles.
+ * @param {number} m - The number of meters.
+ * @return {number} The number of miles.
+ */
+function mToMi(m) {
+  return m / 1609;
+}
 
-  let result;
-  if (copy) {
-    result = JSON.parse(JSON.stringify(baseObj));
-  } else {
-    result = baseObj;
-  }
+/**
+ * Converts seconds to hours.
+ * @param {number} s - The number of seconds.
+ * @return {number} The number of hours.
+ */
+function sToHrs(s) {
+  return s / 3600;
+}
 
-  for (const key in addObj) {
-    if (override) {
-      result[key] = addObj[key];
-    } else {
-      if (!(key in baseObj)) {
-        result[key] = addObj[key];
-      }
+/**
+ * Fills in missing keys in a subset object with a default value.
+ * @param {Object} superset - The object to use as the superset.
+ * @param {Object} subset - The object to fill in missing keys for.
+ * @param {any} defaultValue - The default value to use for missing keys.
+ * @return {Object} The filled-in subset object.
+ */
+function fillKeys(superset, subset, defaultValue = 0) {
+  for (const key in superset) {
+    if (!(key in subset)) {
+      subset[key] = defaultValue;
     }
   }
 
-  return result;
+  return subset;
 }
 
 function useTheme() {
@@ -54,33 +61,4 @@ function getCumulative(arr) {
   }, []);
 }
 
-function formatDate(dateStr, from, to) {
-  const date = {
-    month: 0,
-    day: 0,
-    year: 0,
-  };
-  let result = "";
-
-  if (from === "mm/dd/yyyy") {
-    const split = dateStr.split("/");
-    date.month = Number(split[0]);
-    date.day = Number(split[1]);
-    date.year = Number(split[2]);
-  } else if (from === "yyyy-mm-dd") {
-    const split = dateStr.split("-");
-    date.year = Number(split[0]);
-    date.month = Number(split[1]);
-    date.day = Number(split[2]);
-  }
-
-  if (to  === "yyyy-mm-dd") {
-    result = `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
-  } else if (to === "mm/dd/yyyy") {
-    result = `${String(date.month).padStart(2, "0")}/${String(date.day).padStart(2, "0")}/${date.year}`;
-  }
-
-  return result;
-}
-
-export { mergeObjects, useTheme, getCumulative, formatDate };
+export { mToMi, sToHrs, fillKeys, useTheme, getCumulative };
