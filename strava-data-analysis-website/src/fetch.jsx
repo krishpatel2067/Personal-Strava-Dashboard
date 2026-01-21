@@ -31,10 +31,17 @@ async function fetchAndProcessAnalysis(app, setData, setMetadata, setLoaded) {
 
                 // e.g. activities, distance, kudos, etc.
                 for (const key2 of Object.keys(data.activities[period][key1])) {
-                    for (const sport of Object.keys(data.activities[period][key1][key2])) {
-                        data.activities[period][key1][key2][sport] = {
+                    if (key1 === "overall") {
+                        data.activities[period][key1][key2] = {
                             ...tsDefaults[period],
-                            ...data.activities[period][key1][key2][sport]
+                            ...data.activities[period][key1][key2]
+                        }
+                    } else if (key1 === "by_sport") {
+                        for (const sport of Object.keys(data.activities[period][key1][key2])) {
+                            data.activities[period][key1][key2][sport] = {
+                                ...tsDefaults[period],
+                                ...data.activities[period][key1][key2][sport]
+                            }
                         }
                     }
                 }

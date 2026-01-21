@@ -206,7 +206,6 @@ function App() {
                   headers={["", "Activities Count"]}
                 />
 
-                {/* TODO: fix Total not showing up in chart... */}
                 <ChartCard
                   name="Distance Per Week"
                   chart={
