@@ -1,21 +1,16 @@
 import { useEffect, useState } from 'react';
-import './App.css'
 import { initializeApp } from 'firebase/app';
 
-import { mToMi, sToHrs } from "./util";
 import { fetchAndProcessAnalysis } from "./fetch";
 
-import StatCard from './components/cards/StatCard';
-import TableCard from './components/cards/TableCard';
-import ChartCard from './components/cards/ChartCard';
-import StackedLineChart from './components/charts/StackedLineChart';
-import Tooltip from './components/core/Tooltip';
+import Dashboard from './components/sections/Dashboard';
+import About from './components/sections/About';
+import Header from './components/sections/Header';
+import Footer from './components/sections/Footer';
+import './App.css'
 
-import downArrow from "./assets/down_arrow.svg";
-import githubIcon from "./assets/github_icon.svg";
-import linkedinIcon from "./assets/linkedin_icon.svg";
-import stravaIcon from "./assets/strava_icon.svg";
 // TODO: style text and date inputs; make tooltip render over graph tooltip; add tip to interact with graphs
+// TODO: add shoes
 
 const app = initializeApp({
   apiKey: import.meta.env.VITE_APP_API_KEY,
@@ -27,282 +22,23 @@ const app = initializeApp({
   measurementId: import.meta.env.VITE_APP_MEASUREMENT_ID,
 });
 
-const TOOLTIPS = {
-  chartCard: (
-    <p>
-      <b>Show the past [x] weeks</b>: Start x-axis range from <i>x</i> weeks ago up to now, both inclusive. <i>x</i> must be positive. Leave blank to show all available weeks.
-      <br />
-      <b>Show only weeks from [date1] to [date2]</b>: Start x-axis range from the week that includes <i>date1</i> to the week that includes <i>date2</i>, both inclusive.
-      <br />
-      <b>Cumulative</b>: Toggle to view data cumulatively or not.
-      <br />
-      <b>Toggling series</b>: Click its respective name in the legend.
-      <br />
-      Weeks start on Monday (to match Strava).
-    </p>
-  )
-};
-
 function App() {
   const [loaded, setLoaded] = useState(false);
   const [metadata, setMetadata] = useState({});
   const [data, setData] = useState({});
 
   useEffect(() => {
-    // TODO: remove animation; make static gradient
-    const startGradientAnimation = () => {
-      const banner = document.querySelector(".App .banner");
-      const options = {
-        duration: 1000 * Math.floor(Math.random() * 11 + 10),
-        easing: "ease-in-out",
-        direction: "alternate",
-        iterations: Infinity
-      };
-      banner.animate([
-        {
-          "--x": `${Math.floor(Math.random() * 101)}%`,
-          "--y": `${Math.floor(Math.random() * 101)}%`
-        },
-        {
-          "--x": `${Math.floor(Math.random() * 101)}%`,
-          "--y": `${Math.floor(Math.random() * 101)}%`
-        }
-      ], options);
-
-      banner.animate([
-        {
-          "--stop": `${Math.floor(Math.random() * 81 + 20)}%`,
-        },
-        {
-          "--stop": `${Math.floor(Math.random() * 81 + 20)}%`
-        }
-      ], options);
-    }
-
     fetchAndProcessAnalysis(app, setData, setMetadata, setLoaded);
-    startGradientAnimation();
   }, []);
 
   // equalize the time zone offset then convert to locale date string for localization without auto-adjusting dates by time zone
-  const xAxisApplyFunc = (epoch) => new Date(epoch + new Date().getTimezoneOffset() * 60 * 1000).toLocaleDateString()
 
   return (
     <div className="App">
-      <header>
-        <div className="banner">
-          <div className="container">
-            <h1 className="title">Personal Strava Dashboard</h1>
-            <p className="subtitle">Krish A. Patel</p>
-            <a href="https://github.com/krishpatel2067/Personal-Strava-Dashboard" target="_blank" className="repo">
-              <img src={githubIcon} className="icon" />
-              <span>Repository</span>
-            </a>
-            <div className="scroll-hint">
-              <p>Scroll</p>
-              <img src={downArrow} className="down-arrow" />
-            </div>
-          </div>
-        </div>
-      </header>
-      <section className="info">
-        <h2>Info</h2>
-        <h3>Background</h3>
-        <p>
-          Since the fall 2021 season of cross country, I have had a passion for running, and from summer 2023, I have been using Strava to post my runs, walks, and other workouts. Lucky for me, Strava has a web API to get a user's activities, and that's how the idea for his project started.
-        </p>
-        <h3>About</h3>
-        <p>
-          Personal Strava Dashboard is a statically hosted site that displays the summary statistics calculated from all my Strava activities. Every day, two serverless cloud functions are scheduled to run automatically: one fetches the raw data from Strava, and the other analyzes that data to prepare a clean set of statistics. Finally, this website displays those numbers via cards.
-        </p>
-        <h3>Features</h3>
-        <ul>
-          <li><b>Graph interactivity</b>: On top of built-in ECharts interactivity, some visualizations offer, for instance, the ability to restrict the x-axis to "zoom" in and out on the graph.</li>
-          <li><b>Responsive design</b>: Works on both desktop and mobile. However, the graphs are much easier to interact with on desktop.</li>
-          <li><b>Light and dark mode</b>: Automatically adheres to the device theme.</li>
-        </ul>
-        <h3>Technologies Used</h3>
-        <ul>
-          <li><b>Strava API v3</b>: Authorizes access to my Strava data.</li>
-          <li><b>Firebase</b>
-            <ul>
-              <li><b>Storage</b>: Holds both the JSON files containing the latest raw and analyzed data.</li>
-              <li><b>Functions</b>: Automatically fetches (via JavaScript) and analyzes (via Python and Pandas) the data.</li>
-              <li><b>Firestore</b>: Stores the necessary credentials for accessing my Strava data.</li>
-              <li><b>Hosting</b>: Statically hosts this site.</li>
-            </ul>
-          </li>
-          <li><b>React</b>: Creates the structure and logic of this website.</li>
-          <li><b>Apache ECharts</b>: Displays various visualizations.</li>
-        </ul>
-        <h3>Future Plans</h3>
-        <p>
-          Apart from internal changes (such as refining the codebase), my main plan is to incrementally add new stats and visualizations as I think of them. A smaller plan is to explore better grid options since the current flexbox method has some awkward edge cases.
-        </p>
-      </section>
-      <main>
-        <h2>Stats</h2>
-        <div className="container">
-          {
-            loaded ? (
-              <>
-                <StatCard
-                  name="Total Distance"
-                  stat={mToMi(data.activities.total.overall.distance)}
-                  units="mi"
-                />
-                <StatCard
-                  name="Total Moving Time"
-                  stat={sToHrs(data.activities.total.overall.moving_time)}
-                  units="hrs"
-                />
-                <StatCard
-                  name="Total Elapsed Time"
-                  stat={sToHrs(data.activities.total.overall.elapsed_time)}
-                  units="hrs"
-                />
-                <StatCard
-                  name="Total Elevation Gain"
-                  stat={data.activities.total.overall.elevation_gain}
-                  units="m"
-                />
-                <StatCard
-                  name="Total Kudos"
-                  stat={data.activities.total.overall.kudos}
-                />
-                <StatCard
-                  name="Total Activities"
-                  stat={data.activities.total.overall.activities}
-                />
-                <StatCard
-                  name="Total Recorded Activities"
-                  stat={data.activities.total.overall.recorded_activities}
-                />
-                <TableCard
-                  name="Distance by Sport"
-                  // sort by distance, descending
-                  data={Object.entries(data.activities.total.by_sport.distance).sort((a, b) => b[1] - a[1])}
-                  headers={["", "Distance (mi)"]}
-                  applyFunc={(val) => Math.round(mToMi(val))}
-                />
-                <TableCard
-                  name="Elevation Gain by Sport"
-                  // sort by elevation gain, descending
-                  data={Object.entries(data.activities.total.by_sport.elevation_gain).sort((a, b) => b[1] - a[1])}
-                  headers={["", "Elevation Gain (m)"]}
-                  applyFunc={Math.round}
-                />
-
-                <TableCard
-                  name="Kudos by Sport"
-                  // sort by kudos, descending
-                  data={Object.entries(data.activities.total.by_sport.kudos).sort((a, b) => b[1] - a[1])}
-                  headers={["", "Kudos Count"]}
-                />
-
-                <TableCard
-                  name="Activities by Sport"
-                  // sort by activities, descending
-                  data={Object.entries(data.activities.total.by_sport.activities).sort((a, b) => b[1] - a[1])}
-                  headers={["", "Activities Count"]}
-                />
-
-                <ChartCard
-                  name="Distance Per Week"
-                  chart={
-                    <StackedLineChart
-                      data={{
-                        ...data.activities.weekly.by_sport.distance,
-                        "Total": data.activities.weekly.overall.distance
-                      }}
-                      applyFunc={distance => Math.round(mToMi(distance))}
-                      xAxisApplyFunc={xAxisApplyFunc}
-                      xAxis={{
-                        name: "Date",
-                        data: data.activities.weekly.timestamps
-                      }}
-                      yAxis={{
-                        name: "Distance (mi)",
-                      }}
-                    />
-                  }
-                  tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-                />
-
-                <ChartCard
-                  name="Kudos Per Week"
-                  chart={
-                    <StackedLineChart
-                      data={{
-                        ...data.activities.weekly.by_sport.kudos,
-                        "Total": data.activities.weekly.overall.kudos
-                      }}
-                      xAxisApplyFunc={xAxisApplyFunc}
-                      xAxis={{
-                        name: "Date",
-                        data: data.activities.weekly.timestamps
-                      }}
-                      yAxis={{
-                        name: "Kudos Count",
-                      }}
-                      pastWeeksDefaultValue={25}
-                    />
-                  }
-                  tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-                />
-
-                <ChartCard
-                  name="Activities Per Week"
-                  chart={
-                    <StackedLineChart
-                      data={{
-                        ...data.activities.weekly.by_sport.activities,
-                        "Total": data.activities.weekly.overall.activities
-                      }}
-                      xAxisApplyFunc={xAxisApplyFunc}
-                      xAxis={{
-                        name: "Date",
-                        data: data.activities.weekly.timestamps
-                      }}
-                      yAxis={{
-                        name: "Activities Count",
-                      }}
-                      pastWeeksDefaultValue={25}
-                    />
-                  }
-                  tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-                />
-              </>
-            ) : (
-              <p>Loading...</p>
-            )
-          }
-        </div>
-      </main>
-      <footer>
-        <div className="inner-container">
-          <p>Connect with me</p>
-          <div className="contacts-container">
-            <a href="https://www.linkedin.com/in/krishpatel2067/" target="_blank" className="contact">
-              <img src={linkedinIcon} className="icon" />
-            </a>
-            <a href="https://github.com/krishpatel2067" target="_blank" className="contact">
-              <img src={githubIcon} className="icon" />
-            </a>
-            <a href="https://www.strava.com/athletes/120371207" target="_blank" className="contact">
-              <img src={stravaIcon} className="icon" />
-            </a>
-          </div>
-          <p>
-            <b>Last fetched</b>: {loaded ? new Date(metadata.fetch_end).toLocaleString() : "Loading..."}
-            <br />
-            <b>Last analyzed</b>: {loaded ? new Date(metadata.analysis_end).toLocaleString() : "Loading..."}
-          </p>
-          <p>This website is not affiliated with <a href="https://www.strava.com/" target="_blank">Strava</a>.</p>
-          <p>
-            &#169; {new Date().getFullYear()} Krish A. Patel
-          </p>
-        </div>
-      </footer>
+      <Header />
+      <Dashboard data={data} loaded={loaded} />
+      <About />
+      <Footer metadata={metadata} loaded={loaded} />
     </div>
   );
 }
