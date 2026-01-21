@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 import "./StackedLineChart.css";
 import Checkbox from "../core/Checkbox";
 
+const DEFAULT_PAST_WEEKS = 25;
+
 function StackedLineChart({ option: optionProp, title, data, xAxis,
-  applyFunc: applyFuncProp, xAxisApplyFunc: xAxisApplyFuncProp, yAxis, pastWeeksDefaultValue }) {
+  applyFunc: applyFuncProp, xAxisApplyFunc: xAxisApplyFuncProp, yAxis }) {
   const [option, setOption] = useState({});
   // form
   const [filterType, setFilterType] = useState("weeksPast");
-  const [weeksPast, setWeeksPast] = useState(String(pastWeeksDefaultValue) ?? "25");
+  const [weeksPast, setWeeksPast] = useState(String(DEFAULT_PAST_WEEKS));
   // stored at ms since Epoch
   const [dateBounds, setDateBounds] = useState({
-    dateFrom: xAxis.data.at(pastWeeksDefaultValue <= xAxis.data.length ? -pastWeeksDefaultValue : 0),
+    dateFrom: xAxis.data.at(DEFAULT_PAST_WEEKS <= xAxis.data.length ? -DEFAULT_PAST_WEEKS : 0),
     dateTo: xAxis.data.at(-1)
   });
   const [formError, setFormError] = useState("");

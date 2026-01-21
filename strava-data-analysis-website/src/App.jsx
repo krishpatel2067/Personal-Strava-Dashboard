@@ -218,55 +218,59 @@ function App() {
                       xAxisApplyFunc={xAxisApplyFunc}
                       xAxis={{
                         name: "Date",
-                        data: loaded ? data.activities.weekly.timestamps : []
+                        data: data.activities.weekly.timestamps
                       }}
                       yAxis={{
                         name: "Distance (mi)",
+                      }}
+                    />
+                  }
+                  tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
+                />
+
+                <ChartCard
+                  name="Kudos Per Week"
+                  chart={
+                    <StackedLineChart
+                      data={{
+                        ...data.activities.weekly.by_sport.kudos,
+                        "Total": data.activities.weekly.overall.kudos
+                      }}
+                      xAxisApplyFunc={xAxisApplyFunc}
+                      xAxis={{
+                        name: "Date",
+                        data: data.activities.weekly.timestamps
+                      }}
+                      yAxis={{
+                        name: "Kudos Count",
                       }}
                       pastWeeksDefaultValue={25}
                     />
                   }
                   tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
                 />
-                {/*
-          <ChartCard
-            name="Kudos Per Week"
-            chart={
-              <StackedLineChart
-                data={data.weekly_kudos_by_sport}
-                xAxisApplyFunc={xAxisApplyFunc}
-                xAxis={{
-                  name: "Date",
-                  data: loaded ? data.activities.weekly.timestamps : []
-                }}
-                yAxis={{
-                  name: "Kudos Count",
-                }}
-                pastWeeksDefaultValue={25}
-              />
-            }
-            tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-            loaded={loaded}
-          />
-          <ChartCard
-            name="Activities Per Week"
-            chart={
-              <StackedLineChart
-                data={data.weekly_activities_by_sport}
-                xAxisApplyFunc={xAxisApplyFunc}
-                xAxis={{
-                  name: "Date",
-                  data: loaded ? data.activities.weekly.timestamps : []
-                }}
-                yAxis={{
-                  name: "Activities Count",
-                }}
-                pastWeeksDefaultValue={25}
-              />
-            }
-            tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
-            loaded={loaded}
-          /> */}
+
+                <ChartCard
+                  name="Activities Per Week"
+                  chart={
+                    <StackedLineChart
+                      data={{
+                        ...data.activities.weekly.by_sport.activities,
+                        "Total": data.activities.weekly.overall.activities
+                      }}
+                      xAxisApplyFunc={xAxisApplyFunc}
+                      xAxis={{
+                        name: "Date",
+                        data: data.activities.weekly.timestamps
+                      }}
+                      yAxis={{
+                        name: "Activities Count",
+                      }}
+                      pastWeeksDefaultValue={25}
+                    />
+                  }
+                  tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
+                />
               </>
             ) : (
               <p>Loading...</p>
