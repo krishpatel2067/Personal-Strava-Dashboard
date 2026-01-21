@@ -94,6 +94,7 @@ body {
   height: calc(100svh + var(--fade-h));
   animation: spin ease-in-out infinite 10s alternate;
   mask-image: linear-gradient(black calc(100% - var(--fade-h)), transparent);
+  position: relative;
 }
 
 @keyframes spin {
@@ -123,9 +124,27 @@ body {
   font-size: 4rem;
 }
 
-.App .banner .subtitle {
+.App .banner .title .version {
+  font-size: 1.5rem;
+}
+
+.App .banner .bottom-container {
+  display: grid;
+  gap: 32px;
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.App .banner .credits-and-repo {
+  display: grid;
+  gap: 16px;
+}
+
+.App .banner .credits {
   font-weight: lighter;
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 .App {
@@ -180,7 +199,7 @@ body {
 
 .App .banner .scroll-hint {
   font-size: 1rem;
-  position: absolute;
+  /* position: absolute; */
   bottom: 32px;
   width: 100%;
   display: grid;

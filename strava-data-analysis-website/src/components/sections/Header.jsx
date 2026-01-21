@@ -41,15 +41,22 @@ function Header() {
     <header className="Header">
       <div className="banner">
         <div className="container">
-          <h1 className="title">Personal Strava Dashboard</h1>
-          <p className="subtitle">Krish A. Patel</p>
-          <a href="https://github.com/krishpatel2067/Personal-Strava-Dashboard" target="_blank" className="repo">
-            <img src={githubIcon} className="icon" />
-            <span>Repository</span>
-          </a>
-          <div className="scroll-hint">
-            <p>Scroll</p>
-            <img src={downArrow} className="down-arrow" />
+          <div className="title">
+            <h1 className="title">Personal Strava Dashboard</h1>
+            <p className="version">v2</p>
+          </div>
+          <div className="bottom-container">
+            <div className="credits-and-repo">
+              <p className="credits">Krish A. Patel</p>
+              <a href="https://github.com/krishpatel2067/Personal-Strava-Dashboard" target="_blank" className="repo">
+                <img src={githubIcon} className="icon" />
+                <span>Repository</span>
+              </a>
+            </div>
+            <div className="scroll-hint">
+              <p>Scroll</p>
+              <img src={downArrow} className="down-arrow" />
+            </div>
           </div>
         </div>
       </div>
