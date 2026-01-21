@@ -24,9 +24,9 @@ function Footer({ metadata, loaded }) {
           <b>Last analyzed</b>: {loaded ? new Date(metadata.analysis_end).toLocaleString() : "Loading..."}
         </p>
         <p>
-          <b>Fetch Duration</b>: {loaded ? Math.round(metadata.fetch_duration).toLocaleString() : "Loading..."} ms
+          <b>Fetch Duration</b>: {loaded ? Math.round(metadata.fetch_duration).toLocaleString() + " ms" : "Loading..."}
           <br />
-          <b>Analysis Duration</b>: {loaded ? Math.round(metadata.analysis_duration).toLocaleString() : "Loading..."} ms
+          <b>Analysis Duration</b>: {loaded ? Math.round(metadata.analysis_duration).toLocaleString() + " ms" : "Loading..."}
         </p>
         <p>This website is not affiliated with <a href="https://www.strava.com/" target="_blank">Strava</a>.</p>
         <p>

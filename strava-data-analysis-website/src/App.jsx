@@ -28,7 +28,12 @@ function App() {
   const [data, setData] = useState({});
 
   useEffect(() => {
-    fetchAndProcessAnalysis(app, setData, setMetadata, setLoaded);
+    (async () => {
+      const { data, metadata } = await fetchAndProcessAnalysis(app);
+      setData(data);
+      setMetadata(metadata);
+      setLoaded(true);
+    })();
   }, []);
 
   // equalize the time zone offset then convert to locale date string for localization without auto-adjusting dates by time zone

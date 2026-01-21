@@ -7,6 +7,7 @@ import { mToMi, sToHrs } from "../../util";
 
 // TODO: improve tooltips to not have to manually calculate position
 // TODO: animate numbers
+// TODO: make cards fade in
 
 const TOOLTIPS = {
   chartCard: (
