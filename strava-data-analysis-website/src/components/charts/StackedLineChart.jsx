@@ -6,17 +6,24 @@ import Checkbox from "../core/Checkbox";
 
 const DEFAULT_PAST_DATAPPOINTS = 25;
 
-function StackedLineChart({ option: optionProp, title, data, xAxis,
-  applyFunc: applyFuncProp, xAxisApplyFunc: xAxisApplyFuncProp, yAxis }) {
+function StackedLineChart({ option: optionProp, title, data, keyName,
+  applyFunc: applyFuncProp, yAxis }) {
   const [option, setOption] = useState({});
   // form
-  const [form, setForm] = useState({
-    filterType: "past",       // "past" (show the past x datapoints) or "between" (between 2 date bounds)
-    datapointsPast: String(DEFAULT_PAST_DATAPPOINTS),
-    // stored at ms since Epoch
-    dateFrom: xAxis.data.at(DEFAULT_PAST_DATAPPOINTS <= xAxis.data.length ? -DEFAULT_PAST_DATAPPOINTS : 0),
-    dateTo: xAxis.data.at(-1),
-    error: ""
+  const [form, setForm] = useState(() => {
+    const obj = {
+      filterType: "past",       // "past" (show the past x datapoints) or "between" (between 2 date bounds)
+      period: "weekly",         // "weekly", "monthly", "yearly"
+      datapointsPast: String(DEFAULT_PAST_DATAPPOINTS),
+      // stored at ms since Epoch
+      error: ""
+    }
+
+    obj.xAxis = { name: "Date", data: data[obj.period].timestamps };
+    obj.dateFrom = obj.xAxis.data.at(DEFAULT_PAST_DATAPPOINTS <= obj.xAxis.data.length ? -DEFAULT_PAST_DATAPPOINTS : 0);
+    obj.dateTo = obj.xAxis.data.at(-1);
+
+    return obj;
   });
   const [funcs, setFuncs] = useState({
     // for filtering based on "show the past x datapoints" (aka x-axis range)
@@ -24,7 +31,6 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     // for calculating cumulative data
     cumFunc: (arr) => arr,
     applyFunc: applyFuncProp != null ? applyFuncProp : (val) => val,
-    xAxisApplyFunc: xAxisApplyFuncProp != null ? xAxisApplyFuncProp : (val) => val,
   });
   const { colors } = useTheme();
 
@@ -33,6 +39,17 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   useEffect(() => {
     onRadioChange({ target: { value: form.filterType } });
   }, []);
+
+  const xAxisApplyFunc = (epoch) => {
+    const date = new Date(epoch + new Date().getTimezoneOffset() * 60 * 1000)
+    if (form.period === "weekly") {
+      return date.toLocaleDateString()
+    } else if (form.period === "monthly") {
+      return date.getMonth() + 1 + "/" + date.getFullYear()
+    } else if (form.period === "yearly") {
+      return date.getFullYear()
+    }
+  };
 
   const onDatapointsPastTextboxChange = (e) => {
     const value = e.target.value;
@@ -47,7 +64,9 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
         ...prev,
         filterFunc: newFilterFunc,
       }));
-      setOptionState(undefined, newFilterFunc);
+      setOptionState({
+        filterFunc: newFilterFunc,
+      });
       setForm((prev) => ({
         ...prev,
         error: ""
@@ -69,13 +88,15 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       ...prev,
       error: ""
     }));
-    const length = xAxis.data.length;
+    const length = form.xAxis.data.length;
     const newFilterFunc = (_, index) => index >= length - numPastDatapoints;
     setFuncs((prev) => ({
       ...prev,
       filterFunc: newFilterFunc,
     }));
-    setOptionState(newFilterFunc);
+    setOptionState({
+      filterFunc: newFilterFunc,
+    });
   };
 
   const onCheckboxChange = (label, input) => {
@@ -92,7 +113,9 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
         ...prev,
         cumFunc: newCumFunc,
       }));
-      setOptionState(undefined, newCumFunc);
+      setOptionState({
+        cumFunc: newCumFunc,
+      });
     }
   }
 
@@ -134,7 +157,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       // newDate is ms since Epoch
       let index = 0;
 
-      while (index < LENGTH && newDate >= xAxis.data[index]) {
+      while (index < form.xAxis.data.length && newDate >= form.xAxis.data[index]) {
         index++;
       }
 
@@ -145,23 +168,49 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       return index;
     }
 
-    const LENGTH = xAxis.data.length
-    let indexStart = 0, indexEnd = LENGTH - 1;
-
-    indexStart = getIndex(newDates.dateFrom);
-    indexEnd = getIndex(newDates.dateTo);
+    let indexStart = getIndex(newDates.dateFrom);
+    let indexEnd = getIndex(newDates.dateTo);
 
     const newFilterFunc = (_, index) => index >= indexStart && index <= indexEnd;
     setFuncs((prev) => ({
       ...prev,
       filterFunc: newFilterFunc,
     }));
-    setOptionState(newFilterFunc);
-  }
+    setOptionState({
+      filterFunc: newFilterFunc,
+    });
+  };
 
-  const setOptionState = (newFilterFunc = funcs.filterFunc, newCumFunc = funcs.cumFunc) => {
+  const onPeriodChange = (e) => {
+    const value = e.target.value;
+    setForm((prev) => ({
+      ...prev,
+      xAxis: { name: "Date", data: data[value].timestamps },
+      period: value,
+    }));
+    console.log("period changed to", value);
+    setOptionState({
+      xAxis: { name: "Date", data: data[value].timestamps },
+      period: value,
+    });
+  };
+
+  const setOptionState = (newState) => {
     // restrict x-axis based on date filter func
-    const filteredXAxis = xAxis.data.map(funcs.xAxisApplyFunc).filter(newFilterFunc);
+    newState = {
+      filterFunc: funcs.filterFunc,
+      cumFunc: funcs.cumFunc,
+      period: form.period,
+      xAxis: form.xAxis,
+      ...newState,
+    };
+    console.log("newState", newState);
+    const filteredXAxis = newState.xAxis.data.map(xAxisApplyFunc).filter(newState.filterFunc);
+    const seriesData = {
+      ...data[newState.period].by_sport[keyName],
+      "Total": data[newState.period].overall[keyName],
+    };
+    console.log("seriesData", seriesData);
     const newOption = optionProp ?? {
       title: {
         text: title
@@ -173,7 +222,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       backgroundColor: colors.backgroundColor,
       // priorities (lowest to highest): default xAxis obj, given xAxis obj, xAxis obj with filtered data, 
       xAxis: {
-        ...xAxis,
+        ...newState.xAxis,
         type: "category",
         data: filteredXAxis,
       },
@@ -182,13 +231,13 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
         type: "value",
       },
       legend: {},
-      series: Object.entries(data).reduce((arr, [category, valueData]) => {
+      series: Object.entries(seriesData).reduce((arr, [category, valueData]) => {
         arr.push({
           name: category,
           type: "line",
           showSymbol: filteredXAxis.length <= 50,
-          data: newCumFunc(Object.values(valueData))      // whether or not it's cumulative
-            .filter(newFilterFunc)                        // filter by date
+          data: newState.cumFunc(Object.values(valueData))      // whether or not it's cumulative
+            .filter(newState.filterFunc)                        // filter by date
             .map(datapoint => funcs.applyFunc(datapoint))       // e.g., any formatting for each point
         });
         return arr;
@@ -200,7 +249,11 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
   return (
     <div className="StackedLineChart">
       <form className="controls">
-        <Checkbox label="Cumulative" onChange={onCheckboxChange} />
+        <select className="filter-choice" value={form.period} onChange={onPeriodChange}>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
         <div className="filter-choices">
           <label>
             <input
@@ -249,6 +302,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
             </span>
           </label>
         </div>
+        <Checkbox label="Cumulative" onChange={onCheckboxChange} />
         <p className="form-error">{form.error}</p>
       </form>
       <ReactECharts

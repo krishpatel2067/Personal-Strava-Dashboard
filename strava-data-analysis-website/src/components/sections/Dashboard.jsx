@@ -25,8 +25,6 @@ const TOOLTIPS = {
   )
 };
 
-const xAxisApplyFunc = (epoch) => new Date(epoch + new Date().getTimezoneOffset() * 60 * 1000).toLocaleDateString()
-
 function Dashboard({ data, loaded }) {
   return (
     <main className="Dashboard">
@@ -99,16 +97,9 @@ function Dashboard({ data, loaded }) {
                 name="Distance Per Week"
                 chart={
                   <StackedLineChart
-                    data={{
-                      ...data.activities.weekly.by_sport.distance,
-                      "Total": data.activities.weekly.overall.distance
-                    }}
+                    data={data.activities}
+                    keyName="distance"
                     applyFunc={distance => Math.round(mToMi(distance))}
-                    xAxisApplyFunc={xAxisApplyFunc}
-                    xAxis={{
-                      name: "Date",
-                      data: data.activities.weekly.timestamps
-                    }}
                     yAxis={{
                       name: "Distance (mi)",
                     }}
@@ -121,15 +112,8 @@ function Dashboard({ data, loaded }) {
                 name="Kudos Per Week"
                 chart={
                   <StackedLineChart
-                    data={{
-                      ...data.activities.weekly.by_sport.kudos,
-                      "Total": data.activities.weekly.overall.kudos
-                    }}
-                    xAxisApplyFunc={xAxisApplyFunc}
-                    xAxis={{
-                      name: "Date",
-                      data: data.activities.weekly.timestamps
-                    }}
+                    data={data.activities}
+                    keyName="kudos"
                     yAxis={{
                       name: "Kudos Count",
                     }}
@@ -143,15 +127,8 @@ function Dashboard({ data, loaded }) {
                 name="Activities Per Week"
                 chart={
                   <StackedLineChart
-                    data={{
-                      ...data.activities.weekly.by_sport.activities,
-                      "Total": data.activities.weekly.overall.activities
-                    }}
-                    xAxisApplyFunc={xAxisApplyFunc}
-                    xAxis={{
-                      name: "Date",
-                      data: data.activities.weekly.timestamps
-                    }}
+                    data={data.activities}
+                    keyName="activities"
                     yAxis={{
                       name: "Activities Count",
                     }}
