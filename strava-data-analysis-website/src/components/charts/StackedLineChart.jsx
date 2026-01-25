@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import "./StackedLineChart.css";
 import Checkbox from "../core/Checkbox";
 
-const DEFAULT_PAST_WEEKS = 25;
+const DEFAULT_PAST_DATAPPOINTS = 25;
 
 function StackedLineChart({ option: optionProp, title, data, xAxis,
   applyFunc: applyFuncProp, xAxisApplyFunc: xAxisApplyFuncProp, yAxis }) {
   const [option, setOption] = useState({});
   // form
   const [form, setForm] = useState({
-    filterType: "weeksPast",
-    weeksPast: String(DEFAULT_PAST_WEEKS),
+    filterType: "past",       // "past" (show the past x datapoints) or "between" (between 2 date bounds)
+    datapointsPast: String(DEFAULT_PAST_DATAPPOINTS),
     // stored at ms since Epoch
-    dateFrom: xAxis.data.at(DEFAULT_PAST_WEEKS <= xAxis.data.length ? -DEFAULT_PAST_WEEKS : 0),
+    dateFrom: xAxis.data.at(DEFAULT_PAST_DATAPPOINTS <= xAxis.data.length ? -DEFAULT_PAST_DATAPPOINTS : 0),
     dateTo: xAxis.data.at(-1),
     error: ""
   });
@@ -34,11 +34,11 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     onRadioChange({ target: { value: form.filterType } });
   }, []);
 
-  const onWeeksPastTextboxChange = (e) => {
+  const onDatapointsPastTextboxChange = (e) => {
     const value = e.target.value;
     setForm((prev) => ({
       ...prev,
-      weeksPast: value,
+      datapointsPast: value,
     }));
 
     if (value === "") {
@@ -103,9 +103,9 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       filterType: value,
     }));
 
-    if (value === "weeksPast") {
-      onWeeksPastTextboxChange({ target: { value: String(form.weeksPast) } });
-    } else if (value === "weeksBetween") {
+    if (value === "past") {
+      onDatapointsPastTextboxChange({ target: { value: String(form.datapointsPast) } });
+    } else if (value === "between") {
       onDateChange({ target: { name: "weekFrom", value: new Date(form.dateFrom).toISOString().split("T")[0] } });
       onDateChange({ target: { name: "weekTo", value: new Date(form.dateTo).toISOString().split("T")[0] } });
     }
@@ -206,27 +206,27 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
             <input
               type="radio"
               name="filter"
-              value="weeksPast"
+              value="past"
               onChange={onRadioChange}
-              checked={form.filterType === "weeksPast"}
+              checked={form.filterType === "past"}
             />
             <span className="textbox-container">
               <span>Show the past </span>
               <input
                 type="number"
-                value={form.weeksPast}
-                onChange={onWeeksPastTextboxChange}
-                disabled={form.filterType !== "weeksPast"}
+                value={form.datapointsPast}
+                onChange={onDatapointsPastTextboxChange}
+                disabled={form.filterType !== "past"}
               />
-              <span> weeks</span>
+              <span> datapoints</span>
             </span>
           </label>
           <label>
             <input
               type="radio"
               name="filter"
-              value="weeksBetween"
-              checked={form.filterType === "weeksBetween"}
+              value="between"
+              checked={form.filterType === "between"}
               onChange={onRadioChange}
             />
             <span className="textbox-container">
@@ -236,7 +236,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
                 name="dateFrom"
                 onChange={onDateChange}
                 value={new Date(form.dateFrom).toISOString().split("T")[0]}
-                disabled={form.filterType !== "weeksBetween"}
+                disabled={form.filterType !== "between"}
               />
               <span> to </span>
               <input
@@ -244,7 +244,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
                 name="dateTo"
                 onChange={onDateChange}
                 value={new Date(form.dateTo).toISOString().split("T")[0]}
-                disabled={form.filterType !== "weeksBetween"}
+                disabled={form.filterType !== "between"}
               />
             </span>
           </label>
