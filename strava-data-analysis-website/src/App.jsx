@@ -11,6 +11,7 @@ import './App.css'
 
 // TODO: style text and date inputs; make tooltip render over graph tooltip; add tip to interact with graphs
 // TODO: add shoes
+// TODO: improve styles (perhaps custom drop downs!)
 
 const app = initializeApp({
   apiKey: import.meta.env.VITE_APP_API_KEY,
