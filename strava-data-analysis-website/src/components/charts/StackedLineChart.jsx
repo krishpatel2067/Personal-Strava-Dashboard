@@ -6,6 +6,12 @@ import Checkbox from "../core/Checkbox";
 
 const DEFAULT_PAST_DATAPPOINTS = 25;
 
+const PERIOD_TO_X_AXIS_NAME = {
+  weekly: "Week",
+  monthly: "Month",
+  yearly: "Year",
+}
+
 // TODO: ensure date bounds work with monthly and yearly
 function StackedLineChart({ title, data, keyName,
   applyFunc: applyFuncProp, yAxis }) {
@@ -20,7 +26,7 @@ function StackedLineChart({ title, data, keyName,
       error: ""
     }
 
-    obj.xAxis = { name: "Date", data: data[obj.period].timestamps };
+    obj.xAxis = { name: PERIOD_TO_X_AXIS_NAME[obj.period], data: data[obj.period].timestamps };
     obj.dateFrom = obj.xAxis.data.at(DEFAULT_PAST_DATAPPOINTS <= obj.xAxis.data.length ? -DEFAULT_PAST_DATAPPOINTS : 0);
     obj.dateTo = obj.xAxis.data.at(-1);
 
@@ -41,14 +47,14 @@ function StackedLineChart({ title, data, keyName,
     onRadioChange({ target: { value: form.filterType } });
   }, []);
 
-  const xAxisApplyFunc = (epoch) => {
+  const xAxisApplyFunc = (epoch, period) => {
     const date = new Date(epoch + new Date().getTimezoneOffset() * 60 * 1000)
-    if (form.period === "weekly") {
-      return date.toLocaleDateString()
-    } else if (form.period === "monthly") {
-      return date.getMonth() + 1 + "/" + date.getFullYear()
-    } else if (form.period === "yearly") {
-      return date.getFullYear()
+    if (period === "weekly") {
+      return date.toLocaleDateString();
+    } else if (period === "monthly") {
+      return date.getMonth() + 1 + "/" + date.getFullYear();
+    } else if (period === "yearly") {
+      return date.getFullYear();
     }
   };
 
@@ -183,7 +189,10 @@ function StackedLineChart({ title, data, keyName,
 
   const onPeriodChange = (e) => {
     const value = e.target.value;
-    const newXAxis = { name: "Date", data: data[value].timestamps };
+    const newXAxis = {
+      name: PERIOD_TO_X_AXIS_NAME[value],
+      data: data[value].timestamps
+    };
     const newFilterFunc = (_, index) => index >= data[value].timestamps.length - form.datapointsPast;
     setForm((prev) => ({
       ...prev,
@@ -211,7 +220,7 @@ function StackedLineChart({ title, data, keyName,
       xAxis: form.xAxis,
       ...newState,
     };
-    const filteredXAxis = newState.xAxis.data.map(xAxisApplyFunc).filter(newState.filterFunc);
+    const filteredXAxis = newState.xAxis.data.map((epoch) => xAxisApplyFunc(epoch, newState.period)).filter(newState.filterFunc);
     const seriesData = {
       ...data[newState.period].by_sport[keyName],
       "Total": data[newState.period].overall[keyName],
