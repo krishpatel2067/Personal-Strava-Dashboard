@@ -6,55 +6,76 @@ import Checkbox from "../core/Checkbox";
 
 const DEFAULT_PAST_WEEKS = 25;
 
+// TODO: fix date between glitch!
 function StackedLineChart({ option: optionProp, title, data, xAxis,
   applyFunc: applyFuncProp, xAxisApplyFunc: xAxisApplyFuncProp, yAxis }) {
   const [option, setOption] = useState({});
   // form
-  const [filterType, setFilterType] = useState("weeksPast");
-  const [weeksPast, setWeeksPast] = useState(String(DEFAULT_PAST_WEEKS));
-  // stored at ms since Epoch
-  const [dateBounds, setDateBounds] = useState({
+  const [form, setForm] = useState({
+    filterType: "weeksPast",
+    weeksPast: String(DEFAULT_PAST_WEEKS),
+    // stored at ms since Epoch
     dateFrom: xAxis.data.at(DEFAULT_PAST_WEEKS <= xAxis.data.length ? -DEFAULT_PAST_WEEKS : 0),
-    dateTo: xAxis.data.at(-1)
+    dateTo: xAxis.data.at(-1),
+    error: ""
   });
-  const [formError, setFormError] = useState("");
-  // for filtering based on "show the past x datapoints" (aka x-axis range)
-  const [filterFunc, setFilterFunc] = useState(() => () => true);
-  // for calculating cumulative data
-  const [cumFunc, setCumFunc] = useState(() => (arr) => arr);
+  const [funcs, setFuncs] = useState({
+    // for filtering based on "show the past x datapoints" (aka x-axis range)
+    filterFunc: () => true,
+    // for calculating cumulative data
+    cumFunc: (arr) => arr,
+    applyFunc: applyFuncProp != null ? applyFuncProp : (val) => val,
+    xAxisApplyFunc: xAxisApplyFuncProp != null ? xAxisApplyFuncProp : (val) => val,
+  });
   const { colors } = useTheme();
-  const applyFunc = applyFuncProp != null ? applyFuncProp : (val) => val;
-  const xAxisApplyFunc = xAxisApplyFuncProp != null ? xAxisApplyFuncProp : (val) => val;
 
   const isDarkTheme = useTheme();
 
   useEffect(() => {
-    onRadioChange({ target: { value: filterType } });
+    onRadioChange({ target: { value: form.filterType } });
   }, []);
 
   const onWeeksPastTextboxChange = (e) => {
     const value = e.target.value;
-    setWeeksPast(value);
+    setForm((prev) => ({
+      ...prev,
+      weeksPast: value,
+    }));
 
     if (value === "") {
       const newFilterFunc = () => true;
-      setFilterFunc(() => newFilterFunc);
-      setOptionState(newFilterFunc);
-      setFormError("");
+      setFuncs((prev) => ({
+        ...prev,
+        filterFunc: newFilterFunc,
+      }));
+      setOptionState(undefined, newFilterFunc);
+      setForm((prev) => ({
+        ...prev,
+        error: ""
+      }));
       return;
     }
 
     const numPastDatapoints = Number(value);
 
     if (numPastDatapoints <= 0) {
-      setFormError("Enter a positive number");
+      setForm((prev) => ({
+        ...prev,
+        error: "Enter a positive number"
+      }));
       return;
     }
 
-    setFormError("");
+    setForm((prev) => ({
+      ...prev,
+      error: ""
+    }));
     const length = xAxis.data.length;
     const newFilterFunc = (_, index) => index >= length - numPastDatapoints;
-    setFilterFunc(() => newFilterFunc);
+    setFuncs((prev) => ({
+      ...prev,
+      filterFunc: newFilterFunc,
+    }));
     setOptionState(newFilterFunc);
   };
 
@@ -68,20 +89,26 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
         newCumFunc = (arr) => arr;
       }
 
-      setCumFunc(() => newCumFunc);
+      setFuncs((prev) => ({
+        ...prev,
+        cumFunc: newCumFunc,
+      }));
       setOptionState(undefined, newCumFunc);
     }
   }
 
   const onRadioChange = (e) => {
     const value = e.target.value;
-    setFilterType(value);
+    setForm((prev) => ({
+      ...prev,
+      filterType: value,
+    }));
 
     if (value === "weeksPast") {
-      onWeeksPastTextboxChange({ target: { value: String(weeksPast) } });
+      onWeeksPastTextboxChange({ target: { value: String(form.weeksPast) } });
     } else if (value === "weeksBetween") {
-      onDateChange({ target: { name: "weekFrom", value: new Date(dateBounds.dateFrom).toISOString().split("T")[0] } });
-      onDateChange({ target: { name: "weekTo", value: new Date(dateBounds.dateTo).toISOString().split("T")[0] } });
+      onDateChange({ target: { name: "weekFrom", value: new Date(form.dateFrom).toISOString().split("T")[0] } });
+      onDateChange({ target: { name: "weekTo", value: new Date(form.dateTo).toISOString().split("T")[0] } });
     }
   }
 
@@ -93,12 +120,10 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       return;
     }
 
-    const newDateBounds = {
-      ...dateBounds,
+    setForm((prev) => ({
+      ...prev,
       [name]: new Date(value).getTime(),
-    };
-
-    setDateBounds(newDateBounds);
+    }));
 
     const getIndex = (newDate) => {
       // newDate is ms since Epoch
@@ -118,17 +143,20 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     const LENGTH = xAxis.data.length
     let indexStart = 0, indexEnd = LENGTH - 1;
 
-    indexStart = getIndex(newDateBounds.dateFrom);
-    indexEnd = getIndex(newDateBounds.dateTo);
+    indexStart = getIndex(form.dateFrom);
+    indexEnd = getIndex(form.dateTo);
 
     const newFilterFunc = (_, index) => index >= indexStart && index <= indexEnd;
-    setFilterFunc(() => newFilterFunc);
+    setFuncs((prev) => ({
+      ...prev,
+      filterFunc: newFilterFunc,
+    }));
     setOptionState(newFilterFunc);
   }
 
-  const setOptionState = (newFilterFunc = filterFunc, newCumFunc = cumFunc) => {
+  const setOptionState = (newFilterFunc = funcs.filterFunc, newCumFunc = funcs.cumFunc) => {
     // restrict x-axis based on date filter func
-    const filteredXAxis = xAxis.data.map(xAxisApplyFunc).filter(newFilterFunc);
+    const filteredXAxis = xAxis.data.map(funcs.xAxisApplyFunc).filter(newFilterFunc);
     const newOption = optionProp ?? {
       title: {
         text: title
@@ -156,7 +184,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
           showSymbol: filteredXAxis.length <= 50,
           data: newCumFunc(Object.values(valueData))      // whether or not it's cumulative
             .filter(newFilterFunc)                        // filter by date
-            .map(datapoint => applyFunc(datapoint))       // e.g., any formatting for each point
+            .map(datapoint => funcs.applyFunc(datapoint))       // e.g., any formatting for each point
         });
         return arr;
       }, [])
@@ -175,15 +203,15 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
               name="filter"
               value="weeksPast"
               onChange={onRadioChange}
-              checked={filterType === "weeksPast"}
+              checked={form.filterType === "weeksPast"}
             />
             <span className="textbox-container">
               <span>Show the past </span>
               <input
                 type="number"
-                value={weeksPast}
+                value={form.weeksPast}
                 onChange={onWeeksPastTextboxChange}
-                disabled={filterType !== "weeksPast"}
+                disabled={form.filterType !== "weeksPast"}
               />
               <span> weeks</span>
             </span>
@@ -193,7 +221,7 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
               type="radio"
               name="filter"
               value="weeksBetween"
-              checked={filterType === "weeksBetween"}
+              checked={form.filterType === "weeksBetween"}
               onChange={onRadioChange}
             />
             <span className="textbox-container">
@@ -202,21 +230,21 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
                 type="date"
                 name="dateFrom"
                 onChange={onDateChange}
-                value={new Date(dateBounds.dateFrom).toISOString().split("T")[0]}
-                disabled={filterType !== "weeksBetween"}
+                value={new Date(form.dateFrom).toISOString().split("T")[0]}
+                disabled={form.filterType !== "weeksBetween"}
               />
               <span> to </span>
               <input
                 type="date"
                 name="dateTo"
                 onChange={onDateChange}
-                value={new Date(dateBounds.dateTo).toISOString().split("T")[0]}
-                disabled={filterType !== "weeksBetween"}
+                value={new Date(form.dateTo).toISOString().split("T")[0]}
+                disabled={form.filterType !== "weeksBetween"}
               />
             </span>
           </label>
         </div>
-        <p className="form-error">{formError}</p>
+        <p className="form-error">{form.error}</p>
       </form>
       <ReactECharts
         option={option}
