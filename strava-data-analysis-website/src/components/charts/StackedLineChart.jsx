@@ -6,7 +6,6 @@ import Checkbox from "../core/Checkbox";
 
 const DEFAULT_PAST_WEEKS = 25;
 
-// TODO: fix date between glitch!
 function StackedLineChart({ option: optionProp, title, data, xAxis,
   applyFunc: applyFuncProp, xAxisApplyFunc: xAxisApplyFuncProp, yAxis }) {
   const [option, setOption] = useState({});
@@ -120,9 +119,15 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
       return;
     }
 
+    const newDates = {
+      dateFrom: form.dateFrom,
+      dateTo: form.dateTo,
+      [name]: new Date(value).getTime(),
+    };
+
     setForm((prev) => ({
       ...prev,
-      [name]: new Date(value).getTime(),
+      ...newDates,
     }));
 
     const getIndex = (newDate) => {
@@ -143,8 +148,8 @@ function StackedLineChart({ option: optionProp, title, data, xAxis,
     const LENGTH = xAxis.data.length
     let indexStart = 0, indexEnd = LENGTH - 1;
 
-    indexStart = getIndex(form.dateFrom);
-    indexEnd = getIndex(form.dateTo);
+    indexStart = getIndex(newDates.dateFrom);
+    indexEnd = getIndex(newDates.dateTo);
 
     const newFilterFunc = (_, index) => index >= indexStart && index <= indexEnd;
     setFuncs((prev) => ({
