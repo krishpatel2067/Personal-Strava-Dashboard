@@ -39,9 +39,7 @@ function StackedLineChart({ title, data, keyName,
     cumFunc: (arr) => arr,
     applyFunc: applyFuncProp != null ? applyFuncProp : (val) => val,
   });
-  const { colors } = useTheme();
-
-  const isDarkTheme = useTheme();
+  const { colors, isDarkTheme } = useTheme();
 
   useEffect(() => {
     onRadioChange({ target: { value: form.filterType } });
@@ -338,6 +336,7 @@ function StackedLineChart({ title, data, keyName,
         <p className="form-error">{form.error}</p>
       </form>
       <ReactECharts
+        key={isDarkTheme}
         option={option}
         notMerge={true}
         style={{ maxWidth: "100%", height: "400px" }}
