@@ -2,6 +2,7 @@ import githubIcon from "../../assets/github_icon.svg";
 import linkedinIcon from "../../assets/linkedin_icon.svg";
 import stravaIcon from "../../assets/strava_icon.svg";
 
+// TODO: automated versioning and last deployed date
 function Footer({ metadata, loaded }) {
   return (
     <footer>
@@ -9,6 +10,8 @@ function Footer({ metadata, loaded }) {
         <p><b>Personal Strava Dashboard</b>
           <br />
           Version: 2.1.0
+          <br />
+          Last deployed: {new Date("2026-01-25T00:00:00").toLocaleDateString()}
         </p>
         <p>Connect with me</p>
         <div className="contacts-container">
