@@ -6,6 +6,10 @@ function Footer({ metadata, loaded }) {
   return (
     <footer>
       <div className="inner-container">
+        <p><b>Personal Strava Dashboard</b>
+          <br />
+          Version: 2.1.0
+        </p>
         <p>Connect with me</p>
         <div className="contacts-container">
           <a href="https://www.linkedin.com/in/krishpatel2067/" target="_blank" className="contact">
