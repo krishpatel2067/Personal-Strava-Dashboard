@@ -33,6 +33,7 @@ function useTheme() {
   const computedStyles = getComputedStyle(document.documentElement);
   const colors = {
     backgroundColor: computedStyles.getPropertyValue(`--bkg-col-` + (isDarkTheme ? "dark" : "light")),
+    textColor: computedStyles.getPropertyValue(`--txt-col-` + (isDarkTheme ? "dark" : "light")),
   };
   return { isDarkTheme, colors };
 }

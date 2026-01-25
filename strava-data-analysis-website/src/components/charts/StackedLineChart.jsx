@@ -218,19 +218,42 @@ function StackedLineChart({ title, data, keyName,
     };
     const newOption = {
       title: { text: title },
-      tooltip: { show: true, trigger: "axis" },
       backgroundColor: colors.backgroundColor,
+      tooltip: {
+        show: true,
+        trigger: "axis",
+        backgroundColor: colors.backgroundColor,
+        textStyle: {
+          color: colors.textColor,
+        },
+      },
       // priorities (lowest to highest): default xAxis obj, given xAxis obj, xAxis obj with filtered data, 
       xAxis: {
         ...newState.xAxis,
         type: "category",
         data: filteredXAxis,
+        axisLabel: {
+          color: colors.textColor,
+        },
+        nameTextStyle: {
+          color: colors.textColor,
+        },
       },
       yAxis: {
         ...yAxis,
         type: "value",
+        axisLabel: {
+          color: colors.textColor,
+        },
+        nameTextStyle: {
+          color: colors.textColor,
+        },
       },
-      legend: {},
+      legend: {
+        textStyle: {
+          color: colors.textColor,
+        },
+      },
       series: Object.entries(seriesData).reduce((arr, [category, valueData]) => {
         arr.push({
           name: category,

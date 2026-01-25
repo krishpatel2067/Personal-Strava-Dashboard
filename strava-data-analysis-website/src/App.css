@@ -8,6 +8,9 @@
   --bkg-col-light: white;
   --bkg-col-dark: #1f1f1f;
 
+  --txt-col-light: black;
+  --txt-col-dark: white;
+
   --bkg-col: light-dark(var(--bkg-col-light), var(--bkg-col-dark));
   --secondary-txt-col: light-dark(#666, #999);
 

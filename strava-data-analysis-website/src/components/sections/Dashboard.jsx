@@ -25,6 +25,7 @@ const TOOLTIPS = {
   )
 };
 
+// TODO: make charts refresh upon changing theme
 function Dashboard({ data, loaded }) {
   return (
     <main className="Dashboard">
