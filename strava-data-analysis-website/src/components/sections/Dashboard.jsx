@@ -94,7 +94,7 @@ function Dashboard({ data, loaded }) {
               />
 
               <ChartCard
-                name="Distance Per Week"
+                name="Distance Over Time"
                 chart={
                   <StackedLineChart
                     data={data.activities}
@@ -109,7 +109,7 @@ function Dashboard({ data, loaded }) {
               />
 
               <ChartCard
-                name="Kudos Per Week"
+                name="Kudos Over Time"
                 chart={
                   <StackedLineChart
                     data={data.activities}
@@ -124,7 +124,7 @@ function Dashboard({ data, loaded }) {
               />
 
               <ChartCard
-                name="Activities Per Week"
+                name="Activities Over Time"
                 chart={
                   <StackedLineChart
                     data={data.activities}
