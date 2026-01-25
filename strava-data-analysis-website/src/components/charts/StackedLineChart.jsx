@@ -12,7 +12,7 @@ const PERIOD_TO_X_AXIS_NAME = {
   yearly: "Year",
 }
 
-// TODO: ensure date bounds work with monthly and yearly
+// TODO: organize this code!
 function StackedLineChart({ title, data, keyName,
   applyFunc: applyFuncProp, yAxis }) {
   const [option, setOption] = useState({});
@@ -44,6 +44,10 @@ function StackedLineChart({ title, data, keyName,
   useEffect(() => {
     onRadioChange({ target: { value: form.filterType } });
   }, []);
+
+  // useEffect(() => {
+  //   setOptionState({});
+  // }, [isDarkTheme]);
 
   const xAxisApplyFunc = (epoch, period) => {
     const date = new Date(epoch + new Date().getTimezoneOffset() * 60 * 1000)
@@ -225,42 +229,11 @@ function StackedLineChart({ title, data, keyName,
     };
     const newOption = {
       title: { text: title },
-      backgroundColor: colors.backgroundColor,
-      tooltip: {
-        show: true,
-        trigger: "axis",
-        backgroundColor: colors.backgroundColor,
-        textStyle: {
-          color: colors.textColor,
-        },
-      },
+      tooltip: { show: true, trigger: "axis" },
       // priorities (lowest to highest): default xAxis obj, given xAxis obj, xAxis obj with filtered data, 
-      xAxis: {
-        ...newState.xAxis,
-        type: "category",
-        data: filteredXAxis,
-        axisLabel: {
-          color: colors.textColor,
-        },
-        nameTextStyle: {
-          color: colors.textColor,
-        },
-      },
-      yAxis: {
-        ...yAxis,
-        type: "value",
-        axisLabel: {
-          color: colors.textColor,
-        },
-        nameTextStyle: {
-          color: colors.textColor,
-        },
-      },
-      legend: {
-        textStyle: {
-          color: colors.textColor,
-        },
-      },
+      xAxis: { ...newState.xAxis, type: "category", data: filteredXAxis },
+      yAxis: { ...yAxis, type: "value" },
+      legend: {},
       series: Object.entries(seriesData).reduce((arr, [category, valueData]) => {
         arr.push({
           name: category,
@@ -336,7 +309,6 @@ function StackedLineChart({ title, data, keyName,
         <p className="form-error">{form.error}</p>
       </form>
       <ReactECharts
-        key={isDarkTheme}
         option={option}
         notMerge={true}
         style={{ maxWidth: "100%", height: "400px" }}

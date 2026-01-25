@@ -22,7 +22,14 @@ function useTheme() {
   const [isDarkTheme, setIsDarkTheme] = useState(
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
-  const mqListener = e => setIsDarkTheme(e.matches);
+  const [colors, setColors] = useState({});
+  const mqListener = (e) => {
+    setIsDarkTheme(e.matches);
+    setColors({
+      backgroundColor: computedStyles.getPropertyValue(`--bkg-col-` + (isDarkTheme ? "dark" : "light")),
+      textColor: computedStyles.getPropertyValue(`--txt-col-` + (isDarkTheme ? "dark" : "light")),
+    });
+  };
 
   useEffect(() => {
     const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -31,10 +38,6 @@ function useTheme() {
   }, []);
 
   const computedStyles = getComputedStyle(document.documentElement);
-  const colors = {
-    backgroundColor: computedStyles.getPropertyValue(`--bkg-col-` + (isDarkTheme ? "dark" : "light")),
-    textColor: computedStyles.getPropertyValue(`--txt-col-` + (isDarkTheme ? "dark" : "light")),
-  };
   return { isDarkTheme, colors };
 }
 
