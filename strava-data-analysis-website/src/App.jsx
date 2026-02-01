@@ -43,6 +43,7 @@ function App() {
     <div className="App">
       <Header />
       <Dashboard data={data} loaded={loaded} />
+      <h2>Dashboard</h2>
       <About />
       <Footer metadata={metadata} loaded={loaded} />
     </div>

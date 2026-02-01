@@ -11,8 +11,10 @@
   --txt-col-light: black;
   --txt-col-dark: white;
 
+  /* final properties */
+  --txt-col: light-dark(var(--txt-col-light), var(--txt-col-dark));
   --bkg-col: light-dark(var(--bkg-col-light), var(--bkg-col-dark));
-  --secondary-txt-col: light-dark(#666, #999);
+  --secondary-txt-col: light-dark(#666, #bbb);
 
   accent-color: var(--accent-col-rgb);
   color-scheme: light dark;
@@ -39,9 +41,14 @@ body {
   grid-template-rows: 1fr auto;
 }
 
+.App h2,
+.App h3,
+.App h4 {
+  text-align: center;
+}
+
 .App h2 {
   font-size: 2rem;
-  text-align: center;
 }
 
 .App h3 {
@@ -242,7 +249,7 @@ body {
   width: calc(100% - 32px);
 }
 
-.App main .container {
+.App .Dashboard .container {
   /* --n-cols: 3;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) */
@@ -251,9 +258,11 @@ body {
   gap: 12px;
 }
 
-/* main > * {
-  margin-bottom: 12px;
-} */
+.Dashboard .shoes-container {
+  width: 100%;
+  display: grid;
+  gap: 12px;
+}
 
 footer {
   margin-top: 32px;

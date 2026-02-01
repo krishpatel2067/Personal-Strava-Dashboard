@@ -4,6 +4,7 @@ import ChartCard from '../cards/ChartCard';
 import StackedLineChart from '../charts/StackedLineChart';
 import Tooltip from '../core/Tooltip';
 import { mToMi, sToHrs } from "../../util";
+import ShoeCard from '../cards/ShoeCard';
 
 // TODO: improve tooltips to not have to manually calculate position
 // TODO: animate numbers
@@ -29,10 +30,12 @@ const TOOLTIPS = {
 function Dashboard({ data, loaded }) {
   return (
     <main className="Dashboard">
-      <div className="container">
-        {
-          loaded ? (
-            <>
+      <h2>Dashboard</h2>
+      {
+        loaded ? (
+          <>
+            <h3>Overview</h3>
+            <div className="container">
               <StatCard
                 name="Total Distance"
                 stat={mToMi(data.activities.total.overall.distance)}
@@ -65,6 +68,24 @@ function Dashboard({ data, loaded }) {
                 name="Total Recorded Activities"
                 stat={data.activities.total.overall.recorded_activities}
               />
+            </div>
+            <h3>Shoes</h3>
+            <div className="shoes-container">
+              {data.gear.shoes.sort((a, b) => b.distance - a.distance).map((shoe, index) => (
+                <ShoeCard
+                  key={index}
+                  brandName={shoe.brand_name}
+                  modelName={shoe.model_name}
+                  distance={{
+                    value: Math.round(mToMi(shoe.distance)),
+                    units: "mi"
+                  }}
+                  retired={shoe.retired}
+                />
+              ))}
+            </div>
+            <h3>Advanced</h3>
+            <div className="container">
               <TableCard
                 name="Distance by Sport"
                 // sort by distance, descending
@@ -138,12 +159,12 @@ function Dashboard({ data, loaded }) {
                 }
                 tooltip={<Tooltip content={TOOLTIPS.chartCard} />}
               />
-            </>
-          ) : (
-            <p>Loading...</p>
-          )
-        }
-      </div>
+            </div>
+          </>
+        ) : (
+          <p>Loading...</p>
+        )
+      }
     </main>
   );
 }

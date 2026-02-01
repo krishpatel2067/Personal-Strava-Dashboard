@@ -25,6 +25,7 @@
   font-size: 1em;
   height: fit-content;
   word-wrap: break-word;
+  text-wrap: balance;
 }
 
 .Card .secondary {

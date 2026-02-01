@@ -1,6 +1,6 @@
-import githubIcon from "../../assets/github_icon.svg";
-import linkedinIcon from "../../assets/linkedin_icon.svg";
-import stravaIcon from "../../assets/strava_icon.svg";
+import githubIcon from "../../assets/icons/github_icon.svg";
+import linkedinIcon from "../../assets/icons/linkedin_icon.svg";
+import stravaIcon from "../../assets/icons/strava_icon.svg";
 
 // TODO: automated versioning and last deployed date
 function Footer({ metadata, loaded }) {

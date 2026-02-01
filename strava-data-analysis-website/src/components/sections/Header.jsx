@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import downArrow from "../../assets/down_arrow.svg";
-import githubIcon from "../../assets/github_icon.svg";
+import downArrow from "../../assets/icons/down_arrow.svg";
+import githubIcon from "../../assets/icons/github_icon.svg";
 
 function Header() {
 

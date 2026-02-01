@@ -1,0 +1,37 @@
+.ShoeCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 64px;
+}
+
+.ShoeCard p {
+  margin: 0;
+}
+
+.ShoeCard .data-container {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.ShoeCard .retired,
+.ShoeCard .active {
+  border-radius: 100px;
+  padding: 0px 8px;
+}
+
+.ShoeCard .retired {
+  background-color: var(--secondary-txt-col);
+  color: var(--bkg-col);
+}
+
+.ShoeCard .active {
+  background-color: var(--txt-col);
+  color: var(--bkg-col);
+}
+
+.ShoeCard :is(.retired, .active) p {
+  font-size: 0.875em;
+}

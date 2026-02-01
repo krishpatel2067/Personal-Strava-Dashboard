@@ -39,7 +39,7 @@ function StackedLineChart({ title, data, keyName,
     cumFunc: (arr) => arr,
     applyFunc: applyFuncProp != null ? applyFuncProp : (val) => val,
   });
-  const { colors, isDarkTheme } = useTheme();
+  const { isDarkTheme } = useTheme();
 
   useEffect(() => {
     onRadioChange({ target: { value: form.filterType } });
