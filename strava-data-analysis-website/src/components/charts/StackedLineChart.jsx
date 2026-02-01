@@ -45,10 +45,6 @@ function StackedLineChart({ title, data, keyName,
     onRadioChange({ target: { value: form.filterType } });
   }, []);
 
-  // useEffect(() => {
-  //   setOptionState({});
-  // }, [isDarkTheme]);
-
   const xAxisApplyFunc = (epoch, period) => {
     const date = new Date(epoch + new Date().getTimezoneOffset() * 60 * 1000)
     if (period === "weekly") {

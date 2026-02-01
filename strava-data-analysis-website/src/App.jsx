@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { registerTheme } from 'echarts';
 import { initializeApp } from 'firebase/app';
 
 import { fetchAndProcessAnalysis } from "./fetch";
@@ -9,8 +10,10 @@ import Header from './components/sections/Header';
 import Footer from './components/sections/Footer';
 import './App.css'
 
+import darkTheme from './assets/themes/dark.js';
+
+// TODO: smooth theme transitions
 // TODO: style text and date inputs; make tooltip render over graph tooltip; add tip to interact with graphs
-// TODO: add shoes
 // TODO: improve styles (perhaps custom drop downs!)
 
 const app = initializeApp({
@@ -21,6 +24,43 @@ const app = initializeApp({
   messagingSenderId: import.meta.env.VITE_APP_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_APP_APP_ID,
   measurementId: import.meta.env.VITE_APP_MEASUREMENT_ID,
+});
+
+registerTheme("dark", {
+  ...darkTheme,
+  "backgroundColor": "rgba(0, 0, 0, 0)",
+  tooltip: {
+    textStyle: {
+      color: "#fff",
+    },
+    backgroundColor: "#2f2f2f",
+  },
+  valueAxis: {
+    axisLabel: {
+      color: "#fff",
+    },
+    splitLine: {
+      lineStyle: {
+        color: "#5f5f5f",
+      }
+    }
+  },
+  // TODO: turn axis names white
+  // xAxis: {
+  //   axisLabel: {
+  //     color: "#fff",
+  //   },
+  // },
+  categoryAxis: {
+    axisLabel: {
+      color: "#fff",
+    },
+  },
+  legend: {
+    textStyle: {
+      color: "#fff",
+    },
+  },
 });
 
 function App() {
